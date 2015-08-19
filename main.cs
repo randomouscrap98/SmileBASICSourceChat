@@ -1,15 +1,25 @@
 using MyHelper;
 using System;
+using WebSocketSharp;
+using WebSocketSharp.Server;
 
-public class ChatServer 
+namespace ChatServer
 {
-   public static void Main()
+   public class ChatRunner 
    {
-      var thing = HTTPHelper.ParseHeader("whatever: thing\nmorewhatever: otherthing");
-      
-      foreach(var pair in thing)
-         Console.WriteLine(pair.Key + " had value " + pair.Value);
+      public static void Main()
+      {
+         /*using (var ws = new WebSocket ("ws://www.smilebasicsource.com"))
+           {
 
-      Console.WriteLine("Dude, it ran");
+           }*/
+
+         //var thing = HTTPHelper.ParseHeader("whatever: thing\nmorewhatever: otherthing");
+
+         /*foreach(var pair in thing)
+           Console.WriteLine(pair.Key + " had value " + pair.Value);*/
+
+         Console.WriteLine("Dude, it ran");
+      }
    }
 }
