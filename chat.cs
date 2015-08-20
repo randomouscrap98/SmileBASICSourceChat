@@ -10,7 +10,8 @@ namespace ChatServer
       //I guess this is WHENEVER it receives a message?
       protected override void OnMessage(MessageEventArgs e)
       {
-
+         Sessions.Broadcast(e.Data + " swag");
+         Console.WriteLine("Got message: " + e.Data);
       }
    }
 }
