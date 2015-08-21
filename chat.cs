@@ -59,14 +59,20 @@ namespace ChatServer
          return "";
       }
 
+      //Get a JSON string representing a list of the last 10 messages
       public string GetMessageList()
       {
+         MessageListJSONObject jsonMessages = new MessageListJSONObject();
+
          lock(messageLock)
          {
-            
+            for(int i = 0; i < Math.Min(10, messages.Count); i++)
+               jsonMessages.messages.Add(messages[messages.Count - 1 - i]);
+
+            jsonMessages.messages.Reverse();
          }
 
-         return "";
+         return JsonConvert.SerializeObject(jsonMessages);
       }
 
       protected override void OnOpen()
@@ -78,6 +84,8 @@ namespace ChatServer
       //chatters.
       protected override void OnClose(CloseEventArgs e)
       {
+         Console.WriteLine("Session disconnect: " + username);
+
          lock(chatLock)
          {
             username = "";
@@ -90,6 +98,7 @@ namespace ChatServer
       protected override void OnMessage(MessageEventArgs e)
       {
          ResponseJSONObject response = new ResponseJSONObject();
+         response.result = false;
          dynamic json = new Object();
          string type = "";
 
@@ -103,7 +112,6 @@ namespace ChatServer
          }
          catch
          {
-            response.result = false;
             response.errors.Add("Could not parse JSON");
          }
 
@@ -120,7 +128,6 @@ namespace ChatServer
                //Oops, username was invalid
                if(string.IsNullOrWhiteSpace(newUser))
                {
-                  response.result = true;
                   response.errors.Add("Username was invalid");
                }
                else
@@ -128,7 +135,6 @@ namespace ChatServer
                   //Oops, auth key was invalid
                   if(!CheckAuth(key, newUser))
                   {
-                     response.result = false;
                      response.errors.Add("Key was invalid");
                   }
                   else
@@ -143,7 +149,6 @@ namespace ChatServer
             }
             catch
             {
-               response.result = false;
                response.errors.Add("BIND message was missing fields");
             }
          }
@@ -154,13 +159,12 @@ namespace ChatServer
                //First, gather information from the JSON. THis is so that if
                //the json is invalid, it will fail as soon as possible
                string key = json.key;
-               string message = System.Security.SecurityElement.Escape(json.message);
+               string message = System.Security.SecurityElement.Escape((string)json.text);
                string tag = json.tag;
 
                //Authenticate the user. If not, just quit.
                if(!CheckAuth(key))
                {
-                  response.result = false;
                   response.errors.Add("Your key is invalid");
                }
                else
@@ -175,12 +179,13 @@ namespace ChatServer
                         .ToList();
                   }
 
+                  //Since we added a new message, we need to broadcast.
                   Sessions.Broadcast(GetMessageList());
+                  response.result = true;
                }
             }
             catch
             {
-               response.result = false;
                response.errors.Add("Message was missing fields");
             }
 
@@ -189,7 +194,7 @@ namespace ChatServer
          //Send the "OK" message back.
          Send(JsonConvert.SerializeObject(response));
 
-         Sessions.Broadcast(e.Data);
+         //Sessions.Broadcast(e.Data);
          Console.WriteLine("Got message: " + e.Data);
       }
    }
