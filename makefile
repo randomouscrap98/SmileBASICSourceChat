@@ -9,6 +9,12 @@ chat.exe: main.cs http.cs chat.cs auth.cs string.cs
 run: chat.exe
 	$(run) chat.exe
 
+.PHONY: runserver
+runserver: chat.exe
+	mkdir -p server
+	cp chat.exe *.dll server/
+	$(run) server/chat.exe
+
 .PHONY: clean
 clean:
 	rm -f *.exe

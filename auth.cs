@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Linq;
 using Newtonsoft.Json;
 using MyHelper;
 
@@ -30,7 +31,8 @@ namespace ChatServer
 
       //Auth crap
       private RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
-      private Dictionary<string, string> authCodes = new Dictionary<string, string>();
+      private Dictionary<string, AuthData> authCodes = 
+         new Dictionary<string, AuthData>();
       private Object authLock = new Object();
 
       public AuthServer(int port, bool shouldPrintErrors = false)
@@ -153,8 +155,6 @@ namespace ChatServer
                   client = server.AcceptTcpClient();
                   NetworkStream stream = client.GetStream();
 
-                  Output("Got an authorization client");
-
                   int i = 0;
                   double wait = 0.0;
                   data = "";
@@ -175,10 +175,11 @@ namespace ChatServer
                   }
 
                   //Keep reading until there's nothing left
-                  while((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                  while(stream.DataAvailable)
+                  {
+                     i = stream.Read(bytes, 0, bytes.Length);
                      data += System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-
-                  Output("Read data from authorization client");
+                  }
 
                   //Try to parse the json and send out the auth response
                   dynamic json = JsonConvert.DeserializeObject(data);
@@ -187,10 +188,10 @@ namespace ChatServer
                   if(json.type == "auth")
                   {
                      byte[] response = System.Text.Encoding.ASCII.GetBytes(
-                           GetAuth(json.username));
+                           RequestAuth((string)json.username));
                      stream.Write(response, 0, response.Length);
 
-                     Output("Sent data to authorization client");
+                     Output("Sent authorization token for user: " + json.username);
                   }
                }
                catch (Exception e)
@@ -202,7 +203,6 @@ namespace ChatServer
                   //Now just stop. We're done after the response.
                   if(client != null)
                      client.Close();
-                  Output("Closed connection with authorization client");
                }
             } 
 
@@ -233,39 +233,49 @@ namespace ChatServer
       {
          lock(authLock)
          {
-            //Create a new dictionary for authorization codes.
-            Dictionary<string, string> newCodes = new Dictionary<string, string>();
-
-            //Fill up the new dictionary with the old authorization values. If
-            //any user no longer exists in the given list, they will not be
-            //added to the new dictionary.
-            foreach(string user in users)
-               newCodes.Add(user, GetAuth(user));
-
-            //The final step to victory
-            authCodes = newCodes;
+            //First, remove old users by removing the ones which are expired
+            //and no longer in the list of users.
+            authCodes = authCodes.Where(x => x.Value.Expired &&
+                  !users.Contains(x.Key)).ToDictionary(x => x.Key, 
+                  x => x.Value);
+            
+            //Next, add new users by simply adding those which were not already
+            //in the dictionary.
+            foreach(string user in users.Except(authCodes.Keys))
+               RequestAuth(user); //Remember this automatically adds users 
          }
       }
 
-      //Get the authorization code for the given user. Alternatively, generate
-      //a new one if one doesn't already exist.
+      //The difference between requestauth and getauth is that getauth simply
+      //returns the authentication code; requestauth actually generates an
+      //authentication code for users that don't have one yet. 
+      private string RequestAuth(string username)
+      {
+         //If the username doesn't contain any characters, just return bogus
+         if(string.IsNullOrWhiteSpace(username))
+            return GenerateAuth();
+
+         lock(authLock)
+         {
+            //We need to generate a new auth for this user.
+            if(!authCodes.ContainsKey(username))
+               authCodes.Add(username, new AuthData(GenerateAuth()));
+
+            //Now get the authentication
+            return authCodes[username].Key; 
+         }
+      }
+
+      //Get the authorization code for the given user.
       public string GetAuth(string username)
       {
          lock(authLock)
          {
-            if(authCodes.ContainsKey(username))
-            {
-               return authCodes[username];
-            }
+            //Return some bogus authentication code if the username doesn't exist
+            if(!authCodes.ContainsKey(username))
+               return GenerateAuth();
             else
-            {
-               //We need to generate a new auth for this user.
-               byte[] randomBytes = new byte[8];
-               random.GetBytes(randomBytes);
-               authCodes.Add(username, StringHelper.ByteToHex(randomBytes));
-
-               return authCodes[username];
-            }
+               return authCodes[username].Key;
          }
       }
 
@@ -275,6 +285,34 @@ namespace ChatServer
          List<string> retrievedErrors = new List<string>(errors);
          errors.Clear();
          return retrievedErrors;
+      }
+
+      //Generate an authentication key
+      public string GenerateAuth()
+      {
+         byte[] randomBytes = new byte[8];
+         random.GetBytes(randomBytes);
+         return StringHelper.ByteToHex(randomBytes);
+      }
+   }
+
+   //The authorization key and expiration data. The key should not be removed
+   //unless it is expired.
+   public class AuthData
+   {
+      public const int ExpireMinutes = 5;
+      public readonly string Key;
+      public readonly DateTime Expires;
+
+      public AuthData(string key)
+      {
+         Key = key;
+         Expires = DateTime.Now.AddMinutes(ExpireMinutes);
+      }
+
+      public bool Expired
+      {
+         get { return DateTime.Now > Expires; }
       }
    }
 }

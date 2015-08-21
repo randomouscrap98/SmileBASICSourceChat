@@ -7,6 +7,7 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace ChatServer
 {
@@ -17,26 +18,7 @@ namespace ChatServer
 
       public static void Main()
       {
-         //First, set up websocket server
-         webSocketServer = new WebSocketServer(45695);
-         webSocketServer.AddWebSocketService<Chat> ("/chat", () => new Chat()
-               {
-                  Protocol = "chat",
-                  IgnoreExtensions = true,
-               });
-
-         webSocketServer.Start();
-
-         if (webSocketServer.IsListening) 
-         {
-            Console.WriteLine ("Listening on port {0}, and providing WebSocket services:", 
-                  webSocketServer.Port);
-
-            foreach (var path in webSocketServer.WebSocketServices.Paths)
-               Console.WriteLine ("- {0}", path);
-         }
-
-         //Now set up the auth server
+         //First set up the auth server
          authServer = new AuthServer(45696, true);
          if(!authServer.Start())
          {
@@ -48,6 +30,28 @@ namespace ChatServer
             Console.WriteLine("Authorization server running on port {0}",
                   authServer.Port);
          }
+
+         //Now, set up websocket server
+         webSocketServer = new WebSocketServer(45695);
+         webSocketServer.AddWebSocketService<Chat> ("/chat", () => new Chat()
+               {
+                  Protocol = "chat",
+                  IgnoreExtensions = true,
+               });
+
+         webSocketServer.Start();
+
+         if (webSocketServer.IsListening) 
+         {
+            Console.WriteLine ("Listening on port {0} with services:", 
+                  webSocketServer.Port);
+
+            foreach (var path in webSocketServer.WebSocketServices.Paths)
+               Console.WriteLine ("- {0}", path);
+         }
+
+         //Link the auth server to the websocket server
+         Chat.LinkAuthServer(authServer);
 
          Console.WriteLine("Press Q to stop the server...");
 
