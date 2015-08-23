@@ -235,14 +235,17 @@ namespace ChatServer
          {
             //First, remove old users by removing the ones which are expired
             //and no longer in the list of users.
-            authCodes = authCodes.Where(x => x.Value.Expired &&
-                  !users.Contains(x.Key)).ToDictionary(x => x.Key, 
+            authCodes = authCodes.Where(x => !(x.Value.Expired && 
+                  !users.Contains(x.Key))).ToDictionary(x => x.Key, 
                   x => x.Value);
             
             //Next, add new users by simply adding those which were not already
             //in the dictionary.
             foreach(string user in users.Except(authCodes.Keys))
                RequestAuth(user); //Remember this automatically adds users 
+
+            Output("Users with outstanding authentication codes: " + 
+                  string.Join(", ", authCodes.Keys));
          }
       }
 
@@ -257,12 +260,17 @@ namespace ChatServer
 
          lock(authLock)
          {
-            //We need to generate a new auth for this user.
+            //Oops, the user code expired. Just remove it
+            if(authCodes.ContainsKey(username) && authCodes[username].Expired)
+               authCodes.Remove(username);
+
+            //We need to generate a new auth for this user if they're not in
+            //the auth list OR their old key is expired.
             if(!authCodes.ContainsKey(username))
                authCodes.Add(username, new AuthData(GenerateAuth()));
 
             //Now get the authentication
-            return authCodes[username].Key; 
+            return authCodes[username].AuthKey; 
          }
       }
 
@@ -275,7 +283,7 @@ namespace ChatServer
             if(!authCodes.ContainsKey(username))
                return GenerateAuth();
             else
-               return authCodes[username].Key;
+               return authCodes[username].AuthKey;
          }
       }
 
@@ -301,12 +309,12 @@ namespace ChatServer
    public class AuthData
    {
       public const int ExpireMinutes = 5;
-      public readonly string Key;
+      public readonly string AuthKey;
       public readonly DateTime Expires;
 
       public AuthData(string key)
       {
-         Key = key;
+         AuthKey = key;
          Expires = DateTime.Now.AddMinutes(ExpireMinutes);
       }
 

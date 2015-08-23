@@ -12,6 +12,7 @@ namespace ChatServer
    public class Chat : WebSocketBehavior
    {
       private string username = "";
+      //private DateTime lastPost = DateTime.Now;
       private static AuthServer authServer;
       private static readonly Object authLock = new Object();
       private static List<Message> messages = new List<Message>();
@@ -49,14 +50,33 @@ namespace ChatServer
          return CheckAuth(key, username);
       }
 
-      public string GetUserList()
+      //Update the authenticated users. You should do this on chat join and
+      //leave, although it may be unnecessary for joins.
+      public void UpdateAuthUsers()
+      {
+         lock(authLock)
+         {
+            authServer.UpdateUserList(GetUsers());
+         }
+      }
+
+      //Get JUST a list of users currently in chat (useful for auth)
+      public List<string> GetUsers()
       {
          lock(chatLock)
          {
-
+            return activeChatters.Select(x => x.Username).ToList();    
          }
+      }
 
-         return "";
+      //Get a JSON string representing a list of users currently in chat
+      public string GetUserList()
+      {
+         UserListJSONObject userList = new UserListJSONObject();
+
+         userList.users = GetUsers().Select(x => new UserJSONObject(x, true)).ToList();
+
+         return JsonConvert.SerializeObject(userList);
       }
 
       //Get a JSON string representing a list of the last 10 messages
@@ -69,6 +89,7 @@ namespace ChatServer
             for(int i = 0; i < Math.Min(10, messages.Count); i++)
                jsonMessages.messages.Add(messages[messages.Count - 1 - i]);
 
+            //Oops, remember we added them in reverse order. Fix that
             jsonMessages.messages.Reverse();
          }
 
@@ -92,6 +113,7 @@ namespace ChatServer
             activeChatters.Remove(this);
             Sessions.Broadcast(GetUserList());
          }
+         UpdateAuthUsers();
       }
 
       //I guess this is WHENEVER it receives a message?
@@ -141,9 +163,11 @@ namespace ChatServer
                   {
                      //All is well.
                      username = newUser;
+                     activeChatters.Add(this);
                      response.result = true;
                      Console.WriteLine("Authenticated " + username + " for chat.");
                      Sessions.Broadcast(GetUserList());
+                     UpdateAuthUsers();
                   }
                }
             }
@@ -188,7 +212,32 @@ namespace ChatServer
             {
                response.errors.Add("Message was missing fields");
             }
+         }
+         else if (type == "request")
+         {
+            try
+            {
+               string wanted = json.request;
 
+               if(wanted == "userList")
+               {
+                  Send(GetUserList());
+                  response.result = true;
+               }
+               else if (wanted == "messageList")
+               {
+                  Send(GetMessageList());
+                  response.result = true;
+               }
+               else
+               {
+                  response.errors.Add("Invalid request field");
+               }
+            }
+            catch
+            {
+               response.errors.Add("Request was missing fields");
+            }
          }
 
          //Send the "OK" message back.
@@ -212,9 +261,23 @@ namespace ChatServer
    public class UserListJSONObject
    {
       public readonly string type = "userList";
-      public List<string> users = new List<string>();
+      public List<UserJSONObject> users = new List<UserJSONObject>();
    }
 
+   //A single user within the UserList JSON object
+   public class UserJSONObject
+   {
+      public readonly string username = "";
+      public bool active = false;
+
+      public UserJSONObject(string username, bool active)
+      {
+         this.username = username;
+         this.active = active;
+      }
+   }
+
+   //The list of messages sent out in JSON should follow this format
    public class MessageListJSONObject
    {
       public readonly string type = "messageList";
@@ -238,6 +301,11 @@ namespace ChatServer
          this.tag = tag;
          this.postTime = DateTime.Now;
          this.id = Interlocked.Increment(ref NextID);
+      }
+
+      public string time
+      {
+         get { return postTime.ToString() + " UTC"; }
       }
 
       //This is ONLY because we don't want to serialize it.
