@@ -1,0 +1,13 @@
+﻿<Properties StartupItem="ChatServer/ChatServer.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../chat.cs">
+    <Files>
+      <File FileName="../chat.cs" Line="251" Column="43" />
+      <File FileName="../user.cs" Line="98" Column="97" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

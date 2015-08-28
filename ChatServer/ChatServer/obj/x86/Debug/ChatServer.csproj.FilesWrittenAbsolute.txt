@@ -1,0 +1,14 @@
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/Newtonsoft.Json.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/websocket-sharp.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe.mdb
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatServer/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe.mdb
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatServer/bin/Debug/Newtonsoft.Json.dll
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatServer/bin/Debug/websocket-sharp.dll
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe.mdb
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe

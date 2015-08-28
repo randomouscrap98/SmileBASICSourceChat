@@ -1,7 +1,9 @@
 using System;
+using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using System.Text.RegularExpressions;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 using Newtonsoft.Json;
@@ -12,18 +14,34 @@ namespace ChatServer
    public class Chat : WebSocketBehavior
    {
       private string username = "";
-      //private DateTime lastPost = DateTime.Now;
+
       private static AuthServer authServer;
       private static readonly Object authLock = new Object();
       private static List<Message> messages = new List<Message>();
       private static readonly Object messageLock = new Object();
       private static HashSet<Chat> activeChatters = new HashSet<Chat>();
       private static readonly Object chatLock = new Object();
+      private static Dictionary<string, User> users = new Dictionary<string, User>();
+      private static readonly Object userLock = new Object();
       
       //The username for this session
       public string Username
       {
          get { return username; }
+      }
+
+      public User ThisUser
+      {
+         get
+         {
+            lock (userLock) 
+            {
+               if (!users.ContainsKey (username) && !string.IsNullOrWhiteSpace (username))
+                  users.Add (username, new User (username));
+
+               return users [username];
+            }
+         }
       }
 
       //Assign an authentication server 
@@ -161,6 +179,13 @@ namespace ChatServer
                   }
                   else
                   {
+                     //Before we do anything, remove other chatting sessions
+                     List<Chat> removals = activeChatters.Where(
+                           x => x.Username == newUser).Distinct().ToList();
+
+                     foreach(Chat removeChat in removals)
+                        Sessions.CloseSession(removeChat.ID);
+                     
                      //All is well.
                      username = newUser;
                      activeChatters.Add(this);
@@ -180,32 +205,61 @@ namespace ChatServer
          {
             try
             {
-               //First, gather information from the JSON. THis is so that if
+               //First, gather information from the JSON. This is so that if
                //the json is invalid, it will fail as soon as possible
                string key = json.key;
                string message = System.Security.SecurityElement.Escape((string)json.text);
                string tag = json.tag;
 
                //Authenticate the user. If not, just quit.
-               if(!CheckAuth(key))
+               if(string.IsNullOrWhiteSpace(message))
+               {
+                  response.errors.Add("No empty messages please");
+               }
+               else if(!CheckAuth(key))
                {
                   response.errors.Add("Your key is invalid");
                }
+               else if (ThisUser.BlockedUntil >= DateTime.Now)
+               {
+                  response.errors.Add("You are blocked for " + 
+                     ThisUser.SecondsToUnblock + " second(s) for spamming");
+               }
+               else if(Regex.IsMatch(message, @"^\s*/spamscore\s*$"))
+               {
+                  WarningJSONObject tempWarning = new WarningJSONObject();
+                  tempWarning.warning = "This is a temporary debug feature.  " +
+                     "Your spam score is: " + ThisUser.SpamScore + 
+                     ", badness score: " + ThisUser.GlobalSpamScore;
+                  Send(tempWarning.ToString()); 
+               }
                else
                {
+                  WarningJSONObject warning;
+
                   //User was authenticated (and we know the fields exist
                   //because we just pulled them). Just go ahead and add the
                   //message
                   lock(messageLock)
                   {
-                     messages.Add(new Message(username, message, tag));
-                     messages = messages.Skip(Math.Max(0, messages.Count() - 100))
-                        .ToList();
+                     warning = ThisUser.UpdateSpam(messages, message);
+
+                     if(ThisUser.BlockedUntil < DateTime.Now)
+                     {
+                        messages.Add(new Message(username, message, tag));
+                        messages = messages.Skip(Math.Max(0, messages.Count() - 1000)).ToList();
+                        ThisUser.PerformOnPost();
+                        response.result = true;
+                     }
                   }
 
                   //Since we added a new message, we need to broadcast.
-                  Sessions.Broadcast(GetMessageList());
-                  response.result = true;
+                  if(response.result)
+                     Sessions.Broadcast(GetMessageList());
+
+                  //Send a warning if you got one.
+                  if(warning != null)
+                     Send(warning.ToString());
                }
             }
             catch
@@ -241,26 +295,53 @@ namespace ChatServer
          }
 
          //Send the "OK" message back.
-         Send(JsonConvert.SerializeObject(response));
+         Send(response.ToString());
 
-         //Sessions.Broadcast(e.Data);
          Console.WriteLine("Got message: " + e.Data);
       }
    }
 
-   //Responses from the server should have this format.
-   public class ResponseJSONObject
+   public abstract class JSONObject
    {
-      public readonly string type = "response"; 
+      public readonly string type;
+
+      public JSONObject(string type)
+      {
+         this.type = type;
+      }
+
+      public override string ToString ()
+      {
+         return JsonConvert.SerializeObject(this);
+      }
+   }
+
+   //Responses from the server should have this format.
+   public class ResponseJSONObject : JSONObject
+   {
+      public ResponseJSONObject() : base("response") {}
       public string from = "unknown";
       public bool result = false;
       public List<string> errors = new List<string>();
    }
 
-   //Sending out a list of users should follow this format
-   public class UserListJSONObject
+   public class WarningJSONObject : JSONObject
    {
-      public readonly string type = "userList";
+      public WarningJSONObject() : base("warning") {}
+      public string warning = "";
+   }
+
+   //The list of messages sent out in JSON should follow this format
+   public class MessageListJSONObject : JSONObject
+   {
+      public MessageListJSONObject() : base("messageList") {}
+      public List<Message> messages = new List<Message>();
+   }
+
+   //Sending out a list of users should follow this format
+   public class UserListJSONObject : JSONObject
+   {
+      public UserListJSONObject() : base("userList") {}
       public List<UserJSONObject> users = new List<UserJSONObject>();
    }
 
@@ -275,13 +356,6 @@ namespace ChatServer
          this.username = username;
          this.active = active;
       }
-   }
-
-   //The list of messages sent out in JSON should follow this format
-   public class MessageListJSONObject
-   {
-      public readonly string type = "messageList";
-      public List<Message> messages = new List<Message>();
    }
 
    //A message. It SHOULD be readonly, honestly.

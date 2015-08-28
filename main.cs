@@ -39,6 +39,7 @@ namespace ChatServer
                   IgnoreExtensions = true,
                });
 
+         webSocketServer.WaitTime = TimeSpan.FromSeconds(3);
          webSocketServer.Start();
 
          if (webSocketServer.IsListening) 
