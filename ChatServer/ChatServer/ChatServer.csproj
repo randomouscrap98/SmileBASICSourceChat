@@ -8,6 +8,7 @@
     <RootNamespace>ChatServer</RootNamespace>
     <AssemblyName>ChatServer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ReleaseVersion>0.1.*</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +52,9 @@
     </Compile>
     <Compile Include="..\..\user.cs">
       <Link>user.cs</Link>
+    </Compile>
+    <Compile Include="..\..\StringExtensions.cs">
+      <Link>StringExtensions.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

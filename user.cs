@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MyExtensions;
 
 namespace ChatServer
 {
@@ -75,11 +76,13 @@ namespace ChatServer
          //Update spam score based on last message length, how many previous
          //messages were theirs, and how long it has been since the last
          //message.
-         SpamScore += 10 + current.Length / 100
-            + 2 * (myMessages.Count > 10 ? 10 : myMessages.Count)
-            + 2 * (myMessages.Count(x => x.text == current))
-            - 4 * (int)(DateTime.Now - lastPost).TotalSeconds;
+         SpamScore -= 4 * (int)(DateTime.Now - lastPost).TotalSeconds;
+         SpamScore += 10 + current.Length / 100 
+            + 2 * current.Split("\n".ToCharArray()).Count(x => string.IsNullOrWhiteSpace(x))       //empty line
+            + 2 * (myMessages.Count > 10 ? 10 : myMessages.Count)                                  //previous messages
+            + (int)(2 * (1 - myMessages.Sum(x => StringExtensions.StringDifference(x.text, current))));  //similarity    
 
+         Console.WriteLine(current + " -likeness- " + (int)(2 * myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.text, current))));
          //Update global spam score if they've been good
          if((DateTime.Now - lastSpam).TotalHours > 24)
             GlobalSpamScore -= 2;

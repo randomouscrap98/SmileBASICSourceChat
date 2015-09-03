@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 using Newtonsoft.Json;
+using MyExtensions;
 
 namespace ChatServer
 {
@@ -210,6 +211,7 @@ namespace ChatServer
                string key = json.key;
                string message = System.Security.SecurityElement.Escape((string)json.text);
                string tag = json.tag;
+               WarningJSONObject tempWarning = new WarningJSONObject();
 
                //Authenticate the user. If not, just quit.
                if(string.IsNullOrWhiteSpace(message))
@@ -227,11 +229,25 @@ namespace ChatServer
                }
                else if(Regex.IsMatch(message, @"^\s*/spamscore\s*$"))
                {
-                  WarningJSONObject tempWarning = new WarningJSONObject();
                   tempWarning.warning = "This is a temporary debug feature.  " +
                      "Your spam score is: " + ThisUser.SpamScore + 
                      ", badness score: " + ThisUser.GlobalSpamScore;
                   Send(tempWarning.ToString()); 
+               }
+               else if(Regex.IsMatch(message, @"^\s*/about\s*$"))
+               {
+                  DateTime built = ChatRunner.MyBuildDate();
+                  tempWarning.warning = "Chat server v" +
+                     ChatRunner.AssemblyVersion() + "\nBuilt " +
+                     StringExtensions.LargestTime(DateTime.Now - built) + 
+                     " ago (" + built.ToString("R") + ")";
+                  Send(tempWarning.ToString()); 
+               }
+               else if(Regex.IsMatch(message, @"^\s*/me\s+(.+)$"))
+               {
+                  Match match = Regex.Match(message, @"^\s*/me\s+(.+)$");
+                  tempWarning.warning = username + " " + match.Groups[1].Value;
+                  Sessions.Broadcast(tempWarning.ToString());
                }
                else
                {
