@@ -56,6 +56,9 @@
     <Compile Include="..\..\StringExtensions.cs">
       <Link>StringExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\..\log.cs">
+      <Link>logger.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />
@@ -67,5 +70,7 @@
       <HintPath>..\..\websocket-sharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
   </ItemGroup>
 </Project>

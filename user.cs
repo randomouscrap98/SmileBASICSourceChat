@@ -1,6 +1,9 @@
 using System;
+using System.Web;
+using System.Net;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using MyExtensions;
 
 namespace ChatServer
@@ -12,6 +15,8 @@ namespace ChatServer
       private string username = "";
       private int spamScore = 0;
       private int globalSpamScore = 0;
+
+      private bool staffChat = false;
 
       private DateTime lastPost = DateTime.Now;
       private DateTime lastSpam = new DateTime(0);
@@ -29,7 +34,12 @@ namespace ChatServer
 
       public int SecondsToUnblock
       {
-         get { return (int)((blockedUntil - DateTime.Now).TotalSeconds + 0.99); }
+         get { return (int)((blockedUntil - DateTime.Now).TotalSeconds + 0.9999); }
+      }
+
+      public bool CanStaffChat 
+      {
+         get { return staffChat; }
       }
 
       public int GlobalSpamScore
@@ -61,6 +71,28 @@ namespace ChatServer
       {
          lastPost = DateTime.Now;
       }
+
+      public bool PullInfoFromQueryPage()
+      {
+         try
+         {
+            using (WebClient client = new WebClient())
+            {
+               string url = "http://development.smilebasicsource.com/query/usercheck.php?getinfo=1&username=";
+               url += HttpUtility.UrlEncode(username);
+               string htmlCode = client.DownloadString(url);
+
+               dynamic json = JsonConvert.DeserializeObject(htmlCode);
+               staffChat = json.result.permissions.staffchat;
+            }
+         }
+         catch
+         {
+            return false;
+         }
+
+         return true;
+      }
       
       public WarningJSONObject UpdateSpam(List<Message> messages, string current)
       {
@@ -80,9 +112,9 @@ namespace ChatServer
          SpamScore += 10 + current.Length / 100 
             + 2 * current.Split("\n".ToCharArray()).Count(x => string.IsNullOrWhiteSpace(x))       //empty line
             + 2 * (myMessages.Count > 10 ? 10 : myMessages.Count)                                  //previous messages
-            + (int)(2 * (1 - myMessages.Sum(x => StringExtensions.StringDifference(x.text, current))));  //similarity    
+            + (int)(2 * (myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.text, current))));  //similarity    
 
-         Console.WriteLine(current + " -likeness- " + (int)(2 * myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.text, current))));
+         //Console.WriteLine(current + " -likeness- " + (int)(2 * myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.text, current))));
          //Update global spam score if they've been good
          if((DateTime.Now - lastSpam).TotalHours > 24)
             GlobalSpamScore -= 2;

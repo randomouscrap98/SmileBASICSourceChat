@@ -1,7 +1,7 @@
 comp=mcs
 run=mono
 files=main.cs http.cs chat.cs auth.cs string.cs Options.cs user.cs\
-		StringExtensions.cs
+		StringExtensions.cs logger.cs
 
 chat.exe: $(files) 
 	$(comp) -r:websocket-sharp.dll -r:Newtonsoft.Json.dll -out:chat.exe $(files)

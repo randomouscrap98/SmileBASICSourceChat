@@ -14,6 +14,9 @@ namespace ChatServer
    //This is the thing that will get passed as the... controller to Websockets?
    public class Chat : WebSocketBehavior
    {
+      public const int MaxMessageKeep = 1000;
+      public const int MaxMessageSend = 10;
+
       private string username = "";
 
       private static AuthServer authServer;
@@ -24,13 +27,24 @@ namespace ChatServer
       private static readonly Object chatLock = new Object();
       private static Dictionary<string, User> users = new Dictionary<string, User>();
       private static readonly Object userLock = new Object();
-      
+
+      private MyExtensions.Logging.Logger logger = MyExtensions.Logging.Logger.DefaultLogger;
+
+      //Set up the logger when building the chat provider. Logging will go out to a file and the console
+      //if possible. Otherwise, log to the default logger (which is like throwing them away)
+      public Chat(MyExtensions.Logging.Logger logger = null)
+      {
+         if(logger != null)
+            this.logger = logger;
+      }
+
       //The username for this session
       public string Username
       {
          get { return username; }
       }
 
+      //The user attached to this session
       public User ThisUser
       {
          get
@@ -105,7 +119,7 @@ namespace ChatServer
 
          lock(messageLock)
          {
-            for(int i = 0; i < Math.Min(10, messages.Count); i++)
+            for(int i = 0; i < Math.Min(MaxMessageKeep, messages.Count); i++)
                jsonMessages.messages.Add(messages[messages.Count - 1 - i]);
 
             //Oops, remember we added them in reverse order. Fix that
@@ -124,7 +138,7 @@ namespace ChatServer
       //chatters.
       protected override void OnClose(CloseEventArgs e)
       {
-         Console.WriteLine("Session disconnect: " + username);
+         logger.Log ("Session disconnect: " + username);
 
          lock(chatLock)
          {
@@ -191,9 +205,13 @@ namespace ChatServer
                      username = newUser;
                      activeChatters.Add(this);
                      response.result = true;
-                     Console.WriteLine("Authenticated " + username + " for chat.");
+                     logger.Log("Authenticated " + username + " for chat.");
                      Sessions.Broadcast(GetUserList());
                      UpdateAuthUsers();
+                     if(!ThisUser.PullInfoFromQueryPage())
+                        logger.Warning("Couldn't get user information from website");
+                     else
+                        logger.Log("Staff: " + ThisUser.CanStaffChat);
                   }
                }
             }
@@ -249,6 +267,11 @@ namespace ChatServer
                   tempWarning.warning = username + " " + match.Groups[1].Value;
                   Sessions.Broadcast(tempWarning.ToString());
                }
+               else if (tag == "admin" && !ThisUser.CanStaffChat)
+               {
+                  tempWarning.warning = "You can't post messages here. I'm sorry.";
+                  Send(tempWarning.ToString());
+               }
                else
                {
                   WarningJSONObject warning;
@@ -263,7 +286,7 @@ namespace ChatServer
                      if(ThisUser.BlockedUntil < DateTime.Now)
                      {
                         messages.Add(new Message(username, message, tag));
-                        messages = messages.Skip(Math.Max(0, messages.Count() - 1000)).ToList();
+                        messages = messages.Skip(Math.Max(0, messages.Count() - MaxMessageKeep)).ToList();
                         ThisUser.PerformOnPost();
                         response.result = true;
                      }
@@ -313,7 +336,7 @@ namespace ChatServer
          //Send the "OK" message back.
          Send(response.ToString());
 
-         Console.WriteLine("Got message: " + e.Data);
+         logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
       }
    }
 
@@ -341,10 +364,18 @@ namespace ChatServer
       public List<string> errors = new List<string>();
    }
 
+   //Warnings to be sent to (usually one) users
    public class WarningJSONObject : JSONObject
    {
       public WarningJSONObject() : base("warning") {}
       public string warning = "";
+   }
+
+   //System messages have a similar format to warnings.
+   public class SystemMessageJSONObject : JSONObject
+   {
+      public SystemMessageJSONObject() : base("system") {}
+      public string message = "";
    }
 
    //The list of messages sent out in JSON should follow this format

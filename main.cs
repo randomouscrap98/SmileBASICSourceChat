@@ -21,24 +21,30 @@ namespace ChatServer
 
       public static void Main()
       {
-         Console.WriteLine ("This exe was built on: " + MyBuildDate().ToString());
+         //Set up the logger
+         MyExtensions.Logging.Logger logger = new MyExtensions.Logging.Logger (100, "log.txt");
+         logger.StartAutoDumping(10);
+         logger.StartInstantConsole();
+
+         logger.Log("This exe was built on: " + MyBuildDate().ToString());
 
          //First set up the auth server
-         authServer = new AuthServer(45696, true);
+         authServer = new AuthServer(45696, logger);
+
          if(!authServer.Start())
          {
-            Console.WriteLine("ERROR! Authorization server could not be started!");
+            logger.LogGeneral("Authorization server could not be started!",
+               MyExtensions.Logging.LogLevel.FatalError, "Auth");
             Finish("Fatal error. Exiting");
          }
          else
          {
-            Console.WriteLine("Authorization server running on port {0}",
-                  authServer.Port);
+            logger.Log ("Authorization server running on port " + authServer.Port);
          }
 
          //Now, set up websocket server
          webSocketServer = new WebSocketServer(45695);
-         webSocketServer.AddWebSocketService<Chat> ("/chat", () => new Chat()
+         webSocketServer.AddWebSocketService<Chat> ("/chat", () => new Chat(logger)
                {
                   Protocol = "chat",
                   IgnoreExtensions = true,

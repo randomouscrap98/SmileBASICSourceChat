@@ -25,20 +25,20 @@ namespace ChatServer
       private Thread authSpinner = null;
 
       //Error crap
-      private bool consolePrint;
-      private List<string> errors = new List<string>();
-      private List<string> outputs = new List<string>();
+      private MyExtensions.Logging.Logger logger = MyExtensions.Logging.Logger.DefaultLogger;
 
       //Auth crap
       private RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
-      private Dictionary<string, AuthData> authCodes = 
-         new Dictionary<string, AuthData>();
+      private Dictionary<string, AuthData> authCodes = new Dictionary<string, AuthData>();
       private Object authLock = new Object();
 
-      public AuthServer(int port, bool shouldPrintErrors = false)
+      //Set up the auth server with the given logger. Otherwise, log to an internal logger
+      public AuthServer(int port, MyExtensions.Logging.Logger logger = null)
       {
          Port = port;
-         consolePrint = shouldPrintErrors;
+
+         if (logger != null)
+            this.logger = logger;
       }
 
       //This should (hopefully) start the authorization server
@@ -47,7 +47,7 @@ namespace ChatServer
          //Oops, we already have a spinner for authorization stuff
          if(authSpinner != null)
          {
-            Error("Auth server already running");
+            logger.Error("Auth server already running");
             return false;
          }
 
@@ -64,7 +64,7 @@ namespace ChatServer
          }
          catch(Exception e)
          {
-            Error(e.ToString());
+            logger.Error(e.ToString());
             return false;
          }
 
@@ -85,7 +85,7 @@ namespace ChatServer
          //need to force its hand.
          if(!SpinWait())
          {
-            Error("Authorization thread was not stopped when asked.");
+            logger.Error("Authorization thread was not stopped when asked.");
 
             //Try to force the thread to stop
             try
@@ -94,13 +94,12 @@ namespace ChatServer
 
                //Oops, even with aborting, the thread would not yield
                if(!SpinWait())
-                  Error("Authorization thread could not be forcibly stopped.");
+                  logger.Error("Authorization thread could not be forcibly stopped.");
             }
             catch (Exception e)
             {
                //Wow, aborting threw an exception. Yuck
-               Error("Aborting authorization thread threw exception: " +
-                     e.ToString());
+               logger.Error("Aborting authorization thread threw exception: " + e.ToString());
             }
          }
 
@@ -169,8 +168,7 @@ namespace ChatServer
                      //Oops, we waited to long for a response
                      if(wait > MaxWaitSeconds)
                      {
-                        throw new Exception("Read timeout reached (" +
-                              MaxWaitSeconds + " sec)");
+                        throw new Exception("Read timeout reached (" + MaxWaitSeconds + " sec)");
                      }
                   }
 
@@ -191,12 +189,12 @@ namespace ChatServer
                            RequestAuth((string)json.username));
                      stream.Write(response, 0, response.Length);
 
-                     Output("Sent authorization token for user: " + json.username);
+                     logger.Log("Sent authorization token for user: " + json.username);
                   }
                }
                catch (Exception e)
                {
-                  Error("Auth server error: " + e.ToString());
+                  logger.Error("Auth server error: " + e.ToString());
                }
                finally
                {
@@ -208,24 +206,6 @@ namespace ChatServer
 
             Thread.Sleep(ThreadSleepMilliseconds);
          }
-      }
-
-      //Call this function as an alternative to printing to STDOUT
-      private void Output(string output)
-      {
-         if(consolePrint)
-            Console.WriteLine(output);
-         else
-            outputs.Add(output);
-      }
-
-      //Call this function as an alternative to print to STDERR
-      private void Error(string error)
-      {
-         if(consolePrint)
-            Console.WriteLine(error);
-         else
-            errors.Add(error);
       }
 
       //Update the list of users who should have an authorization code
@@ -244,7 +224,7 @@ namespace ChatServer
             foreach(string user in users.Except(authCodes.Keys))
                RequestAuth(user); //Remember this automatically adds users 
 
-            Output("Users with outstanding authentication codes: " + 
+            logger.Log("Users with outstanding authentication codes: " + 
                   string.Join(", ", authCodes.Keys));
          }
       }
@@ -285,14 +265,6 @@ namespace ChatServer
             else
                return authCodes[username].AuthKey;
          }
-      }
-
-      //Give the user a list of errors (a NEW list so it can't be altered)
-      public List<string> RetrieveErrors()
-      {
-         List<string> retrievedErrors = new List<string>(errors);
-         errors.Clear();
-         return retrievedErrors;
       }
 
       //Generate an authentication key
