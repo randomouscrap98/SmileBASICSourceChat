@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Linq;
 using Newtonsoft.Json;
-using MyHelper;
+using MyExtensions;
 
 namespace ChatServer
 {
@@ -272,7 +272,7 @@ namespace ChatServer
       {
          byte[] randomBytes = new byte[8];
          random.GetBytes(randomBytes);
-         return StringHelper.ByteToHex(randomBytes);
+         return StringExtensions.ByteToHex(randomBytes);
       }
    }
 

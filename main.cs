@@ -7,10 +7,13 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json;
+using ModuleSystem;
+using ChatEssentials;
 
-[assembly: AssemblyVersion("0.1.*")]
+[assembly: AssemblyVersion("0.2.*")]
 
 namespace ChatServer
 {
@@ -18,54 +21,123 @@ namespace ChatServer
    {
       private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
+      private static MyExtensions.Logging.Logger logger;
+      private static ModuleLoader loader;
+
+      public const string ConfigFile = "config.xml";
+      public const string ModuleConfigFile = "moduleConfig.xml";
+      public const string OptionTag = "main";
+
+      public static List<ModuleSystem.Module> ActiveModules
+      {
+         get { return loader.ActiveModules; }
+      }
 
       public static void Main()
       {
+         Dictionary<string, object> defaultOptions = new Dictionary<string, object> {
+            {"loggerBacklog", 100},
+            {"loggerFileDumpInterval", 10},
+            {"loggerFile", "log.txt"},
+            {"authServerPort", 45696},
+            {"chatServerPort", 45695},
+            {"chatTimeout", 3},
+            {"messageBacklog", 1000},
+            {"messageSend", 10},
+            {"acceptedTags", "general, admin, offtopic"},
+            {"globalTag", "any"},
+            {"userUpdateInterval", 60},
+            {"inactiveMinutes", 5},
+            {"spamBlockSeconds", 20}
+         };
+
+         //Set up and read options. We need to do this first so that the values can be used for init
+         MyExtensions.Options options = new MyExtensions.Options();
+         options.AddOptions(OptionTag, defaultOptions);
+
+         //Oops, can't load options from file. Just use defaults
+         if (!options.LoadFromFile(ConfigFile))
+         {
+            Console.WriteLine("ERROR: Could not load main configuration file!");
+            Console.WriteLine("Using default configuration");
+         }
+
+         //Oops, can't save configuration file? Wow, something really went wrong
+         if (!options.WriteToFile(ConfigFile))
+         {
+            Console.WriteLine("ERROR: Could not write configuration file!");
+            Console.WriteLine("Please check directory environment and file permissions");
+         }
+
          //Set up the logger
-         MyExtensions.Logging.Logger logger = new MyExtensions.Logging.Logger (100, "log.txt");
-         logger.StartAutoDumping(10);
+         logger = new MyExtensions.Logging.Logger (options.GetAsType<int>(OptionTag, "loggerBacklog"), 
+            options.GetAsType<string>(OptionTag, "loggerFile"));
+         logger.StartAutoDumping(options.GetAsType<int>(OptionTag, "loggerFileDumpInterval"));
          logger.StartInstantConsole();
 
          logger.Log("This exe was built on: " + MyBuildDate().ToString());
 
+         //Set up the module system
+         loader = new ModuleLoader(logger);
+         List<Type> extraModules = new List<Type>(){typeof(GlobalModule)};
+
+         //Oops, couldn't load the modules. What the heck?
+         if (!loader.Setup("moduleConfig.xml", extraModules))
+         {
+            logger.LogGeneral("Module loader failed. Cannot continue", MyExtensions.Logging.LogLevel.FatalError);
+            Finish();
+            return;
+         }
+
          //First set up the auth server
-         authServer = new AuthServer(45696, logger);
+         authServer = new AuthServer(options.GetAsType<int>(OptionTag, "authServerPort"), logger);
 
          if(!authServer.Start())
          {
             logger.LogGeneral("Authorization server could not be started!",
                MyExtensions.Logging.LogLevel.FatalError, "Auth");
             Finish("Fatal error. Exiting");
+            return;
          }
          else
          {
             logger.Log ("Authorization server running on port " + authServer.Port);
          }
 
+         //As an in-between, set some chat parameters
+         Chat.SetChatParameters(options.GetAsType<int>(OptionTag, "messageBacklog"),
+            options.GetAsType<int>(OptionTag, "messageSend"), 
+            options.GetAsType<string>(OptionTag, "acceptedTags"),
+            options.GetAsType<string>(OptionTag, "globalTag"));
+
+         //Also set user parameters
+         User.SetUserParameters(options.GetAsType<int>(OptionTag, "spamBlockSeconds"),
+            options.GetAsType<int>(OptionTag, "inactiveMinutes"));
+         
          //Now, set up websocket server
-         webSocketServer = new WebSocketServer(45695);
-         webSocketServer.AddWebSocketService<Chat> ("/chat", () => new Chat(logger)
+         webSocketServer = new WebSocketServer(options.GetAsType<int>(OptionTag, "chatServerPort"));
+         webSocketServer.AddWebSocketService<Chat> ("/chat", () => new Chat(loader.ActiveModules, 
+            options.GetAsType<int>(OptionTag, "userUpdateInterval"), logger)
                {
                   Protocol = "chat",
                   IgnoreExtensions = true,
                });
 
-         webSocketServer.WaitTime = TimeSpan.FromSeconds(3);
+         webSocketServer.WaitTime = TimeSpan.FromSeconds(options.GetAsType<int>(OptionTag, "chatTimeout"));
          webSocketServer.Start();
 
          if (webSocketServer.IsListening) 
          {
-            Console.WriteLine ("Listening on port {0} with services:", 
-                  webSocketServer.Port);
+            logger.Log("Listening on port " + webSocketServer.Port + " with services:");
 
             foreach (var path in webSocketServer.WebSocketServices.Paths)
-               Console.WriteLine ("- {0}", path);
+               logger.Log ("- " + path);
          }
 
          //Link the auth server to the websocket server
          Chat.LinkAuthServer(authServer);
 
-         Console.WriteLine("Press Q to stop the server...");
+         Console.WriteLine(">> Press Q to stop the server...");
 
          //Now enter the "server loop" and run forever?
          while(true)
@@ -87,8 +159,8 @@ namespace ChatServer
       {
          authServer.Stop();
          webSocketServer.Stop();
-         Console.WriteLine();
-         Console.WriteLine(message);
+         logger.Log(message);
+         logger.DumpToFile();
       }
 
       //Something to show build time.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace MyExtensions
 {
@@ -336,5 +337,20 @@ namespace MyExtensions
 			else
 				return possibilities.OrderBy(x => (double)StringExtensions.DamerauLevenshteinDistance(substring.ToLower(), x.ToLower()) / x.Length).First();
 		}
+
+      public static string PathFixer(string path) //A helper function which fixes paths if they don't include the ending slashes
+      {
+         if (!string.IsNullOrWhiteSpace(path) && !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            return path + Path.DirectorySeparatorChar;
+
+         return path;
+      }
+
+      //Convert byte array to hexadecimal string
+      public static string ByteToHex(byte[] ba)
+      {
+         string hex = BitConverter.ToString(ba);
+         return hex.Replace("-","");
+      }
 	}
 }

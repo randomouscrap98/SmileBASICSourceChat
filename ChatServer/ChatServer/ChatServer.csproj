@@ -44,21 +44,6 @@
     <Compile Include="..\..\main.cs">
       <Link>main.cs</Link>
     </Compile>
-    <Compile Include="..\..\Options.cs">
-      <Link>Options.cs</Link>
-    </Compile>
-    <Compile Include="..\..\string.cs">
-      <Link>string.cs</Link>
-    </Compile>
-    <Compile Include="..\..\user.cs">
-      <Link>user.cs</Link>
-    </Compile>
-    <Compile Include="..\..\StringExtensions.cs">
-      <Link>StringExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\log.cs">
-      <Link>logger.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />
@@ -72,5 +57,20 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Module\Module.csproj">
+      <Project>{42DCD240-6A25-4981-9017-2A566B99D42D}</Project>
+      <Name>Module</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MyExtensions\MyExtensions.csproj">
+      <Project>{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}</Project>
+      <Name>MyExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ChatEssentials\ChatEssentials.csproj">
+      <Project>{11915F24-34FB-4C4D-8CE7-3F509F8D5A42}</Project>
+      <Name>ChatEssentials</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

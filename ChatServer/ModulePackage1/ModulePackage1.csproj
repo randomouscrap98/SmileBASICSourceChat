@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E7D4D252-BC74-4C17-8288-874D31208813}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>ModulePackage1</RootNamespace>
+    <AssemblyName>ModulePackage1</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ReleaseVersion>0.1.*</ReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\modules\pmModule.cs">
+      <Link>pmModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\modules\smallModules.cs">
+      <Link>smallModules.cs</Link>
+    </Compile>
+    <Compile Include="..\..\modules\funModule.cs">
+      <Link>funModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\modules\debugModule.cs">
+      <Link>debugModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\modules\adminModule.cs">
+      <Link>adminModule.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Module\Module.csproj">
+      <Project>{42DCD240-6A25-4981-9017-2A566B99D42D}</Project>
+      <Name>Module</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ChatEssentials\ChatEssentials.csproj">
+      <Project>{11915F24-34FB-4C4D-8CE7-3F509F8D5A42}</Project>
+      <Name>ChatEssentials</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

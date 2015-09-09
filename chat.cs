@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Timers;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
@@ -8,16 +9,18 @@ using WebSocketSharp;
 using WebSocketSharp.Server;
 using Newtonsoft.Json;
 using MyExtensions;
+using ChatEssentials;
+using ModuleSystem;
 
 namespace ChatServer
 {
    //This is the thing that will get passed as the... controller to Websockets?
    public class Chat : WebSocketBehavior
    {
-      public const int MaxMessageKeep = 1000;
-      public const int MaxMessageSend = 10;
-
-      private string username = "";
+      private static int MaxMessageKeep = 1;
+      private static int MaxMessageSend = 1;
+      private static List<string> AllAcceptedTags = new List<string>();
+      private static string GlobalTag = "";
 
       private static AuthServer authServer;
       private static readonly Object authLock = new Object();
@@ -28,14 +31,46 @@ namespace ChatServer
       private static Dictionary<string, User> users = new Dictionary<string, User>();
       private static readonly Object userLock = new Object();
 
-      private MyExtensions.Logging.Logger logger = MyExtensions.Logging.Logger.DefaultLogger;
+      private string username = "";
+
+      private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
+      private readonly MyExtensions.Logging.Logger logger = MyExtensions.Logging.Logger.DefaultLogger;
+      private readonly List<Module> modules = new List<Module>();
 
       //Set up the logger when building the chat provider. Logging will go out to a file and the console
       //if possible. Otherwise, log to the default logger (which is like throwing them away)
-      public Chat(MyExtensions.Logging.Logger logger = null)
+      public Chat(List<Module> modules, int userUpdateInterval, MyExtensions.Logging.Logger logger = null)
       {
+         this.modules = modules;
+
+         userUpdateTimer.Interval = userUpdateInterval * 1000;
+         userUpdateTimer.Elapsed += UpdateActiveUserList;
+         userUpdateTimer.Start();
+
          if(logger != null)
             this.logger = logger;
+      }
+
+      public static void SetChatParameters(int maxMessageKeep, int maxMessageSend, string acceptedTags, string globalTag)
+      {
+         MaxMessageKeep = maxMessageKeep;
+         MaxMessageSend = maxMessageSend;
+
+         GlobalTag = globalTag;
+         AllAcceptedTags = acceptedTags.Split(",".ToCharArray(), 
+            StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+         AllAcceptedTags.Add(GlobalTag);
+      }
+
+      //This should be the ONLY place where the active state changes
+      private void UpdateActiveUserList(object source, System.Timers.ElapsedEventArgs e)
+      {
+         if (ThisUser.StatusChanged)
+         {
+            ThisUser.SaveActiveState();
+            Sessions.Broadcast(GetUserList());
+            logger.LogGeneral(username + " became " + (ThisUser.Active ? "active" : "inactive"), MyExtensions.Logging.LogLevel.Debug);
+         }
       }
 
       //The username for this session
@@ -49,12 +84,15 @@ namespace ChatServer
       {
          get
          {
-            lock (userLock) 
+            lock (userLock)
             {
-               if (!users.ContainsKey (username) && !string.IsNullOrWhiteSpace (username))
-                  users.Add (username, new User (username));
+               if (!users.ContainsKey(username) && !string.IsNullOrWhiteSpace(username))
+                  users.Add(username, new User(username));
 
-               return users [username];
+               if (users.ContainsKey(username))
+                  return users[username];
+               else
+                  return new User("default");
             }
          }
       }
@@ -94,7 +132,7 @@ namespace ChatServer
       }
 
       //Get JUST a list of users currently in chat (useful for auth)
-      public List<string> GetUsers()
+      public static List<string> GetUsers()
       {
          lock(chatLock)
          {
@@ -102,12 +140,15 @@ namespace ChatServer
          }
       }
 
-      //Get a JSON string representing a list of users currently in chat
-      public string GetUserList()
+      //Get a JSON string representing a list of users currently in chat. Do NOT call this while locking on userLock
+      public static  string GetUserList()
       {
          UserListJSONObject userList = new UserListJSONObject();
 
-         userList.users = GetUsers().Select(x => new UserJSONObject(x, true)).ToList();
+         lock (userLock)
+         {
+            userList.users = GetUsers().Select(x => new UserJSONObject(x, users[x].Active)).ToList();
+         }
 
          return JsonConvert.SerializeObject(userList);
       }
@@ -116,15 +157,18 @@ namespace ChatServer
       public string GetMessageList()
       {
          MessageListJSONObject jsonMessages = new MessageListJSONObject();
+         List<Message> visibleMessages; 
 
-         lock(messageLock)
+         lock (messageLock)
          {
-            for(int i = 0; i < Math.Min(MaxMessageKeep, messages.Count); i++)
-               jsonMessages.messages.Add(messages[messages.Count - 1 - i]);
-
-            //Oops, remember we added them in reverse order. Fix that
-            jsonMessages.messages.Reverse();
+            visibleMessages = messages.Where(x => x.Display).ToList();
          }
+
+         for(int i = 0; i < Math.Min(MaxMessageSend, visibleMessages.Count); i++)
+            jsonMessages.messages.Add(visibleMessages[visibleMessages.Count - 1 - i]);
+
+         //Oops, remember we added them in reverse order. Fix that
+         jsonMessages.messages.Reverse();
 
          return JsonConvert.SerializeObject(jsonMessages);
       }
@@ -171,7 +215,7 @@ namespace ChatServer
          }
 
          //If we got a bind message, let's try to authorize this channel.
-         if(type == "bind")
+         if (type == "bind")
          {
             try
             {
@@ -181,14 +225,14 @@ namespace ChatServer
                string newUser = json.username;
 
                //Oops, username was invalid
-               if(string.IsNullOrWhiteSpace(newUser))
+               if (string.IsNullOrWhiteSpace(newUser))
                {
                   response.errors.Add("Username was invalid");
                }
                else
                {
                   //Oops, auth key was invalid
-                  if(!CheckAuth(key, newUser))
+                  if (!CheckAuth(key, newUser))
                   {
                      response.errors.Add("Key was invalid");
                   }
@@ -196,9 +240,9 @@ namespace ChatServer
                   {
                      //Before we do anything, remove other chatting sessions
                      List<Chat> removals = activeChatters.Where(
-                           x => x.Username == newUser).Distinct().ToList();
+                                              x => x.Username == newUser).Distinct().ToList();
 
-                     foreach(Chat removeChat in removals)
+                     foreach (Chat removeChat in removals)
                         Sessions.CloseSession(removeChat.ID);
                      
                      //All is well.
@@ -206,9 +250,13 @@ namespace ChatServer
                      activeChatters.Add(this);
                      response.result = true;
                      logger.Log("Authenticated " + username + " for chat.");
+
+                     //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
+                     ThisUser.PerformOnPing();
                      Sessions.Broadcast(GetUserList());
                      UpdateAuthUsers();
-                     if(!ThisUser.PullInfoFromQueryPage())
+
+                     if (!ThisUser.PullInfoFromQueryPage())
                         logger.Warning("Couldn't get user information from website");
                      else
                         logger.Log("Staff: " + ThisUser.CanStaffChat);
@@ -220,6 +268,11 @@ namespace ChatServer
                response.errors.Add("BIND message was missing fields");
             }
          }
+         else if (type == "ping")
+         {
+            ThisUser.PerformOnPing();
+            UpdateActiveUserList(null, null);
+         }
          else if (type == "message")
          {
             try
@@ -229,9 +282,10 @@ namespace ChatServer
                string key = json.key;
                string message = System.Security.SecurityElement.Escape((string)json.text);
                string tag = json.tag;
-               WarningJSONObject tempWarning = new WarningJSONObject();
+               //WarningJSONObject tempWarning = new WarningJSONObject();
+               ThisUser.PullInfoFromQueryPage();
 
-               //Authenticate the user. If not, just quit.
+               //These first things don't increase spam score in any way
                if(string.IsNullOrWhiteSpace(message))
                {
                   response.errors.Add("No empty messages please");
@@ -245,60 +299,142 @@ namespace ChatServer
                   response.errors.Add("You are blocked for " + 
                      ThisUser.SecondsToUnblock + " second(s) for spamming");
                }
-               else if(Regex.IsMatch(message, @"^\s*/spamscore\s*$"))
+               else if (ThisUser.Banned)
                {
-                  tempWarning.warning = "This is a temporary debug feature.  " +
-                     "Your spam score is: " + ThisUser.SpamScore + 
-                     ", badness score: " + ThisUser.GlobalSpamScore;
-                  Send(tempWarning.ToString()); 
-               }
-               else if(Regex.IsMatch(message, @"^\s*/about\s*$"))
-               {
-                  DateTime built = ChatRunner.MyBuildDate();
-                  tempWarning.warning = "Chat server v" +
-                     ChatRunner.AssemblyVersion() + "\nBuilt " +
-                     StringExtensions.LargestTime(DateTime.Now - built) + 
-                     " ago (" + built.ToString("R") + ")";
-                  Send(tempWarning.ToString()); 
-               }
-               else if(Regex.IsMatch(message, @"^\s*/me\s+(.+)$"))
-               {
-                  Match match = Regex.Match(message, @"^\s*/me\s+(.+)$");
-                  tempWarning.warning = username + " " + match.Groups[1].Value;
-                  Sessions.Broadcast(tempWarning.ToString());
+                  response.errors.Add("You are banned from chat for " + 
+                     StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now));
                }
                else if (tag == "admin" && !ThisUser.CanStaffChat)
                {
-                  tempWarning.warning = "You can't post messages here. I'm sorry.";
-                  Send(tempWarning.ToString());
+                  response.errors.Add("You can't post messages here. I'm sorry.");
+               }
+               else if (!AllAcceptedTags.Contains(tag))
+               {
+                  response.errors.Add("Your post has an unrecognized tag. Cannot display");
                }
                else
                {
-                  WarningJSONObject warning;
+                  List<JSONObject> outputs = new List<JSONObject>();
+                  Message userMessage = new Message(username, message, tag);
+                  UserCommand userCommand;
+                  Module commandModule;
+                  string commandError;
+                  bool updateSpamScore = true;
 
-                  //User was authenticated (and we know the fields exist
-                  //because we just pulled them). Just go ahead and add the
-                  //message
-                  lock(messageLock)
+                  //Step 1: parse a possible command. If no command is parsed, no module will be written.
+                  if(TryCommandParse(userMessage, out commandModule, out userCommand, out commandError))
                   {
-                     warning = ThisUser.UpdateSpam(messages, message);
+                     Dictionary<string, User> tempUsers = new Dictionary<string, User>();
 
-                     if(ThisUser.BlockedUntil < DateTime.Now)
+                     lock(userLock)
                      {
-                        messages.Add(new Message(username, message, tag));
-                        messages = messages.Skip(Math.Max(0, messages.Count() - MaxMessageKeep)).ToList();
-                        ThisUser.PerformOnPost();
-                        response.result = true;
+                        tempUsers = new Dictionary<string, User>(users);
+                     }
+
+                     //We found a command. Send it off to the proper module and get the output
+                     lock(commandModule.Lock)
+                     {
+                        outputs.AddRange(commandModule.ProcessCommand(userCommand, ThisUser, tempUsers));
+                     }
+
+                     //do not update spam score if command module doesn't want it
+                     if(!userCommand.MatchedCommand.ShouldUpdateSpamScore)
+                        updateSpamScore = false;
+
+                     //For now, simply capture all commands no matter what.
+                     userMessage.SetHidden();
+
+                     logger.LogGeneral("Module " + commandModule.ModuleName + " processed command from " + username, 
+                        MyExtensions.Logging.LogLevel.Debug);
+                  }
+                  else
+                  {
+                     //If an error was given, add it to our response
+                     if(!string.IsNullOrWhiteSpace(commandError))
+                     {
+                        response.errors.Add("Command error: " + commandError);
+                        userMessage.SetHidden();
+                        updateSpamScore = false;
                      }
                   }
 
+                  //Update spam score
+                  if(updateSpamScore)
+                  {
+                     lock(messageLock)
+                     {
+                        WarningJSONObject warning = ThisUser.UpdateSpam(messages, message);
+                        if(warning != null)
+                           outputs.Add(warning);
+                     }
+                  }
+
+                  //Only add message to message list if we previously set that we should.
+                  if(ThisUser.BlockedUntil < DateTime.Now)
+                  {
+                     lock(messageLock)
+                     {
+                        messages.Add(userMessage);
+                        messages = messages.Skip(Math.Max(0, messages.Count() - MaxMessageKeep)).ToList();
+                     }
+                     ThisUser.PerformOnPost();
+                     response.result = response.errors.Count == 0;
+                  }
+
+                  //Now send out userlist if active status changed
+                  UpdateActiveUserList(null, null);
+
                   //Since we added a new message, we need to broadcast.
-                  if(response.result)
+                  if(response.result && userMessage.Display)
                      Sessions.Broadcast(GetMessageList());
 
-                  //Send a warning if you got one.
-                  if(warning != null)
-                     Send(warning.ToString());
+                  //Step 2: run regular message through all modules' regular message processor (probably no output?)
+
+                  //Step 3: run all modules' post processor (no message required)
+
+                  //Step 4: iterate over returned messages and send them out appropriately
+                  foreach(JSONObject jsonMessage in outputs)
+                  {
+                     //System messages are easy: just send to user.
+                     if(jsonMessage is SystemMessageJSONObject)
+                     {
+                        Send(jsonMessage.ToString());
+                     }
+                     else if (jsonMessage is WarningJSONObject)
+                     {
+                        Send(jsonMessage.ToString());
+                     }
+                     else if (jsonMessage is ModuleJSONObject)
+                     {
+                        ModuleJSONObject tempJSON = jsonMessage as ModuleJSONObject;
+                        tempJSON.username = username;
+
+                        if(string.IsNullOrWhiteSpace(tempJSON.tag))
+                           tempJSON.tag = tag;
+
+                        if(tempJSON.broadcast)
+                        { 
+                           Sessions.Broadcast(tempJSON.ToString());
+                           logger.LogGeneral("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
+                        }
+                        else
+                        {
+                           
+                           foreach(string user in tempJSON.recipients.Distinct())
+                           {
+                              if(activeChatters.Any(x => x.Username == user))
+                                 activeChatters.First(x => x.Username == user).Send(tempJSON.ToString());
+                              else
+                                 logger.LogGeneral("Recipient " + user + " in module message was not found", MyExtensions.Logging.LogLevel.Warning);
+                           }
+
+                           //No recipients? You probably meant to send it to the current user.
+                           if(tempJSON.recipients.Count == 0)
+                              Send(tempJSON.ToString());
+                        }
+                     }
+                  }
+                  //end of regular message processing
                }
             }
             catch
@@ -338,101 +474,135 @@ namespace ChatServer
 
          logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
       }
-   }
-
-   public abstract class JSONObject
-   {
-      public readonly string type;
-
-      public JSONObject(string type)
+         
+      /// <summary>
+      /// Parse and build command if possible. Assign module which will handle command. 
+      /// </summary>
+      /// <returns>Successful command parse</returns>
+      /// <param name="message">Message.</param>
+      /// <param name="commandModule">Command module.</param>
+      /// <param name="userCommand">User command.</param>
+      private bool TryCommandParse(Message message, out Module commandModule, out UserCommand userCommand, out string error)
       {
-         this.type = type;
+         userCommand = null;
+         commandModule = null;
+         error = "";
+
+         //Check through all modules for possible command match
+         foreach(Module module in modules)
+         {
+            //We already found the module, so get out.
+            if(commandModule != null)
+               break;
+
+            //Check through this module's command for possible match
+            foreach(ModuleCommand command in module.Commands)
+            {
+               Match match = Regex.Match(message.text, command.FullRegex);
+
+               //This command matched, so preparse the command and get out of here.
+               if(match.Success)
+               {
+                  //Build arguments from regex.
+                  List<string> arguments = new List<string>();
+                  for(int i = 2; i < match.Groups.Count; i++)
+                     arguments.Add(match.Groups[i].Value.Trim());
+
+                  //We have a user command. Cool, but will it parse? Ehhhh.
+                  userCommand = new UserCommand(match.Groups[1].Value, arguments, message, command);
+
+                  //Now preprocess the command to make sure certain standard fields check out (like username)
+                  for( int i = 0; i < command.Arguments.Count; i++)
+                  {
+                     //Users need to exist. If not, throw error.
+                     if (command.Arguments[i].Type == ArgumentType.User)
+                     {
+                        if (userCommand.Arguments[i].StartsWith("?"))
+                        {
+                           userCommand.Arguments[i] = StringExtensions.AutoCorrectionMatch(
+                              userCommand.Arguments[i].Replace("?", ""), GetUsers());
+                        }
+                        if (!users.ContainsKey(arguments[i]))
+                        {
+                           error = "User does not exist";
+                           return false;
+                        }
+                     }
+                     else if (command.Arguments[i].Type == ArgumentType.Module)
+                     {
+                        if (!modules.Any(x => x.Nickname == arguments[i].ToLower()))
+                        {
+                           error = "Module does not exist";
+                           return false;
+                        }
+                     }
+                  }
+
+                  commandModule = module;
+                  break;
+               }
+            }
+         }
+
+         return (commandModule != null);
+      }
+   }
+      
+   public class GlobalModule : Module
+   {
+
+      public GlobalModule()
+      {
+         commands.AddRange(new List<ModuleCommand> {
+            new ModuleCommand("about", new List<CommandArgument>(), "See information about the chat server"),
+            new ModuleCommand("help", new List<CommandArgument>(), "See all modules which you can get help with"),
+            new ModuleCommand("help", new List<CommandArgument>() {
+               new CommandArgument("module", ArgumentType.Module)
+            }, "Get help about a particular module")
+         });
       }
 
-      public override string ToString ()
+      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<string, User> users)
       {
-         return JsonConvert.SerializeObject(this);
-      }
-   }
+         List<JSONObject> outputs = new List<JSONObject>();
 
-   //Responses from the server should have this format.
-   public class ResponseJSONObject : JSONObject
-   {
-      public ResponseJSONObject() : base("response") {}
-      public string from = "unknown";
-      public bool result = false;
-      public List<string> errors = new List<string>();
-   }
+         ModuleJSONObject output = new ModuleJSONObject();
 
-   //Warnings to be sent to (usually one) users
-   public class WarningJSONObject : JSONObject
-   {
-      public WarningJSONObject() : base("warning") {}
-      public string warning = "";
-   }
+         switch (command.Command)
+         {
+            case "about":
+               output = new ModuleJSONObject();
+               DateTime built = ChatRunner.MyBuildDate();
+               output.message = "Chat server v" + ChatRunner.AssemblyVersion() + "\nBuilt " +
+                  StringExtensions.LargestTime(DateTime.Now - built) + " ago (" + built.ToString("R") + ")";
+               outputs.Add(output);
+               break;
+            case "help":
+               output = new ModuleJSONObject();
+               if (command.Arguments.Count == 0)
+               {
+                  output.message = "Which module would you like help with?\n";
 
-   //System messages have a similar format to warnings.
-   public class SystemMessageJSONObject : JSONObject
-   {
-      public SystemMessageJSONObject() : base("system") {}
-      public string message = "";
-   }
+                  foreach (Module module in ChatRunner.ActiveModules)
+                     output.message += "\n" + module.Nickname;
 
-   //The list of messages sent out in JSON should follow this format
-   public class MessageListJSONObject : JSONObject
-   {
-      public MessageListJSONObject() : base("messageList") {}
-      public List<Message> messages = new List<Message>();
-   }
+                  output.message += "\n\nRerun help command with a module name to see commands for that module";
+                  outputs.Add(output);
+               }
+               else
+               {
+                  output.message = "Commands for the " + command.Arguments[0] + " module:\n";
 
-   //Sending out a list of users should follow this format
-   public class UserListJSONObject : JSONObject
-   {
-      public UserListJSONObject() : base("userList") {}
-      public List<UserJSONObject> users = new List<UserJSONObject>();
-   }
+                  foreach(ModuleCommand moduleCommand in ChatRunner.ActiveModules.First(x => x.Nickname == command.Arguments[0]).Commands)
+                     output.message += "\n" + moduleCommand.DisplayString;
 
-   //A single user within the UserList JSON object
-   public class UserJSONObject
-   {
-      public readonly string username = "";
-      public bool active = false;
+                  outputs.Add(output);
+               }
+               break;
 
-      public UserJSONObject(string username, bool active)
-      {
-         this.username = username;
-         this.active = active;
-      }
-   }
+         }
 
-   //A message. It SHOULD be readonly, honestly.
-   public class Message
-   {
-      public readonly string username;
-      public readonly string text;
-      public readonly long id;
-      public readonly string tag;
-      private readonly DateTime postTime;
-      private static long NextID = 0;
-
-      public Message(string username, string message, string tag)
-      {
-         this.username = username;
-         this.text = message;
-         this.tag = tag;
-         this.postTime = DateTime.Now;
-         this.id = Interlocked.Increment(ref NextID);
-      }
-
-      public string time
-      {
-         get { return postTime.ToString() + " UTC"; }
-      }
-
-      //This is ONLY because we don't want to serialize it.
-      public DateTime PostTime()
-      {
-         return postTime;
+         return outputs;
       }
    }
 }

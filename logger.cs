@@ -22,6 +22,11 @@ namespace MyExtensions.Logging
       //If you want to log to a file, you must specify it in the constructor
       public Logger(int maxMessages = -1, string logFile = "")
       {
+         //First, try to create the file if it doesn't exist
+         if (!File.Exists (logFile) && !string.IsNullOrWhiteSpace(logFile))
+            File.Create (logFile);
+
+         //If it still doesn't exist, that means it's not accessible
          if (File.Exists (logFile))
          {
             this.logFile = logFile;
@@ -44,8 +49,9 @@ namespace MyExtensions.Logging
       public void StartAutoDumping(int secondInterval)
       {
          autoDumpTimer.Interval = 1000 * secondInterval;
-         autoDumpTimer.Elapsed += new ElapsedEventHandler (AutoDump);
+         autoDumpTimer.Elapsed += AutoDump;
          autoDumpTimer.Start ();
+         Log("Will start auto-dumping logs", "System");
       }
 
       //Stop dumping everywhere, jeez
@@ -104,7 +110,7 @@ namespace MyExtensions.Logging
             {
                if (!message.WasLoggedBy ("file"))
                {
-                  File.AppendText (message.ToString () + Environment.NewLine);
+                  File.AppendAllText (logFile, message.ToString () + Environment.NewLine);
                   message.SetLoggedBy ("file");
                }
             }
@@ -217,7 +223,7 @@ namespace MyExtensions.Logging
       public override string ToString ()
       {
          return string.Format ("[{0}]{1}{2}: {3}", TimeStamp.ToString("MM/dd/yy hh:mm:ss"),
-            (level == LogLevel.Normal ? "" : "{" + level.ToString()) + "}", (HasTag ? "(" + Tag + ")" : ""), Message);
+            (level == LogLevel.Normal ? "" : "{" + level.ToString() + "}"), (HasTag ? "(" + Tag + ")" : ""), Message);
       }
    }
 }

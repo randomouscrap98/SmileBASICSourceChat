@@ -1,0 +1,10 @@
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/MyExtensions/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/MyExtensions/bin/Debug/MyExtensions.dll.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/MyExtensions/bin/Debug/MyExtensions.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/MyExtensions/obj/Debug/MyExtensions.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/MyExtensions/obj/Debug/MyExtensions.dll.mdb
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/MyExtensions/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/MyExtensions/bin/Debug/MyExtensions.dll.mdb
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/MyExtensions/bin/Debug/MyExtensions.dll
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/MyExtensions/obj/Debug/MyExtensions.dll
+/home/cj/Desktop/smilebasic/chatserver/ChatServer/MyExtensions/obj/Debug/MyExtensions.dll.mdb
