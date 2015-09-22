@@ -17,11 +17,15 @@ namespace ChatServer
    //This is the thing that will get passed as the... controller to Websockets?
    public class Chat : WebSocketBehavior
    {
+      public const int HeaderSize = 64;
+
       private static int MaxMessageKeep = 1;
       private static int MaxMessageSend = 1;
       private static List<string> AllAcceptedTags = new List<string>();
       private static string GlobalTag = "";
 
+      private static BandwidthMonitor bandwidth = new BandwidthMonitor();
+      private static readonly Object bandwidthLock = new Object();
       private static AuthServer authServer;
       private static readonly Object authLock = new Object();
       private static List<Message> messages = new List<Message>();
@@ -36,6 +40,7 @@ namespace ChatServer
       private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
       private readonly MyExtensions.Logging.Logger logger = MyExtensions.Logging.Logger.DefaultLogger;
       private readonly List<Module> modules = new List<Module>();
+
 
       //Set up the logger when building the chat provider. Logging will go out to a file and the console
       //if possible. Otherwise, log to the default logger (which is like throwing them away)
@@ -62,13 +67,18 @@ namespace ChatServer
          AllAcceptedTags.Add(GlobalTag);
       }
 
+      public static BandwidthContainer GetBandwidth()
+      {
+         return (BandwidthContainer)bandwidth;
+      }
+
       //This should be the ONLY place where the active state changes
       private void UpdateActiveUserList(object source, System.Timers.ElapsedEventArgs e)
       {
          if (ThisUser.StatusChanged)
          {
             ThisUser.SaveActiveState();
-            Sessions.Broadcast(GetUserList());
+            MyBroadcast(GetUserList());
             logger.LogGeneral(username + " became " + (ThisUser.Active ? "active" : "inactive"), MyExtensions.Logging.LogLevel.Debug);
          }
       }
@@ -141,7 +151,7 @@ namespace ChatServer
       }
 
       //Get a JSON string representing a list of users currently in chat. Do NOT call this while locking on userLock
-      public static  string GetUserList()
+      public static string GetUserList()
       {
          UserListJSONObject userList = new UserListJSONObject();
 
@@ -164,13 +174,58 @@ namespace ChatServer
             visibleMessages = messages.Where(x => x.Display).ToList();
          }
 
-         for(int i = 0; i < Math.Min(MaxMessageSend, visibleMessages.Count); i++)
-            jsonMessages.messages.Add(visibleMessages[visibleMessages.Count - 1 - i]);
+         foreach (string tag in AllAcceptedTags.Where(x => x != GlobalTag))
+         {
+            List<Message> tagMessages = visibleMessages.Where(x => x.tag == tag).ToList();
+            for (int i = 0; i < Math.Min(MaxMessageSend, tagMessages.Count); i++)
+               jsonMessages.messages.Add(tagMessages[tagMessages.Count - 1 - i]);
+         }
 
          //Oops, remember we added them in reverse order. Fix that
-         jsonMessages.messages.Reverse();
+         jsonMessages.messages = jsonMessages.messages.OrderBy(x => x.id).ToList();
+         //jsonMessages.messages.Reverse();
 
          return JsonConvert.SerializeObject(jsonMessages);
+      }
+
+      protected void MySend(string message)
+      {
+         if (string.IsNullOrEmpty(message))
+            return;
+         
+         lock (bandwidthLock)
+         {
+            bandwidth.AddOutgoing(message.Length + HeaderSize);
+         }
+
+         try
+         {
+            Send(message);
+         }
+         catch (Exception e)
+         {
+            logger.Warning("Cannot send message: " + message + " to user: " + username + " because: " + e);
+         }
+      }
+
+      protected void MyBroadcast(string message)
+      {
+         if (string.IsNullOrEmpty(message))
+            return;
+         
+         lock (bandwidthLock)
+         {
+            bandwidth.AddOutgoing(Sessions.Count * (message.Length + HeaderSize));
+         }
+
+         try
+         {
+            Sessions.Broadcast(message);
+         }
+         catch (Exception e)
+         {
+            logger.Warning("Cannot broadcast message: " + message + " because: " + e);
+         }
       }
 
       protected override void OnOpen()
@@ -188,7 +243,7 @@ namespace ChatServer
          {
             username = "";
             activeChatters.Remove(this);
-            Sessions.Broadcast(GetUserList());
+            MyBroadcast(GetUserList());
          }
          UpdateAuthUsers();
       }
@@ -200,6 +255,15 @@ namespace ChatServer
          response.result = false;
          dynamic json = new Object();
          string type = "";
+
+         //Before anything else, log the amount of incoming data
+         if (!string.IsNullOrEmpty(e.Data))
+         {
+            lock (bandwidthLock)
+            {
+               bandwidth.AddIncoming(e.Data.Length + HeaderSize);
+            }
+         }
 
          //First, just try to parse the JSON they gave us. If it's absolute
          //garbage (or just not JSON), let them know and quit immediately.
@@ -253,7 +317,7 @@ namespace ChatServer
 
                      //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
                      ThisUser.PerformOnPing();
-                     Sessions.Broadcast(GetUserList());
+                     MyBroadcast(GetUserList());
                      UpdateAuthUsers();
 
                      if (!ThisUser.PullInfoFromQueryPage())
@@ -386,7 +450,7 @@ namespace ChatServer
 
                   //Since we added a new message, we need to broadcast.
                   if(response.result && userMessage.Display)
-                     Sessions.Broadcast(GetMessageList());
+                     MyBroadcast(GetMessageList());
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
 
@@ -398,11 +462,11 @@ namespace ChatServer
                      //System messages are easy: just send to user.
                      if(jsonMessage is SystemMessageJSONObject)
                      {
-                        Send(jsonMessage.ToString());
+                        MySend(jsonMessage.ToString());
                      }
                      else if (jsonMessage is WarningJSONObject)
                      {
-                        Send(jsonMessage.ToString());
+                        MySend(jsonMessage.ToString());
                      }
                      else if (jsonMessage is ModuleJSONObject)
                      {
@@ -414,7 +478,7 @@ namespace ChatServer
 
                         if(tempJSON.broadcast)
                         { 
-                           Sessions.Broadcast(tempJSON.ToString());
+                           MyBroadcast(tempJSON.ToString());
                            logger.LogGeneral("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
                         }
                         else
@@ -423,23 +487,24 @@ namespace ChatServer
                            foreach(string user in tempJSON.recipients.Distinct())
                            {
                               if(activeChatters.Any(x => x.Username == user))
-                                 activeChatters.First(x => x.Username == user).Send(tempJSON.ToString());
+                                 activeChatters.First(x => x.Username == user).MySend(tempJSON.ToString());
                               else
                                  logger.LogGeneral("Recipient " + user + " in module message was not found", MyExtensions.Logging.LogLevel.Warning);
                            }
 
                            //No recipients? You probably meant to send it to the current user.
                            if(tempJSON.recipients.Count == 0)
-                              Send(tempJSON.ToString());
+                              MySend(tempJSON.ToString());
                         }
                      }
                   }
                   //end of regular message processing
                }
             }
-            catch
+            catch (Exception messageError)
             {
-               response.errors.Add("Message was missing fields");
+               response.errors.Add("Internal server error: " + messageError.Message);
+               //response.errors.Add("Message was missing fields");
             }
          }
          else if (type == "request")
@@ -450,12 +515,12 @@ namespace ChatServer
 
                if(wanted == "userList")
                {
-                  Send(GetUserList());
+                  MySend(GetUserList());
                   response.result = true;
                }
                else if (wanted == "messageList")
                {
-                  Send(GetMessageList());
+                  MySend(GetMessageList());
                   response.result = true;
                }
                else
@@ -470,7 +535,7 @@ namespace ChatServer
          }
 
          //Send the "OK" message back.
-         Send(response.ToString());
+         MySend(response.ToString());
 
          logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
       }
@@ -498,7 +563,7 @@ namespace ChatServer
             //Check through this module's command for possible match
             foreach(ModuleCommand command in module.Commands)
             {
-               Match match = Regex.Match(message.text, command.FullRegex);
+               Match match = Regex.Match(message.text, command.FullRegex, RegexOptions.Singleline);
 
                //This command matched, so preparse the command and get out of here.
                if(match.Success)
@@ -555,6 +620,9 @@ namespace ChatServer
       {
          commands.AddRange(new List<ModuleCommand> {
             new ModuleCommand("about", new List<CommandArgument>(), "See information about the chat server"),
+            new ModuleCommand("uactest", new List<CommandArgument> {
+               new CommandArgument("shortuser", ArgumentType.User)
+            }, "Test user autocorrection (use ? on username to enable shorthand)"),
             new ModuleCommand("help", new List<CommandArgument>(), "See all modules which you can get help with"),
             new ModuleCommand("help", new List<CommandArgument>() {
                new CommandArgument("module", ArgumentType.Module)
@@ -572,9 +640,15 @@ namespace ChatServer
          {
             case "about":
                output = new ModuleJSONObject();
+               BandwidthContainer bandwidth = Chat.GetBandwidth();
                DateTime built = ChatRunner.MyBuildDate();
-               output.message = "Chat server v" + ChatRunner.AssemblyVersion() + "\nBuilt " +
-                  StringExtensions.LargestTime(DateTime.Now - built) + " ago (" + built.ToString("R") + ")";
+               output.message = 
+                  "---Build info---\n" +
+                  "Version: " + ChatRunner.AssemblyVersion() + "\n" +
+                  "Built " + StringExtensions.LargestTime(DateTime.Now - built) + " ago (" + built.ToString("R") + ")\n" +
+                  "---Data usage---\n" +
+                  "Outgoing: " + bandwidth.GetTotalBandwidthOutgoing() + " (1h: " + bandwidth.GetHourBandwidthOutgoing() + ")\n" +
+                  "Incoming: " + bandwidth.GetTotalBandwidthIncoming() + " (1h: " + bandwidth.GetHourBandwidthIncoming() + ")\n";
                outputs.Add(output);
                break;
             case "help":
@@ -599,7 +673,11 @@ namespace ChatServer
                   outputs.Add(output);
                }
                break;
-
+            case "uactest":
+               output = new ModuleJSONObject();
+               output.message = "User " + command.OriginalArguments[0] + " corrects to " + command.Arguments[0];
+               outputs.Add(output);
+               break;
          }
 
          return outputs;

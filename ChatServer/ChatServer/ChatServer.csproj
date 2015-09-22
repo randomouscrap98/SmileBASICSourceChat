@@ -44,6 +44,12 @@
     <Compile Include="..\..\main.cs">
       <Link>main.cs</Link>
     </Compile>
+    <Compile Include="..\..\bandwidth.cs">
+      <Link>bandwidth.cs</Link>
+    </Compile>
+    <Compile Include="..\..\pm.cs">
+      <Link>pm.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />

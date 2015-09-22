@@ -30,7 +30,7 @@ namespace ChatServer
       //Auth crap
       private RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
       private Dictionary<string, AuthData> authCodes = new Dictionary<string, AuthData>();
-      private Object authLock = new Object();
+      private readonly Object authLock = new Object();
 
       //Set up the auth server with the given logger. Otherwise, log to an internal logger
       public AuthServer(int port, MyExtensions.Logging.Logger logger = null)
@@ -241,8 +241,8 @@ namespace ChatServer
          lock(authLock)
          {
             //Oops, the user code expired. Just remove it
-            if(authCodes.ContainsKey(username) && authCodes[username].Expired)
-               authCodes.Remove(username);
+//            if(authCodes.ContainsKey(username) && authCodes[username].Expired)
+//               authCodes.Remove(username);
 
             //We need to generate a new auth for this user if they're not in
             //the auth list OR their old key is expired.

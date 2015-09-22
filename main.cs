@@ -23,6 +23,7 @@ namespace ChatServer
       private static AuthServer authServer;
       private static MyExtensions.Logging.Logger logger;
       private static ModuleLoader loader;
+      private static MyExtensions.Options options = new MyExtensions.Options();
 
       public const string ConfigFile = "config.xml";
       public const string ModuleConfigFile = "moduleConfig.xml";
@@ -48,11 +49,12 @@ namespace ChatServer
             {"globalTag", "any"},
             {"userUpdateInterval", 60},
             {"inactiveMinutes", 5},
-            {"spamBlockSeconds", 20}
+            {"spamBlockSeconds", 20},
+            {"buildHourModifier", 4}
          };
 
          //Set up and read options. We need to do this first so that the values can be used for init
-         MyExtensions.Options options = new MyExtensions.Options();
+         options = new MyExtensions.Options();
          options.AddOptions(OptionTag, defaultOptions);
 
          //Oops, can't load options from file. Just use defaults
@@ -205,6 +207,8 @@ namespace ChatServer
          var buildDateTime = new DateTime(2000, 1, 1).Add(new TimeSpan(
             TimeSpan.TicksPerDay * version.Build + // days since 1 January 2000
             TimeSpan.TicksPerSecond * 2 * version.Revision)); // seconds since midnight, (multiply by 2 to get original)
+
+         buildDateTime = buildDateTime.AddHours(options.GetAsType<int>(OptionTag, "buildHourModifier"));
 
          return buildDateTime;
       }

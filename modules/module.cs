@@ -298,7 +298,7 @@ namespace ModuleSystem
             string display = CommandStart + Command;
 
             foreach (CommandArgument argument in Arguments)
-               display += " [" + argument.Name + "]";
+               display += " [" + (argument.Type == ArgumentType.User ? "?" : "") + argument.Name + "]";
 
             display += " => " + Description;
 
@@ -321,12 +321,14 @@ namespace ModuleSystem
    {
       public readonly string Command;
       public readonly List<string> Arguments;
+      public readonly List<string> OriginalArguments;
       public readonly ModuleCommand MatchedCommand;
 
       public UserCommand(string command, List<string> parts, Message originalMessage, ModuleCommand matched) : base(originalMessage)
       {
          Command = command;
          Arguments = parts;
+         OriginalArguments = new List<string>(parts);
          MatchedCommand = matched;
       }
    }

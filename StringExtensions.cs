@@ -53,7 +53,29 @@ namespace MyExtensions
       //Returns a normalized number between 0 and 1 representing the difference. 0 means strings are the same
       public static double StringDifference(string s1, string s2)
       {
-         return (double)LevenshteinDistance(s1, s2) / Math.Max(s1.Length, s2.Length);
+         //Go through all the subsets matching the shorter string to the longer string and get the min distance.
+         string longer = s1;
+         string shorter = s2;
+
+         if (s1.Length < s2.Length)
+         {
+            longer = s2;
+            shorter = s1;
+         }
+
+         int minLength = int.MaxValue;
+
+         for (int i = 0; i < longer.Length - shorter.Length; i++)
+         {
+            int subLength = LevenshteinDistance(shorter, longer.Substring(i, shorter.Length));
+
+            if (subLength < minLength)
+               minLength = subLength;
+         }
+
+         return 0.8 * ((double)minLength / shorter.Length) + 0.2 * ((double)LevenshteinDistance(s1, s2) / longer.Length);
+
+         //return (double)LevenshteinDistance(s1, s2) / Math.Max(s1.Length, s2.Length);
       }
 
 		private static int GetStupid(int x, int y, int[,] silly)
