@@ -50,7 +50,8 @@ namespace ChatServer
             {"userUpdateInterval", 60},
             {"inactiveMinutes", 5},
             {"spamBlockSeconds", 20},
-            {"buildHourModifier", 4}
+            {"buildHourModifier", 4},
+            {"website", "http://development.smilebasicsource.com"}
          };
 
          //Set up and read options. We need to do this first so that the values can be used for init
@@ -114,7 +115,8 @@ namespace ChatServer
 
          //Also set user parameters
          User.SetUserParameters(options.GetAsType<int>(OptionTag, "spamBlockSeconds"),
-            options.GetAsType<int>(OptionTag, "inactiveMinutes"));
+            options.GetAsType<int>(OptionTag, "inactiveMinutes"),
+            options.GetAsType<string>(OptionTag, "website"));
          
          //Now, set up websocket server
          webSocketServer = new WebSocketServer(options.GetAsType<int>(OptionTag, "chatServerPort"));
@@ -159,8 +161,11 @@ namespace ChatServer
       //IDK a way to end everything.
       private static void Finish(string message = "Done")
       {
+         logger.Log("Stopping auth server...");
          authServer.Stop();
+         logger.Log("Stopping chat server...");
          webSocketServer.Stop();
+         logger.Log("Stopping logger...");
          logger.Log(message);
          logger.DumpToFile();
       }

@@ -13,6 +13,7 @@ namespace ChatEssentials
    {
       private static int SpamBlockSeconds = 1;
       private static int InactiveMinutes = 1;
+      private static string Website = "";
 
       private string username = "";
       private int spamScore = 0;
@@ -36,10 +37,11 @@ namespace ChatEssentials
       }
 
       //Set static user parameters (constants, probably from an options file)
-      public static void SetUserParameters(int spamBlockSeconds, int inactiveMinutes)
+      public static void SetUserParameters(int spamBlockSeconds, int inactiveMinutes, string website)
       {
          SpamBlockSeconds = spamBlockSeconds;
          InactiveMinutes = inactiveMinutes;
+         Website = website;
       }
 
       public DateTime LastPost
@@ -148,9 +150,13 @@ namespace ChatEssentials
          {
             using (WebClient client = new WebClient())
             {
-               string url = "http://development.smilebasicsource.com/query/usercheck.php?getinfo=1&username=";
+               string url = Website + "/query/usercheck.php?getinfo=1&uid=";
                url += Uri.EscapeDataString(username);
                string htmlCode = client.DownloadString(url);
+
+               //Console.WriteLine("URL: " + url);
+               //Console.WriteLine("Username: " + username);
+               //Console.WriteLine("Result: " + htmlCode);
 
                dynamic json = JsonConvert.DeserializeObject(htmlCode);
 

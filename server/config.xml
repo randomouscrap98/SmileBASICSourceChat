@@ -24,12 +24,12 @@
       <HashSize>0</HashSize>
     </a4:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_b77a5c561934e089_x005D__x005D_>
     <a4:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_b77a5c561934e089_x005D__x005D_ id="ref-7" xmlns:a4="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0">
-      <Version>28</Version>
+      <Version>30</Version>
       <Comparer href="#ref-2" />
       <HashSize>17</HashSize>
       <KeyValuePairs href="#ref-8" />
     </a4:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_b77a5c561934e089_x005D__x005D_>
-    <SOAP-ENC:Array id="ref-8" xmlns:a5="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0" SOAP-ENC:arrayType="a5:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_b77a5c561934e089_x005D__x005D_[14]">
+    <SOAP-ENC:Array id="ref-8" xmlns:a5="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0" SOAP-ENC:arrayType="a5:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_b77a5c561934e089_x005D__x005D_[15]">
       <item>
         <key id="ref-9">loggerBacklog</key>
         <value xsi:type="xsd:int">100</value>
@@ -85,6 +85,10 @@
       <item>
         <key id="ref-25">buildHourModifier</key>
         <value xsi:type="xsd:int">4</value>
+      </item>
+      <item>
+        <key id="ref-26">website</key>
+        <value id="ref-27" xsi:type="SOAP-ENC:string">http://development.smilebasicsource.com</value>
       </item>
     </SOAP-ENC:Array>
   </SOAP-ENV:Body>

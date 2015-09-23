@@ -154,10 +154,11 @@ namespace ChatServer
       public static string GetUserList()
       {
          UserListJSONObject userList = new UserListJSONObject();
+         List<string> activeUsers = GetUsers();
 
          lock (userLock)
          {
-            userList.users = GetUsers().Select(x => new UserJSONObject(x, users[x].Active)).ToList();
+            userList.users = activeUsers.Select(x => new UserJSONObject(x, users[x].Active)).ToList();
          }
 
          return JsonConvert.SerializeObject(userList);
@@ -212,20 +213,33 @@ namespace ChatServer
       {
          if (string.IsNullOrEmpty(message))
             return;
-         
-         lock (bandwidthLock)
-         {
-            bandwidth.AddOutgoing(Sessions.Count * (message.Length + HeaderSize));
-         }
 
-         try
+         lock (chatLock)
          {
-            Sessions.Broadcast(message);
+            foreach (Chat chatter in activeChatters)
+               chatter.MySend(message);
          }
-         catch (Exception e)
-         {
-            logger.Warning("Cannot broadcast message: " + message + " because: " + e);
-         }
+//         try
+//         {
+//            int sessionCount = Sessions.Count;
+//            lock (bandwidthLock)
+//            {
+//               bandwidth.AddOutgoing(sessionCount * (message.Length + HeaderSize));
+//            }
+//         }
+//         catch
+//         {
+//            logger.Warning("Couldn't update bandwidth");
+//         }
+//
+//         try
+//         {
+//            Sessions.Broadcast(message);
+//         }
+//         catch (Exception e)
+//         {
+//            logger.Warning("Cannot broadcast message: " + message + " because: " + e);
+//         }
       }
 
       protected override void OnOpen()
@@ -243,8 +257,9 @@ namespace ChatServer
          {
             username = "";
             activeChatters.Remove(this);
-            MyBroadcast(GetUserList());
          }
+
+         MyBroadcast(GetUserList());
          UpdateAuthUsers();
       }
 
