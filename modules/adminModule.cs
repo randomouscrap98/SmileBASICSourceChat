@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace ModulePackage1
 {
-   public class AdminModule : Module
+   /*public class AdminModule : Module
    {
       public AdminModule()
       {
@@ -24,7 +24,7 @@ namespace ModulePackage1
          }, "Remove a user's ban"));
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<string, User> users)
+      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
       {
          List<JSONObject> outputs = new List<JSONObject>();
          ModuleJSONObject moduleOutput;
@@ -55,7 +55,7 @@ namespace ModulePackage1
                string banError;
 
                if (!TryBanQuery(new Dictionary<string, string> {
-                  { "username", command.username },
+                  { "username", command.uid },
                   { "time", hours.ToString() } }, out banError))
                {
                   moduleOutput.message = banError;
@@ -63,7 +63,7 @@ namespace ModulePackage1
                   break;
                }
 
-               moduleOutput.message = command.username + " " + command.Arguments[0];
+               moduleOutput.message = command.uid + " " + command.Arguments[0];
                outputs.Add(moduleOutput);
                break;
          }
@@ -104,5 +104,5 @@ namespace ModulePackage1
 
          return result;
       }
-   }
+   }*/
 }

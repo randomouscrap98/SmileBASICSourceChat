@@ -15,7 +15,8 @@ namespace ChatEssentials
       private static int InactiveMinutes = 1;
       private static string Website = "";
 
-      private string username = "";
+      private readonly int uid = 0;
+      private string username = "default";
       private int spamScore = 0;
       private int globalSpamScore = 0;
 
@@ -31,9 +32,19 @@ namespace ChatEssentials
 
       private readonly Object Lock = new Object();
 
-      public User(string name)
+      public User(int uid)
       {
-         username = name;
+         this.uid = uid;
+      }
+
+      public string Username
+      {
+         get { return username; }
+      }
+
+      public int UID
+      {
+         get { return uid; }
       }
 
       //Set static user parameters (constants, probably from an options file)
@@ -150,8 +161,7 @@ namespace ChatEssentials
          {
             using (WebClient client = new WebClient())
             {
-               string url = Website + "/query/usercheck.php?getinfo=1&uid=";
-               url += Uri.EscapeDataString(username);
+               string url = Website + "/query/usercheck.php?getinfo=1&uid=" + uid;
                string htmlCode = client.DownloadString(url);
 
                //Console.WriteLine("URL: " + url);
@@ -162,6 +172,7 @@ namespace ChatEssentials
 
                lock(Lock)
                {
+                  username = json.result.username;
                   staffChat = json.result.permissions.staffchat;
                   chatBanned = json.result.chatbanned;
                   bannedUntil = DateExtensions.FromUnixTime((double)json.result.banneduntil);
@@ -184,8 +195,7 @@ namespace ChatEssentials
          //Look at all the messages and see how many messages in the 
          //last minute were theirs (up to 10). Increase spam score accordingly
          List<Message> myMessages = messages.Where(x => 
-         (DateTime.Now - x.PostTime()).TotalMinutes < 1 &&
-                                 x.username == username).ToList();
+            (DateTime.Now - x.PostTime()).TotalMinutes < 1 && x.uid == uid).ToList();
 
          //Update spam score based on last message length, how many previous
          //messages were theirs, and how long it has been since the last

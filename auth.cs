@@ -29,7 +29,7 @@ namespace ChatServer
 
       //Auth crap
       private RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
-      private Dictionary<string, AuthData> authCodes = new Dictionary<string, AuthData>();
+      private Dictionary<int, AuthData> authCodes = new Dictionary<int, AuthData>();
       private readonly Object authLock = new Object();
 
       //Set up the auth server with the given logger. Otherwise, log to an internal logger
@@ -185,11 +185,11 @@ namespace ChatServer
                   //If the client wants an auth code, send it.
                   if(json.type == "auth")
                   {
-                     byte[] response = System.Text.Encoding.ASCII.GetBytes(
-                           RequestAuth((string)json.username));
+                     string auth = RequestAuth((int)json.uid);
+                     byte[] response = System.Text.Encoding.ASCII.GetBytes(auth);
                      stream.Write(response, 0, response.Length);
 
-                     logger.Log("Sent authorization token for user: " + json.username);
+                     logger.Log("Sent authorization token " + auth + " for user " + json.uid);
                   }
                }
                catch (Exception e)
@@ -209,7 +209,7 @@ namespace ChatServer
       }
 
       //Update the list of users who should have an authorization code
-      public void UpdateUserList(List<string> users)
+      public void UpdateUserList(List<int> users)
       {
          lock(authLock)
          {
@@ -221,21 +221,21 @@ namespace ChatServer
             
             //Next, add new users by simply adding those which were not already
             //in the dictionary.
-            foreach(string user in users.Except(authCodes.Keys))
+            foreach(int user in users.Except(authCodes.Keys))
                RequestAuth(user); //Remember this automatically adds users 
 
             logger.Log("Users with outstanding authentication codes: " + 
-                  string.Join(", ", authCodes.Keys));
+               string.Join(", ", authCodes.Keys));
          }
       }
 
       //The difference between requestauth and getauth is that getauth simply
       //returns the authentication code; requestauth actually generates an
       //authentication code for users that don't have one yet. 
-      private string RequestAuth(string username)
+      private string RequestAuth(int uid)
       {
-         //If the username doesn't contain any characters, just return bogus
-         if(string.IsNullOrWhiteSpace(username))
+         //If the uid isn't valid, just return bogus authkey
+         if(uid <= 0)
             return GenerateAuth();
 
          lock(authLock)
@@ -246,24 +246,24 @@ namespace ChatServer
 
             //We need to generate a new auth for this user if they're not in
             //the auth list OR their old key is expired.
-            if(!authCodes.ContainsKey(username))
-               authCodes.Add(username, new AuthData(GenerateAuth()));
+            if(!authCodes.ContainsKey(uid))
+               authCodes.Add(uid, new AuthData(GenerateAuth()));
 
             //Now get the authentication
-            return authCodes[username].AuthKey; 
+            return authCodes[uid].AuthKey; 
          }
       }
 
       //Get the authorization code for the given user.
-      public string GetAuth(string username)
+      public string GetAuth(int uid)
       {
          lock(authLock)
          {
             //Return some bogus authentication code if the username doesn't exist
-            if(!authCodes.ContainsKey(username))
+            if(!authCodes.ContainsKey(uid))
                return GenerateAuth();
             else
-               return authCodes[username].AuthKey;
+               return authCodes[uid].AuthKey;
          }
       }
 

@@ -76,7 +76,7 @@
       </item>
       <item>
         <key id="ref-24">inactiveMinutes</key>
-        <value id="ref-25" xsi:type="SOAP-ENC:string">5</value>
+        <value id="ref-25" xsi:type="SOAP-ENC:string">1</value>
       </item>
       <item>
         <key id="ref-26">spamBlockSeconds</key>

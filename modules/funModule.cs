@@ -19,7 +19,7 @@ namespace ModulePackage1
          AddOptions(new Dictionary<string, object>{{"emoteLink", "http://development.smilebasicsource.com/emotes.json"}});
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<string, User> users)
+      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
       {
          List<JSONObject> outputs = new List<JSONObject>();
          ModuleJSONObject moduleOutput;
@@ -29,7 +29,7 @@ namespace ModulePackage1
             case "me":
                moduleOutput = new ModuleJSONObject();
                moduleOutput.broadcast = true;
-               moduleOutput.message = command.username + " " + command.Arguments[0];
+               moduleOutput.message = user.Username + " " + command.Arguments[0];
                outputs.Add(moduleOutput);
                break;
 

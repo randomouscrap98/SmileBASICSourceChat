@@ -2,6 +2,7 @@ using System;
 using ModuleSystem;
 using System.Collections.Generic;
 using ChatEssentials;
+using System.Linq;
 
 namespace ModulePackage1
 {
@@ -17,7 +18,7 @@ namespace ModulePackage1
          });
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<string, User> users)
+      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
       {
          List<JSONObject> outputs = new List<JSONObject>();
          ModuleJSONObject output = new ModuleJSONObject();
@@ -25,11 +26,20 @@ namespace ModulePackage1
          switch (command.Command)
          {
             case "pm":
+               //First, make sure this even works
+               User recipient;
                output = new ModuleJSONObject();
+
+               if (!GetUserFromArgument(command.Arguments[0], users, out recipient))
+               {
+                  AddError(outputs);
+                  break;
+               }
+               
                output.tag = "any";
-               output.message = command.username + " -> " + command.Arguments[0] + ":\n" + command.Arguments[1];
-               output.recipients.Add(command.Arguments[0]);
-               output.recipients.Add(command.username);
+               output.message = user.Username + " -> " + command.Arguments[0] + ":\n" + command.Arguments[1];
+               output.recipients.Add(recipient.UID);
+               output.recipients.Add(command.uid);
                outputs.Add(output);
                break;
          }

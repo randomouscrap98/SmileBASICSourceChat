@@ -60,7 +60,28 @@ namespace ModuleSystem
          this.options.AddOptions(ModuleName, options);
       }
 
-      public virtual List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<string, User> users)
+      protected bool GetUserFromArgument(string argument, Dictionary<int, User> users, out User user)
+      {
+         user = null;
+         try
+         {
+            user = users.First(x => x.Value.Username == argument).Value;
+            return true;
+         }
+         catch
+         {
+            return false;
+         }
+      }
+
+      protected void AddError(List<JSONObject> output)
+      {
+         ModuleJSONObject error = new ModuleJSONObject();
+         error.message = "An internal error occurred for the " + Nickname + " module";
+         output.Add(error);
+      }
+
+      public virtual List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
       {
          List<JSONObject> output = new List<JSONObject>();
 
@@ -330,6 +351,17 @@ namespace ModuleSystem
          Arguments = parts;
          OriginalArguments = new List<string>(parts);
          MatchedCommand = matched;
+      }
+
+      public UserCommand(UserCommand copy) : base(copy)
+      {
+         if (copy != null)
+         {
+            Command = copy.Command;
+            Arguments = new List<string>(copy.Arguments);
+            OriginalArguments = new List<string>(copy.OriginalArguments);
+            MatchedCommand = copy.MatchedCommand;
+         }
       }
    }
 

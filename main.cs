@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using ModuleSystem;
 using ChatEssentials;
 
-[assembly: AssemblyVersion("0.2.*")]
+[assembly: AssemblyVersion("0.3.*")]
 
 namespace ChatServer
 {

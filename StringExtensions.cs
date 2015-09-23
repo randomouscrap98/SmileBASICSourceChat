@@ -65,7 +65,7 @@ namespace MyExtensions
 
          int minLength = int.MaxValue;
 
-         for (int i = 0; i < longer.Length - shorter.Length; i++)
+         for (int i = 0; i <= longer.Length - shorter.Length; i++)
          {
             int subLength = LevenshteinDistance(shorter, longer.Substring(i, shorter.Length));
 
@@ -73,7 +73,7 @@ namespace MyExtensions
                minLength = subLength;
          }
 
-         return 0.8 * ((double)minLength / shorter.Length) + 0.2 * ((double)LevenshteinDistance(s1, s2) / longer.Length);
+         return 0.9 * ((double)minLength / shorter.Length) + 0.1 * ((double)LevenshteinDistance(s1, s2) / longer.Length);
 
          //return (double)LevenshteinDistance(s1, s2) / Math.Max(s1.Length, s2.Length);
       }

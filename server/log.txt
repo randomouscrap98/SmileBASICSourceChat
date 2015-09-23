@@ -27407,3 +27407,63 @@
 [09/23/15 05:05:17]{Debug}: Got message: {"type":"ping"}
 [09/23/15 05:06:24]{Debug}: Got message: {"type":"ping"}
 [09/23/15 05:06:27]{Debug}: Got message: {"type":"ping"}
+[09/23/15 05:08:38]{Debug}: randomouscrap98 became inactive
+[09/23/15 05:11:37]{Debug}: bluesun became inactive
+[09/23/15 05:23:49]{Debug}: randomouscrap98 became active
+[09/23/15 05:23:49]{Debug}: Got message: {"type":"ping"}
+[09/23/15 05:29:38]{Debug}: randomouscrap98 became inactive
+[09/23/15 05:45:07]{Debug}: randomouscrap98 became active
+[09/23/15 05:45:07]{Debug}: Got message: {"type":"ping"}
+[09/23/15 05:45:10]: Sent authorization token for user: randomouscrap98
+[09/23/15 05:45:10]: Session disconnect: randomouscrap98
+[09/23/15 05:45:10]: Users with outstanding authentication codes: BrianXP7, bluesun
+[09/23/15 05:45:10]{Debug}: Got message: {"type":"bind","username":"randomouscrap98","key":"A985A3D7EF32704B"}
+[09/23/15 05:45:10]: Session disconnect: 
+[09/23/15 05:45:10]: Users with outstanding authentication codes: BrianXP7, bluesun
+[09/23/15 05:45:11]: Sent authorization token for user: randomouscrap98
+[09/23/15 05:45:11]: Authenticated randomouscrap98 for chat.
+[09/23/15 05:45:11]: Users with outstanding authentication codes: BrianXP7, bluesun, randomouscrap98
+[09/23/15 05:45:11]: Staff: True
+[09/23/15 05:45:11]{Debug}: Got message: {"type":"bind","username":"randomouscrap98","key":"DBF78D488FBA36E1"}
+[09/23/15 05:45:12]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 05:45:12]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 05:45:13]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 05:51:11]{Debug}: randomouscrap98 became inactive
+[09/23/15 05:52:08]{Debug}: randomouscrap98 became active
+[09/23/15 05:52:08]{Debug}: Got message: {"type":"ping"}
+[09/23/15 05:52:12]{Debug}: Got message: {"type":"ping"}
+[09/23/15 05:58:11]{Debug}: randomouscrap98 became inactive
+[09/23/15 06:04:33]{Debug}: randomouscrap98 became active
+[09/23/15 06:04:33]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:06:28]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:09:31]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:15:11]{Debug}: randomouscrap98 became inactive
+[09/23/15 06:33:16]{Debug}: randomouscrap98 became active
+[09/23/15 06:33:16]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:39:11]{Debug}: randomouscrap98 became inactive
+[09/23/15 06:42:28]{Debug}: randomouscrap98 became active
+[09/23/15 06:42:28]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:42:51]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:43:55]{Debug}: BrianXP7 became active
+[09/23/15 06:43:55]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:43:56]: Session disconnect: BrianXP7
+[09/23/15 06:43:56]: Users with outstanding authentication codes: bluesun, randomouscrap98
+[09/23/15 06:45:36]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:51:11]{Debug}: randomouscrap98 became inactive
+[09/23/15 06:51:57]{Debug}: randomouscrap98 became active
+[09/23/15 06:51:57]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:52:12]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:53:12]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:53:19]{Debug}: Got message: {"type":"message","text":"I'm afraid to put up the shiny new (probably about as stable as a needle balanced on a canoe) chat server... but I need it to be tested with real world usage lol","key":"DBF78D488FBA36E1","tag":"offtopic"}
+[09/23/15 06:55:51]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:56:02]{Debug}: Got message: {"type":"message","text":"Someone is DEFINITELY pinging me! What the heck...","key":"DBF78D488FBA36E1","tag":"offtopic"}
+[09/23/15 06:56:58]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:57:12]{Debug}: Got message: {"type":"ping"}
+[09/23/15 06:57:20]{Debug}: Got message: {"type":"message","text":">unit tests on a chat server, how to?","key":"DBF78D488FBA36E1","tag":"offtopic"}
+[09/23/15 07:03:11]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:03:12]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:04:19]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:04:23]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:06:12]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:07:12]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:07:16]{Debug}: Got message: {"type":"message","text":"Blue, if you see this, I'm \"upgrading\" the chat server. It's all backend stuff (not that anyone cares anyway), so it won't look or act any different. The ENTIRE backend was ripped apart and put back together though, and even though I tested it for like an hour.... uhhh IDK. It's probably still ripped apart in places I didn't think to look.","key":"DBF78D488FBA36E1","tag":"offtopic"}

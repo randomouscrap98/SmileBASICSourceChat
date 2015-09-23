@@ -62,12 +62,12 @@ namespace ChatEssentials
    //A single user within the UserList JSON object
    public class UserJSONObject
    {
-      public readonly string username = "";
+      public readonly int uid = 0;
       public bool active = false;
 
-      public UserJSONObject(string username, bool active)
+      public UserJSONObject(int uid, bool active)
       {
-         this.username = username;
+         this.uid = uid;
          this.active = active;
       }
    }
@@ -76,17 +76,17 @@ namespace ChatEssentials
    {
       public ModuleJSONObject() : base("module") {}
       public string message = "";
-      public string username = "";
+      public int uid = 0;
       public bool broadcast = false;
       public string tag = "";
-      public List<string> recipients = new List<string>();
+      public List<int> recipients = new List<int>();
    }
 
 
    //A message. It SHOULD be readonly, honestly.
    public class Message
    {
-      public readonly string username;
+      public readonly int uid;
       public readonly string text;
       public readonly long id;
       public readonly string tag;
@@ -95,9 +95,9 @@ namespace ChatEssentials
 
       private bool display = true;
 
-      public Message(string username, string message, string tag)
+      public Message(int uid, string message, string tag)
       {
-         this.username = username;
+         this.uid = uid;
          this.text = message;
          this.tag = tag;
          this.postTime = DateTime.Now;
@@ -106,11 +106,14 @@ namespace ChatEssentials
 
       public Message(Message copy)
       {
-         username = copy.username;
-         text = copy.text;
-         id = copy.id;
-         tag = copy.tag;
-         postTime = copy.postTime;
+         if (copy != null)
+         {
+            uid = copy.uid;
+            text = copy.text;
+            id = copy.id;
+            tag = copy.tag;
+            postTime = copy.postTime;
+         }
       }
 
       public string time
