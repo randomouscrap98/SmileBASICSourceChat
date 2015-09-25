@@ -338,14 +338,14 @@ namespace ModuleSystem
       }
    }
 
-   public class UserCommand : Message
+   public class UserCommand : UserMessageJSONObject
    {
       public readonly string Command;
       public readonly List<string> Arguments;
       public readonly List<string> OriginalArguments;
       public readonly ModuleCommand MatchedCommand;
 
-      public UserCommand(string command, List<string> parts, Message originalMessage, ModuleCommand matched) : base(originalMessage)
+      public UserCommand(string command, List<string> parts, UserMessageJSONObject originalMessage, ModuleCommand matched) : base(originalMessage)
       {
          Command = command;
          Arguments = parts;

@@ -18,6 +18,7 @@ namespace ChatServer
       public const string Address = "127.0.0.1";
       public const int ThreadSleepMilliseconds = 10;
       public const int MaxWaitSeconds = 5;
+      public const string LogTag = "Authentication";
 
       //Server crap
       private bool stop = false;
@@ -41,13 +42,23 @@ namespace ChatServer
             this.logger = logger;
       }
 
+      public void Log(string message, MyExtensions.Logging.LogLevel level = MyExtensions.Logging.LogLevel.Normal)
+      {
+         logger.LogGeneral(message, level, LogTag);
+      }
+
+      public void Error(string message)
+      {
+         Log(message, MyExtensions.Logging.LogLevel.Error);
+      }
+
       //This should (hopefully) start the authorization server
       public bool Start()
       {
          //Oops, we already have a spinner for authorization stuff
          if(authSpinner != null)
          {
-            logger.Error("Auth server already running");
+            Error("Auth server already running");
             return false;
          }
 
@@ -64,7 +75,7 @@ namespace ChatServer
          }
          catch(Exception e)
          {
-            logger.Error(e.ToString());
+            Error(e.ToString());
             return false;
          }
 
@@ -85,7 +96,7 @@ namespace ChatServer
          //need to force its hand.
          if(!SpinWait())
          {
-            logger.Error("Authorization thread was not stopped when asked.");
+            Log("Authorization thread was not stopped when asked.", MyExtensions.Logging.LogLevel.Warning);
 
             //Try to force the thread to stop
             try
@@ -94,12 +105,12 @@ namespace ChatServer
 
                //Oops, even with aborting, the thread would not yield
                if(!SpinWait())
-                  logger.Error("Authorization thread could not be forcibly stopped.");
+                  Error("Authorization thread could not be forcibly stopped.");
             }
             catch (Exception e)
             {
                //Wow, aborting threw an exception. Yuck
-               logger.Error("Aborting authorization thread threw exception: " + e.ToString());
+               Error("Aborting authorization thread threw exception: " + e.ToString());
             }
          }
 
@@ -165,7 +176,7 @@ namespace ChatServer
                      Thread.Sleep(ThreadSleepMilliseconds);
                      wait += ThreadSleepMilliseconds / 1000.0;
 
-                     //Oops, we waited to long for a response
+                     //Oops, we waited too long for a response
                      if(wait > MaxWaitSeconds)
                      {
                         throw new Exception("Read timeout reached (" + MaxWaitSeconds + " sec)");
@@ -189,12 +200,12 @@ namespace ChatServer
                      byte[] response = System.Text.Encoding.ASCII.GetBytes(auth);
                      stream.Write(response, 0, response.Length);
 
-                     logger.Log("Sent authorization token " + auth + " for user " + json.uid);
+                     Log("Sent authorization token " + auth + " for user " + json.uid);
                   }
                }
                catch (Exception e)
                {
-                  logger.Error("Auth server error: " + e.ToString());
+                  Error("Auth server error: " + e.ToString());
                }
                finally
                {
@@ -213,19 +224,27 @@ namespace ChatServer
       {
          lock(authLock)
          {
-            //First, remove old users by removing the ones which are expired
-            //and no longer in the list of users.
-            authCodes = authCodes.Where(x => !(x.Value.Expired && 
-                  !users.Contains(x.Key))).ToDictionary(x => x.Key, 
-                  x => x.Value);
-            
+            //Start expiring any user codes that are no longer in the updated list
+            foreach (int key in authCodes.Keys)
+               if (!users.Contains(key))
+                  authCodes[key].StartExpire();
+               
+            //Now remove any expired authcodes
+            authCodes = authCodes.Where(
+               x => !(x.Value.Expired && !users.Contains(x.Key))).ToDictionary(
+               x => x.Key, x => x.Value);
+
+            if (users.Except(authCodes.Keys).Count() > 0)
+               Log("Someone attempted to add users to the authentication server", 
+                  MyExtensions.Logging.LogLevel.Warning);
+
             //Next, add new users by simply adding those which were not already
             //in the dictionary.
-            foreach(int user in users.Except(authCodes.Keys))
-               RequestAuth(user); //Remember this automatically adds users 
+//            foreach(int user in users.Except(authCodes.Keys))
+//               RequestAuth(user); //Remember this automatically adds users 
 
-            logger.Log("Users with outstanding authentication codes: " + 
-               string.Join(", ", authCodes.Keys));
+            Log("Users with outstanding authentication codes: " + string.Join(", ", authCodes.Keys),
+               MyExtensions.Logging.LogLevel.Debug);
          }
       }
 
@@ -248,6 +267,9 @@ namespace ChatServer
             //the auth list OR their old key is expired.
             if(!authCodes.ContainsKey(uid))
                authCodes.Add(uid, new AuthData(GenerateAuth()));
+
+            //The auth key was requested, so stop expiring
+            authCodes[uid].HaltExpire();
 
             //Now get the authentication
             return authCodes[uid].AuthKey; 
@@ -282,17 +304,33 @@ namespace ChatServer
    {
       public const int ExpireMinutes = 5;
       public readonly string AuthKey;
-      public readonly DateTime Expires;
+      private DateTime expireDate = new DateTime(0);
 
       public AuthData(string key)
       {
          AuthKey = key;
-         Expires = DateTime.Now.AddMinutes(ExpireMinutes);
+         HaltExpire();
       }
 
+      //Begin the expiration process
+      public void StartExpire(int seconds = ExpireMinutes * 60)
+      {
+         expireDate = DateTime.Now.AddSeconds(seconds);
+      }
+
+      //Stop the expiration process
+      public void HaltExpire()
+      {
+         expireDate = new DateTime(0);
+      }
+
+      //When the auth data is expired, just throw it away immediately.
       public bool Expired
       {
-         get { return DateTime.Now > Expires; }
+         get 
+         { 
+            return expireDate.Ticks != 0 && DateTime.Now > expireDate; 
+         }
       }
    }
 }

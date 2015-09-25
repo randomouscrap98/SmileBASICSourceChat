@@ -35,7 +35,7 @@ namespace ChatEssentials
    public class WarningJSONObject : JSONObject
    {
       public WarningJSONObject() : base("warning") {}
-      public string warning = "";
+      public string message = "";
    }
 
    //System messages have a similar format to warnings.
@@ -49,7 +49,7 @@ namespace ChatEssentials
    public class MessageListJSONObject : JSONObject
    {
       public MessageListJSONObject() : base("messageList") {}
-      public List<Message> messages = new List<Message>();
+      public List<UserMessageJSONObject> messages = new List<UserMessageJSONObject>();
    }
 
    //Sending out a list of users should follow this format
@@ -62,13 +62,21 @@ namespace ChatEssentials
    //A single user within the UserList JSON object
    public class UserJSONObject
    {
+      public readonly string username = "";
+      public readonly string avatar = "";
+      public readonly string stars = "";
       public readonly int uid = 0;
+      public readonly long joined = 0;
       public bool active = false;
 
-      public UserJSONObject(int uid, bool active)
+      public UserJSONObject(User user)
       {
-         this.uid = uid;
-         this.active = active;
+         uid = user.UID;
+         username = user.Username;
+         avatar = user.Avatar;
+         stars = user.StarString;
+         active = user.Active;
+         joined = user.UnixJoinDate;
       }
    }
 
@@ -84,10 +92,13 @@ namespace ChatEssentials
 
 
    //A message. It SHOULD be readonly, honestly.
-   public class Message
+   public class UserMessageJSONObject : JSONObject
    {
       public readonly int uid;
-      public readonly string text;
+      public readonly string username;
+      public readonly string avatar;
+      public readonly string stars;
+      public readonly string message;
       public readonly long id;
       public readonly string tag;
       private readonly DateTime postTime;
@@ -95,21 +106,24 @@ namespace ChatEssentials
 
       private bool display = true;
 
-      public Message(int uid, string message, string tag)
+      public UserMessageJSONObject(User user, string message, string tag) : base("message")
       {
-         this.uid = uid;
-         this.text = message;
+         this.uid = user.UID;
+         this.username = user.Username;
+         this.avatar = user.Avatar;
+         this.stars = user.StarString;
+         this.message = message;
          this.tag = tag;
          this.postTime = DateTime.Now;
          this.id = Interlocked.Increment(ref NextID);
       }
 
-      public Message(Message copy)
+      public UserMessageJSONObject(UserMessageJSONObject copy) : base("message")
       {
          if (copy != null)
          {
             uid = copy.uid;
-            text = copy.text;
+            message = copy.message;
             id = copy.id;
             tag = copy.tag;
             postTime = copy.postTime;

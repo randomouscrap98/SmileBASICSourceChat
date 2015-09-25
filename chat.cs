@@ -28,7 +28,7 @@ namespace ChatServer
       private static readonly Object bandwidthLock = new Object();
       private static AuthServer authServer;
       private static readonly Object authLock = new Object();
-      private static List<Message> messages = new List<Message>();
+      private static List<UserMessageJSONObject> messages = new List<UserMessageJSONObject>();
       private static readonly Object messageLock = new Object();
       private static HashSet<Chat> activeChatters = new HashSet<Chat>();
       private static readonly Object chatLock = new Object();
@@ -174,7 +174,7 @@ namespace ChatServer
 
          lock (userLock)
          {
-            userList.users = activeUsers.Select(x => new UserJSONObject(x, users[x].Active)).ToList();
+            userList.users = activeUsers.Select(x => new UserJSONObject(users[x])).ToList();
          }
 
          return JsonConvert.SerializeObject(userList);
@@ -184,7 +184,7 @@ namespace ChatServer
       public string GetMessageList()
       {
          MessageListJSONObject jsonMessages = new MessageListJSONObject();
-         List<Message> visibleMessages; 
+         List<UserMessageJSONObject> visibleMessages; 
 
          lock (messageLock)
          {
@@ -193,7 +193,7 @@ namespace ChatServer
 
          foreach (string tag in AllAcceptedTags.Where(x => x != GlobalTag))
          {
-            List<Message> tagMessages = visibleMessages.Where(x => x.tag == tag).ToList();
+            List<UserMessageJSONObject> tagMessages = visibleMessages.Where(x => x.tag == tag).ToList();
             for (int i = 0; i < Math.Min(MaxMessageSend, tagMessages.Count); i++)
                jsonMessages.messages.Add(tagMessages[tagMessages.Count - 1 - i]);
          }
@@ -225,7 +225,7 @@ namespace ChatServer
          }
       }
 
-      protected void MyBroadcast(string message)
+      public static void MyBroadcast(string message)
       {
          if (string.IsNullOrEmpty(message))
             return;
@@ -269,6 +269,9 @@ namespace ChatServer
       {
          logger.Log ("Session disconnect: " + uid);
 
+         bool authenticated = (uid > 0);
+         string username = ThisUser.Username;
+
          lock(chatLock)
          {
             uid = -1;
@@ -277,6 +280,9 @@ namespace ChatServer
 
          MyBroadcast(GetUserList());
          UpdateAuthUsers();
+
+         if (authenticated)
+            MyBroadcast((new SystemMessageJSONObject() { message = username + " has left the chat." }).ToString());
       }
 
       //I guess this is WHENEVER it receives a message?
@@ -342,24 +348,33 @@ namespace ChatServer
                      foreach (Chat removeChat in removals)
                         Sessions.CloseSession(removeChat.ID);
                      
-                     //All is well.
+                     //OK, I may trust you, but there's one more step to do. Can we get your information from the webserver?
                      uid = newUser;
-                     activeChatters.Add(this);
-                     response.result = true;
-
-                     //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
-                     ThisUser.PerformOnPing();
-                     MyBroadcast(GetUserList());
-                     UpdateAuthUsers();
 
                      if (!ThisUser.PullInfoFromQueryPage())
                      {
+                        uid = -1;
                         logger.Warning("Couldn't get user information from website");
+                        response.errors.Add("Couldn't authenticate because your user information couldn't be found");
                      }
                      else
                      {
+                        //BEFORE adding, broadcast the "whatever has entered the chat" message
+                        MyBroadcast((new SystemMessageJSONObject() { 
+                           message = ThisUser.Username + " has entered the chat." }).ToString());
+
+                        //All is well.
+                        activeChatters.Add(this);
+
+                        //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
+                        ThisUser.PerformOnPing();
+                        MyBroadcast(GetUserList());
+                        UpdateAuthUsers();
+
                         logger.Log("Authentication complete: UID " + uid + " maps to username " + ThisUser.Username
                            + (ThisUser.CanStaffChat ? "(staff)" : ""));
+                        response.result = true;
+
                      }
                   }
                }
@@ -384,7 +399,7 @@ namespace ChatServer
                string message = System.Security.SecurityElement.Escape((string)json.text);
                string tag = json.tag;
                //WarningJSONObject tempWarning = new WarningJSONObject();
-               ThisUser.PullInfoFromQueryPage();
+               //ThisUser.PullInfoFromQueryPage();
 
                //These first things don't increase spam score in any way
                if(string.IsNullOrWhiteSpace(message))
@@ -417,7 +432,7 @@ namespace ChatServer
                else
                {
                   List<JSONObject> outputs = new List<JSONObject>();
-                  Message userMessage = new Message(uid, message, tag);
+                  UserMessageJSONObject userMessage = new UserMessageJSONObject(ThisUser, message, tag);
                   UserCommand userCommand;
                   Module commandModule;
                   string commandError = "";
@@ -585,7 +600,7 @@ namespace ChatServer
       /// <param name="message">Message.</param>
       /// <param name="commandModule">Command module.</param>
       /// <param name="userCommand">User command.</param>
-      private bool TryCommandParse(Message message, out Module commandModule, out UserCommand userCommand, out string error)
+      private bool TryCommandParse(UserMessageJSONObject message, out Module commandModule, out UserCommand userCommand, out string error)
       {
          userCommand = null;
          commandModule = null;
@@ -603,7 +618,7 @@ namespace ChatServer
             //Check through this module's command for possible match
             foreach(ModuleCommand command in module.Commands)
             {
-               Match match = Regex.Match(message.text, command.FullRegex, RegexOptions.Singleline);
+               Match match = Regex.Match(message.message, command.FullRegex, RegexOptions.Singleline);
 
                //This command matched, so preparse the command and get out of here.
                if(match.Success)

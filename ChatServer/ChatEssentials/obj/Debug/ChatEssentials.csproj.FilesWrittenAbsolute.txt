@@ -1,11 +1,3 @@
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/bin/Debug/ChatEssentials.dll.mdb
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/bin/Debug/ChatEssentials.dll
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/obj/Debug/ChatEssentials.dll
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/obj/Debug/ChatEssentials.dll.mdb
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/bin/Debug/Newtonsoft.Json.dll
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/bin/Debug/MyExtensions.dll
-/home/cj/Desktop/smilebasic/chatserver/ChatServer/ChatEssentials/bin/Debug/MyExtensions.dll.mdb
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatEssentials/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatEssentials/bin/Debug/ChatEssentials.dll.mdb
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatEssentials/bin/Debug/ChatEssentials.dll

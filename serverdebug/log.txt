@@ -6491,3 +6491,459 @@
 [09/23/15 07:05:00]{Debug}: Got message: {"type":"message","text":"/about","key":"46BA35EA322AB8AD","tag":"offtopic"}
 [09/23/15 07:05:24]{Debug}: Got message: {"type":"ping"}
 [09/23/15 07:06:24]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:08:24]{Debug}: testuser (21) became inactive
+[09/23/15 07:18:31]{Debug}: testuser (21) became active
+[09/23/15 07:18:31]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:18:35]: Session disconnect: 21
+[09/23/15 07:18:35]: Users with outstanding authentication codes: 
+[09/23/15 07:30:51]: Sent authorization token E5115F7AC02E26AD for user 2
+[09/23/15 07:30:52]: Users with outstanding authentication codes: 2
+[09/23/15 07:30:52]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/23/15 07:30:52]{Debug}: Got message: {"type":"bind","uid":2,"key":"E5115F7AC02E26AD"}
+[09/23/15 07:30:52]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 07:30:52]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 07:31:59]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:33:08]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:33:10]{Debug}: Got message: {"type":"ping"}
+[09/23/15 07:34:52]{Debug}: randomouscrap98 (2) became inactive
+[09/23/15 09:11:26]: Session disconnect: 2
+[09/23/15 09:11:26]: Users with outstanding authentication codes: 
+[09/23/15 04:27:13]: Sent authorization token 0926287A87ACF527 for user 2
+[09/23/15 04:27:13]: Users with outstanding authentication codes: 2
+[09/23/15 04:27:13]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/23/15 04:27:13]{Debug}: Got message: {"type":"bind","uid":2,"key":"0926287A87ACF527"}
+[09/23/15 04:27:13]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 04:27:14]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 04:27:17]: Session disconnect: 2
+[09/23/15 04:27:17]: Users with outstanding authentication codes: 2
+[09/23/15 11:08:39]: Sent authorization token E8079AD91DADE870 for user 19
+[09/23/15 11:08:40]: Users with outstanding authentication codes: 19
+[09/23/15 11:08:40]: Authentication complete: UID 19 maps to username slackerSnail(staff)
+[09/23/15 11:08:40]{Debug}: Got message: {"type":"bind","uid":19,"key":"E8079AD91DADE870"}
+[09/23/15 11:08:40]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 11:08:40]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/23/15 11:08:46]: Session disconnect: 19
+[09/23/15 11:08:46]: Users with outstanding authentication codes: 19
+[09/24/15 12:47:57]: Sent authorization token E8079AD91DADE870 for user 19
+[09/24/15 12:47:59]: Users with outstanding authentication codes: 19
+[09/24/15 12:47:59]: Authentication complete: UID 19 maps to username slackerSnail(staff)
+[09/24/15 12:47:59]{Debug}: Got message: {"type":"bind","uid":19,"key":"E8079AD91DADE870"}
+[09/24/15 12:48:00]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/24/15 12:48:00]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/24/15 12:48:01]{Debug}: Got message: {"type":"ping"}
+[09/24/15 12:48:08]: Session disconnect: 19
+[09/24/15 12:48:08]: Users with outstanding authentication codes: 
+[09/24/15 09:45:12]: Sent authorization token AC028F1854C58734 for user 19
+[09/24/15 09:45:14]: Users with outstanding authentication codes: 19
+[09/24/15 09:45:14]: Authentication complete: UID 19 maps to username slackerSnail(staff)
+[09/24/15 09:45:14]{Debug}: Got message: {"type":"bind","uid":19,"key":"AC028F1854C58734"}
+[09/24/15 09:45:14]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/24/15 09:45:15]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/24/15 09:45:18]{Debug}: Got message: {"type":"ping"}
+[09/24/15 09:45:18]: Session disconnect: 19
+[09/24/15 09:45:18]: Users with outstanding authentication codes: 19
+[09/25/15 12:22:07]: Sent authorization token AC028F1854C58734 for user 19
+[09/25/15 12:22:08]: Users with outstanding authentication codes: 19
+[09/25/15 12:22:09]: Authentication complete: UID 19 maps to username slackerSnail(staff)
+[09/25/15 12:22:09]{Debug}: Got message: {"type":"bind","uid":19,"key":"AC028F1854C58734"}
+[09/25/15 12:22:09]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 12:22:09]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 12:22:16]: Session disconnect: 19
+[09/25/15 12:22:16]: Users with outstanding authentication codes: 
+[09/25/15 03:59:13]: Sent authorization token 40ECC633E6DAE4E9 for user 2
+[09/25/15 03:59:13]: Users with outstanding authentication codes: 2
+[09/25/15 03:59:13]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 03:59:13]{Debug}: Got message: {"type":"bind","uid":2,"key":"40ECC633E6DAE4E9"}
+[09/25/15 03:59:13]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 03:59:13]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 03:59:17]: Sent authorization token 40ECC633E6DAE4E9 for user 2
+[09/25/15 03:59:17]: Session disconnect: 2
+[09/25/15 03:59:17]: Users with outstanding authentication codes: 2
+[09/25/15 03:59:18]: Users with outstanding authentication codes: 2
+[09/25/15 03:59:18]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 03:59:18]{Debug}: Got message: {"type":"bind","uid":2,"key":"40ECC633E6DAE4E9"}
+[09/25/15 03:59:18]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 03:59:18]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:00:18]{Debug}: randomouscrap98 (2) became active
+[09/25/15 04:01:18]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 04:06:11]: Stopping auth server...
+[09/25/15 04:06:11]: Stopping chat server...
+[09/25/15 04:06:12]: Session disconnect: 2
+[09/25/15 04:06:12]: Users with outstanding authentication codes: 
+[09/25/15 04:06:12]: Stopping logger...
+[09/25/15 04:06:12]: Done
+[09/25/15 04:06:15](System): Will start auto-dumping logs
+[09/25/15 04:06:15]: This exe was built on: 9/25/2015 4:03:34 AM
+[09/25/15 04:06:15]: Found plugin: /home/csanchez/chatserver/serverdebug/plugins/ModulePackage1.dll
+[09/25/15 04:06:15]{Debug}(ModuleLoader): Found module: PmModule
+[09/25/15 04:06:15](ModuleLoader): Module activated: PmModule
+[09/25/15 04:06:15]{Debug}(ModuleLoader): Found module: FunModule
+[09/25/15 04:06:15](ModuleLoader): Module activated: FunModule
+[09/25/15 04:06:15]{Debug}(ModuleLoader): Found module: DebugModule
+[09/25/15 04:06:15](ModuleLoader): Module activated: DebugModule
+[09/25/15 04:06:15]{Debug}(ModuleLoader): Found module: GlobalModule
+[09/25/15 04:06:15](ModuleLoader): Module activated: GlobalModule
+[09/25/15 04:06:15]: Authorization server running on port 45698
+[09/25/15 04:06:15]: Listening on port 45697 with services:
+[09/25/15 04:06:15]: - /chat
+[09/25/15 04:06:19]: Sent authorization token 15545B51FECAF57A for user 2
+[09/25/15 04:06:20]: Users with outstanding authentication codes: 2
+[09/25/15 04:06:20]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 04:06:20]{Debug}: Got message: {"type":"bind","uid":2,"key":"15545B51FECAF57A"}
+[09/25/15 04:06:20]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:06:40]{Debug}: Got message: {"type":"ping"}
+[09/25/15 04:06:44]{Debug}: Got message: {"type":"message","text":"oooohhhhhh","key":"15545B51FECAF57A","tag":"offtopic"}
+[09/25/15 04:06:47]{Debug}: Got message: {"type":"message","text":"BRO","key":"15545B51FECAF57A","tag":"offtopic"}
+[09/25/15 04:06:50]{Debug}: Got message: {"type":"message","text":"get on my level","key":"15545B51FECAF57A","tag":"offtopic"}
+[09/25/15 04:07:20]{Debug}: Got message: {"type":"ping"}
+[09/25/15 04:09:20]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 04:11:10]{Debug}: randomouscrap98 (2) became active
+[09/25/15 04:11:10]{Debug}: Got message: {"type":"ping"}
+[09/25/15 04:12:20]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 04:44:59]: Stopping auth server...
+[09/25/15 04:44:59]: Stopping chat server...
+[09/25/15 04:44:59]: Session disconnect: 2
+[09/25/15 04:44:59]: Users with outstanding authentication codes: 
+[09/25/15 04:44:59]: Stopping logger...
+[09/25/15 04:44:59]: Done
+[09/25/15 04:45:01](System): Will start auto-dumping logs
+[09/25/15 04:45:01]: This exe was built on: 9/25/2015 4:44:00 AM
+[09/25/15 04:45:01]: Found plugin: /home/csanchez/chatserver/serverdebug/plugins/ModulePackage1.dll
+[09/25/15 04:45:01]{Debug}(ModuleLoader): Found module: PmModule
+[09/25/15 04:45:01](ModuleLoader): Module activated: PmModule
+[09/25/15 04:45:01]{Debug}(ModuleLoader): Found module: FunModule
+[09/25/15 04:45:01](ModuleLoader): Module activated: FunModule
+[09/25/15 04:45:01]{Debug}(ModuleLoader): Found module: DebugModule
+[09/25/15 04:45:01](ModuleLoader): Module activated: DebugModule
+[09/25/15 04:45:01]{Debug}(ModuleLoader): Found module: GlobalModule
+[09/25/15 04:45:01](ModuleLoader): Module activated: GlobalModule
+[09/25/15 04:45:02]: Authorization server running on port 45698
+[09/25/15 04:45:02]: Listening on port 45697 with services:
+[09/25/15 04:45:02]: - /chat
+[09/25/15 04:45:07]: Sent authorization token D442A19B5507E639 for user 2
+[09/25/15 04:45:08]: Users with outstanding authentication codes: 2
+[09/25/15 04:45:08]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 04:45:08]{Debug}: Got message: {"type":"bind","uid":2,"key":"D442A19B5507E639"}
+[09/25/15 04:45:08]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:45:16]: Sent authorization token EC08E9B6913139D9 for user 21
+[09/25/15 04:45:17]{Debug}: Got message: {"type":"ping"}
+[09/25/15 04:45:17]: Users with outstanding authentication codes: 2, 21
+[09/25/15 04:45:17]: Authentication complete: UID 21 maps to username testuser
+[09/25/15 04:45:17]{Debug}: Got message: {"type":"bind","uid":21,"key":"EC08E9B6913139D9"}
+[09/25/15 04:45:17]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:45:17]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:45:18]{Debug}: Got message: {"type":"ping"}
+[09/25/15 04:45:20]: Sent authorization token EC08E9B6913139D9 for user 21
+[09/25/15 04:45:22]: Session disconnect: 21
+[09/25/15 04:45:22]: Users with outstanding authentication codes: 2, 21
+[09/25/15 04:45:22]: Users with outstanding authentication codes: 2, 21
+[09/25/15 04:45:22]: Authentication complete: UID 21 maps to username testuser
+[09/25/15 04:45:22]{Debug}: Got message: {"type":"bind","uid":21,"key":"EC08E9B6913139D9"}
+[09/25/15 04:45:22]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:45:22]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:45:39]: Sent authorization token EC08E9B6913139D9 for user 21
+[09/25/15 04:45:39]: Session disconnect: 21
+[09/25/15 04:45:39]: Users with outstanding authentication codes: 2, 21
+[09/25/15 04:45:39]: Users with outstanding authentication codes: 2, 21
+[09/25/15 04:45:39]: Authentication complete: UID 21 maps to username testuser
+[09/25/15 04:45:39]{Debug}: Got message: {"type":"bind","uid":21,"key":"EC08E9B6913139D9"}
+[09/25/15 04:45:39]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:45:39]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 04:46:56]{Debug}: Got message: {"type":"ping"}
+[09/25/15 04:47:07]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 04:48:39]{Debug}: testuser (21) became inactive
+[09/25/15 05:24:21]{Debug}: randomouscrap98 (2) became active
+[09/25/15 05:24:21]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:24:36]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:24:59]{Debug}: testuser (21) became active
+[09/25/15 05:24:59]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:25:05]: Stopping auth server...
+[09/25/15 05:25:05]: Stopping chat server...
+[09/25/15 05:25:05]: Session disconnect: 2
+[09/25/15 05:25:05]: Users with outstanding authentication codes: 21
+[09/25/15 05:25:05]: Session disconnect: 21
+[09/25/15 05:25:05]: Users with outstanding authentication codes: 
+[09/25/15 05:25:05]: Stopping logger...
+[09/25/15 05:25:05]: Done
+[09/25/15 05:25:10](System): Will start auto-dumping logs
+[09/25/15 05:25:10]: This exe was built on: 9/25/2015 5:24:24 AM
+[09/25/15 05:25:11]: Found plugin: /home/csanchez/chatserver/serverdebug/plugins/ModulePackage1.dll
+[09/25/15 05:25:11]{Debug}(ModuleLoader): Found module: PmModule
+[09/25/15 05:25:11](ModuleLoader): Module activated: PmModule
+[09/25/15 05:25:11]{Debug}(ModuleLoader): Found module: FunModule
+[09/25/15 05:25:11](ModuleLoader): Module activated: FunModule
+[09/25/15 05:25:11]{Debug}(ModuleLoader): Found module: DebugModule
+[09/25/15 05:25:11](ModuleLoader): Module activated: DebugModule
+[09/25/15 05:25:11]{Debug}(ModuleLoader): Found module: GlobalModule
+[09/25/15 05:25:11](ModuleLoader): Module activated: GlobalModule
+[09/25/15 05:25:11]: Authorization server running on port 45698
+[09/25/15 05:25:11]: Listening on port 45697 with services:
+[09/25/15 05:25:11]: - /chat
+[09/25/15 05:25:15]: Sent authorization token 7BB6C2BD996F56AD for user 2
+[09/25/15 05:25:17]: Users with outstanding authentication codes: 2
+[09/25/15 05:25:17]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:25:17]{Debug}: Got message: {"type":"bind","uid":2,"key":"7BB6C2BD996F56AD"}
+[09/25/15 05:25:21]{Debug}: Got message: {"type":"message","text":"what","key":"7BB6C2BD996F56AD","tag":"offtopic"}
+[09/25/15 05:26:54]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:26:56]: Sent authorization token 7BB6C2BD996F56AD for user 2
+[09/25/15 05:26:56]: Session disconnect: 2
+[09/25/15 05:26:56]: Users with outstanding authentication codes: 2
+[09/25/15 05:26:56]{Debug}: Got message: {"type":"bind","uid":null,"key":"7BB6C2BD996F56AD"}
+[09/25/15 05:26:56]: Session disconnect: -1
+[09/25/15 05:26:56]: Users with outstanding authentication codes: 2
+[09/25/15 05:27:05]: Sent authorization token 7BB6C2BD996F56AD for user 2
+[09/25/15 05:27:05]{Debug}: Got message: {"type":"bind","uid":null,"key":"7BB6C2BD996F56AD"}
+[09/25/15 05:27:05]: Session disconnect: -1
+[09/25/15 05:27:05]: Users with outstanding authentication codes: 2
+[09/25/15 05:27:41]: Sent authorization token 7BB6C2BD996F56AD for user 2
+[09/25/15 05:27:42]: Users with outstanding authentication codes: 2
+[09/25/15 05:27:42]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:27:42]{Debug}: Got message: {"type":"bind","uid":2,"key":"7BB6C2BD996F56AD"}
+[09/25/15 05:27:45]{Debug}: Got message: {"type":"message","text":"hey bro","key":"7BB6C2BD996F56AD","tag":"offtopic"}
+[09/25/15 05:29:00]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:29:02]: Sent authorization token 7BB6C2BD996F56AD for user 2
+[09/25/15 05:29:02]: Session disconnect: 2
+[09/25/15 05:29:02]: Users with outstanding authentication codes: 2
+[09/25/15 05:29:02]: Users with outstanding authentication codes: 2
+[09/25/15 05:29:02]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:29:02]{Debug}: Got message: {"type":"bind","uid":2,"key":"7BB6C2BD996F56AD"}
+[09/25/15 05:29:05]{Debug}: Got message: {"type":"message","text":"howdy","key":"7BB6C2BD996F56AD","tag":"offtopic"}
+[09/25/15 05:30:38]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:30:39]: Sent authorization token 7BB6C2BD996F56AD for user 2
+[09/25/15 05:30:39]: Session disconnect: 2
+[09/25/15 05:30:39]: Users with outstanding authentication codes: 
+[09/25/15 05:30:40]: User 2 tried to bind with bad auth code: 7BB6C2BD996F56AD
+[09/25/15 05:30:40]{Debug}: Got message: {"type":"bind","uid":2,"key":"7BB6C2BD996F56AD"}
+[09/25/15 05:33:18]: Sent authorization token 19671DB639ED5CE1 for user 2
+[09/25/15 05:33:18]: Session disconnect: -1
+[09/25/15 05:33:18]: Users with outstanding authentication codes: 2
+[09/25/15 05:33:19]: Users with outstanding authentication codes: 2
+[09/25/15 05:33:19]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:33:19]{Debug}: Got message: {"type":"bind","uid":2,"key":"19671DB639ED5CE1"}
+[09/25/15 05:33:22]{Debug}: Got message: {"type":"message","text":"oy butts","key":"19671DB639ED5CE1","tag":"offtopic"}
+[09/25/15 05:34:05]: Sent authorization token 19671DB639ED5CE1 for user 2
+[09/25/15 05:34:05]: Session disconnect: 2
+[09/25/15 05:34:05]: Users with outstanding authentication codes: 2
+[09/25/15 05:34:06]: Users with outstanding authentication codes: 2
+[09/25/15 05:34:06]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:34:06]{Debug}: Got message: {"type":"bind","uid":2,"key":"19671DB639ED5CE1"}
+[09/25/15 05:34:08]{Debug}: Got message: {"type":"message","text":"psh","key":"19671DB639ED5CE1","tag":"offtopic"}
+[09/25/15 05:35:08]: Sent authorization token 19671DB639ED5CE1 for user 2
+[09/25/15 05:35:08]: Session disconnect: 2
+[09/25/15 05:35:08]: Users with outstanding authentication codes: 2
+[09/25/15 05:35:09]: Users with outstanding authentication codes: 2
+[09/25/15 05:35:09]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:35:09]{Debug}: Got message: {"type":"bind","uid":2,"key":"19671DB639ED5CE1"}
+[09/25/15 05:35:12]{Debug}: Got message: {"type":"message","text":"oy","key":"19671DB639ED5CE1","tag":"offtopic"}
+[09/25/15 05:35:26]{Debug}: Got message: {"type":"message","text":"hello","key":"19671DB639ED5CE1","tag":"offtopic"}
+[09/25/15 05:37:09]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 05:40:04]: Stopping auth server...
+[09/25/15 05:40:04]: Stopping chat server...
+[09/25/15 05:40:04]: Session disconnect: 2
+[09/25/15 05:40:04]: Users with outstanding authentication codes: 
+[09/25/15 05:40:04]: Stopping logger...
+[09/25/15 05:40:04]: Done
+[09/25/15 05:40:05](System): Will start auto-dumping logs
+[09/25/15 05:40:05]: This exe was built on: 9/25/2015 5:39:26 AM
+[09/25/15 05:40:05]: Found plugin: /home/csanchez/chatserver/serverdebug/plugins/ModulePackage1.dll
+[09/25/15 05:40:05]{Debug}(ModuleLoader): Found module: PmModule
+[09/25/15 05:40:05](ModuleLoader): Module activated: PmModule
+[09/25/15 05:40:05]{Debug}(ModuleLoader): Found module: FunModule
+[09/25/15 05:40:05](ModuleLoader): Module activated: FunModule
+[09/25/15 05:40:05]{Debug}(ModuleLoader): Found module: DebugModule
+[09/25/15 05:40:05](ModuleLoader): Module activated: DebugModule
+[09/25/15 05:40:05]{Debug}(ModuleLoader): Found module: GlobalModule
+[09/25/15 05:40:05](ModuleLoader): Module activated: GlobalModule
+[09/25/15 05:40:05]: Authorization server running on port 45698
+[09/25/15 05:40:05]: Listening on port 45697 with services:
+[09/25/15 05:40:05]: - /chat
+[09/25/15 05:40:10]: Sent authorization token CA5DD59E169E1090 for user 2
+[09/25/15 05:40:11]: Users with outstanding authentication codes: 2
+[09/25/15 05:40:11]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:40:11]{Debug}: Got message: {"type":"bind","uid":2,"key":"CA5DD59E169E1090"}
+[09/25/15 05:40:14]{Debug}: Got message: {"type":"message","text":"howdy?","key":"CA5DD59E169E1090","tag":"offtopic"}
+[09/25/15 05:40:20]{Debug}: Got message: {"type":"message","text":"buh breh","key":"CA5DD59E169E1090","tag":"offtopic"}
+[09/25/15 05:40:23]{Debug}: Got message: {"type":"message","text":"doody","key":"CA5DD59E169E1090","tag":"offtopic"}
+[09/25/15 05:40:27]{Debug}: Got message: {"type":"message","text":"dooky","key":"CA5DD59E169E1090","tag":"offtopic"}
+[09/25/15 05:40:32]: Sent authorization token DB1BD0E541E6C467 for user 21
+[09/25/15 05:40:33]: Users with outstanding authentication codes: 2, 21
+[09/25/15 05:40:33]: Authentication complete: UID 21 maps to username testuser
+[09/25/15 05:40:33]{Debug}: Got message: {"type":"bind","uid":21,"key":"DB1BD0E541E6C467"}
+[09/25/15 05:40:38]{Debug}: Got message: {"type":"message","text":"am I a working?","key":"DB1BD0E541E6C467","tag":"offtopic"}
+[09/25/15 05:40:41]{Debug}: Got message: {"type":"message","text":"Yes I am","key":"DB1BD0E541E6C467","tag":"offtopic"}
+[09/25/15 05:40:44]{Debug}: Got message: {"type":"message","text":"yes I am","key":"DB1BD0E541E6C467","tag":"offtopic"}
+[09/25/15 05:40:47]{Debug}: Got message: {"type":"message","text":"yes yesy yesy yesy ysey","key":"DB1BD0E541E6C467","tag":"offtopic"}
+[09/25/15 05:40:54]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:41:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:42:10]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 05:42:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:43:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:44:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:45:03]: Sent authorization token CA5DD59E169E1090 for user 2
+[09/25/15 05:45:03]: Session disconnect: 2
+[09/25/15 05:45:03]: Users with outstanding authentication codes: 2, 21
+[09/25/15 05:45:04]: Users with outstanding authentication codes: 2, 21
+[09/25/15 05:45:04]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:45:04]{Debug}: Got message: {"type":"bind","uid":2,"key":"CA5DD59E169E1090"}
+[09/25/15 05:45:04]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:45:11]{Debug}: randomouscrap98 (2) became active
+[09/25/15 05:45:11]{Debug}: Got message: {"type":"message","text":"HAH, IGNORED","key":"CA5DD59E169E1090","tag":"offtopic"}
+[09/25/15 05:45:17]{Debug}: Got message: {"type":"message","text":"shut up, you're not my real dad","key":"DB1BD0E541E6C467","tag":"offtopic"}
+[09/25/15 05:45:20]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:45:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:45:33]{Debug}: Got message: {"type":"message","text":"PSH, I'm your mom, doofus","key":"CA5DD59E169E1090","tag":"offtopic"}
+[09/25/15 05:45:56]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:46:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:47:04]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 05:47:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:48:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:49:00]: Sent authorization token CA5DD59E169E1090 for user 2
+[09/25/15 05:49:00]: Session disconnect: 2
+[09/25/15 05:49:00]: Users with outstanding authentication codes: 21
+[09/25/15 05:49:00]: User 2 tried to bind with bad auth code: CA5DD59E169E1090
+[09/25/15 05:49:00]{Debug}: Got message: {"type":"bind","uid":2,"key":"CA5DD59E169E1090"}
+[09/25/15 05:49:01]: Session disconnect: -1
+[09/25/15 05:49:01]: Users with outstanding authentication codes: 21
+[09/25/15 05:49:02]: Sent authorization token B168D642C0BD70B6 for user 2
+[09/25/15 05:49:03]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:49:03]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:49:03]{Debug}: Got message: {"type":"bind","uid":2,"key":"B168D642C0BD70B6"}
+[09/25/15 05:49:03]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:49:09]: Sent authorization token B168D642C0BD70B6 for user 2
+[09/25/15 05:49:09]: Session disconnect: 2
+[09/25/15 05:49:09]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:49:09]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:49:09]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:49:09]{Debug}: Got message: {"type":"bind","uid":2,"key":"B168D642C0BD70B6"}
+[09/25/15 05:49:10]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:49:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:50:09]{Debug}: randomouscrap98 (2) became active
+[09/25/15 05:50:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:50:34]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:50:37]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:50:38]: Sent authorization token B168D642C0BD70B6 for user 2
+[09/25/15 05:50:38]: Session disconnect: 2
+[09/25/15 05:50:38]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:50:39]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:50:39]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:50:39]{Debug}: Got message: {"type":"bind","uid":2,"key":"B168D642C0BD70B6"}
+[09/25/15 05:50:39]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:51:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:51:48]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:51:49]: Sent authorization token B168D642C0BD70B6 for user 2
+[09/25/15 05:51:49]: Session disconnect: 2
+[09/25/15 05:51:49]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:51:50]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:51:50]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:51:50]{Debug}: Got message: {"type":"bind","uid":2,"key":"B168D642C0BD70B6"}
+[09/25/15 05:51:50]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:52:14]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:52:15]: Sent authorization token B168D642C0BD70B6 for user 2
+[09/25/15 05:52:15]: Session disconnect: 2
+[09/25/15 05:52:15]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:52:15]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:52:15]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:52:15]{Debug}: Got message: {"type":"bind","uid":2,"key":"B168D642C0BD70B6"}
+[09/25/15 05:52:15]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:52:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:54:15]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 05:54:25]: Sent authorization token B168D642C0BD70B6 for user 2
+[09/25/15 05:54:25]: Session disconnect: 2
+[09/25/15 05:54:25]: Users with outstanding authentication codes: 21
+[09/25/15 05:54:25]: User 2 tried to bind with bad auth code: B168D642C0BD70B6
+[09/25/15 05:54:25]{Debug}: Got message: {"type":"bind","uid":2,"key":"B168D642C0BD70B6"}
+[09/25/15 05:54:25]: Session disconnect: -1
+[09/25/15 05:54:25]: Users with outstanding authentication codes: 21
+[09/25/15 05:54:27]: Sent authorization token D15CBC1F219B5904 for user 2
+[09/25/15 05:54:28]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:54:28]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:54:28]{Debug}: Got message: {"type":"bind","uid":2,"key":"D15CBC1F219B5904"}
+[09/25/15 05:54:28]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:54:33]{Debug}: testuser (21) became inactive
+[09/25/15 05:55:28]{Debug}: randomouscrap98 (2) became active
+[09/25/15 05:55:36]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:56:38]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:56:40]: Sent authorization token D15CBC1F219B5904 for user 2
+[09/25/15 05:56:40]: Session disconnect: 2
+[09/25/15 05:56:40]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:56:41]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:56:41]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:56:41]{Debug}: Got message: {"type":"bind","uid":2,"key":"D15CBC1F219B5904"}
+[09/25/15 05:56:41]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 05:58:41]{Debug}: randomouscrap98 (2) became inactive
+[09/25/15 05:59:04]{Debug}: randomouscrap98 (2) became active
+[09/25/15 05:59:04]{Debug}: Got message: {"type":"ping"}
+[09/25/15 05:59:06]: Sent authorization token D15CBC1F219B5904 for user 2
+[09/25/15 05:59:06]: Session disconnect: 2
+[09/25/15 05:59:06]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:59:06]: Users with outstanding authentication codes: 21, 2
+[09/25/15 05:59:06]: Authentication complete: UID 2 maps to username randomouscrap98(staff)
+[09/25/15 05:59:06]{Debug}: Got message: {"type":"bind","uid":2,"key":"D15CBC1F219B5904"}
+[09/25/15 05:59:07]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 06:00:33]{Debug}: Got message: {"type":"ping"}
+[09/25/15 06:00:37]: Sent authorization token D15CBC1F219B5904 for user 2
+[09/25/15 06:00:37]: Session disconnect: 2
+[09/25/15 06:00:37]: Users with outstanding authentication codes: 21
+[09/25/15 06:00:38]: User 2 tried to bind with bad auth code: D15CBC1F219B5904
+[09/25/15 06:00:38]{Debug}: Got message: {"type":"bind","uid":2,"key":"D15CBC1F219B5904"}
+[09/25/15 06:00:38]: Session disconnect: -1
+[09/25/15 06:00:38]: Users with outstanding authentication codes: 21
+[09/25/15 07:00:12]{Debug}: testuser (21) became active
+[09/25/15 07:00:12]{Debug}: Got message: {"type":"ping"}
+[09/25/15 07:01:33]{Debug}: testuser (21) became inactive
+[09/25/15 07:19:05]: Stopping auth server...
+[09/25/15 07:19:05]: Stopping chat server...
+[09/25/15 07:19:05]: Session disconnect: 21
+[09/25/15 07:19:05]: Users with outstanding authentication codes: 
+[09/25/15 07:19:05]: Stopping logger...
+[09/25/15 07:19:05]: Done
+[09/25/15 07:19:07](System): Will start auto-dumping logs
+[09/25/15 07:19:07](System): This exe was built on: 9/25/2015 7:17:06 AM
+[09/25/15 07:19:07]: Found plugin: /home/csanchez/chatserver/serverdebug/plugins/ModulePackage1.dll
+[09/25/15 07:19:07]{Debug}(ModuleLoader): Found module: PmModule
+[09/25/15 07:19:07](ModuleLoader): Module activated: PmModule
+[09/25/15 07:19:07]{Debug}(ModuleLoader): Found module: FunModule
+[09/25/15 07:19:07](ModuleLoader): Module activated: FunModule
+[09/25/15 07:19:07]{Debug}(ModuleLoader): Found module: DebugModule
+[09/25/15 07:19:07](ModuleLoader): Module activated: DebugModule
+[09/25/15 07:19:07]{Debug}(ModuleLoader): Found module: GlobalModule
+[09/25/15 07:19:07](ModuleLoader): Module activated: GlobalModule
+[09/25/15 07:19:07](System): Authorization server running on port 45698
+[09/25/15 07:19:08](System): Chat Server listening on port 45697 with services:
+[09/25/15 07:19:08](System): - /chat
+[09/25/15 07:19:19](Authentication): Sent authorization token 0E1824396C9BFAF4 for user 21
+[09/25/15 07:19:20]{Debug}(Authentication): Users with outstanding authentication codes: 21
+[09/25/15 07:19:20]: Authentication complete: UID 21 maps to username testuser
+[09/25/15 07:19:20]{Debug}: Got message: {"type":"bind","uid":21,"key":"0E1824396C9BFAF4"}
+[09/25/15 07:19:20]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 07:19:30](System): Stopping auth server...
+[09/25/15 07:19:30](System): Stopping chat server...
+[09/25/15 07:19:30]: Session disconnect: 21
+[09/25/15 07:19:30]{Debug}(Authentication): Users with outstanding authentication codes: 21
+[09/25/15 07:19:30](System): Stopping logger...
+[09/25/15 07:19:30]: Done
+[09/25/15 07:21:04](System): Will start auto-dumping logs
+[09/25/15 07:21:04](System): This exe was built on: 9/25/2015 7:17:06 AM
+[09/25/15 07:21:04]: Found plugin: /home/csanchez/chatserver/serverdebug/plugins/ModulePackage1.dll
+[09/25/15 07:21:04]{Debug}(ModuleLoader): Found module: PmModule
+[09/25/15 07:21:04](ModuleLoader): Module activated: PmModule
+[09/25/15 07:21:04]{Debug}(ModuleLoader): Found module: FunModule
+[09/25/15 07:21:04](ModuleLoader): Module activated: FunModule
+[09/25/15 07:21:04]{Debug}(ModuleLoader): Found module: DebugModule
+[09/25/15 07:21:04](ModuleLoader): Module activated: DebugModule
+[09/25/15 07:21:04]{Debug}(ModuleLoader): Found module: GlobalModule
+[09/25/15 07:21:04](ModuleLoader): Module activated: GlobalModule
+[09/25/15 07:21:04](System): Authorization server running on port 45698
+[09/25/15 07:21:04](System): Chat Server listening on port 45697 with services:
+[09/25/15 07:21:04](System): - /chat
+[09/25/15 07:21:13](Authentication): Sent authorization token 49B4BCA4AE003734 for user 21
+[09/25/15 07:21:15]{Debug}(Authentication): Users with outstanding authentication codes: 21
+[09/25/15 07:21:15]: Authentication complete: UID 21 maps to username testuser
+[09/25/15 07:21:15]{Debug}: Got message: {"type":"bind","uid":21,"key":"49B4BCA4AE003734"}
+[09/25/15 07:21:15]{Debug}: Got message: {"type":"request","request":"messageList"}
+[09/25/15 07:21:16](System): Stopping auth server...
+[09/25/15 07:21:16](System): Stopping chat server...
+[09/25/15 07:21:16]: Session disconnect: 21
+[09/25/15 07:21:16]{Debug}(Authentication): Users with outstanding authentication codes: 21
+[09/25/15 07:21:16](System): Stopping logger...
+[09/25/15 07:21:16]: Done

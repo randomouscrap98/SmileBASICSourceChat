@@ -17,6 +17,10 @@ namespace ChatEssentials
 
       private readonly int uid = 0;
       private string username = "default";
+      private string avatar = "";
+      private string stars = "";
+      private DateTime joinDate = DateTime.Now;
+
       private int spamScore = 0;
       private int globalSpamScore = 0;
 
@@ -42,9 +46,24 @@ namespace ChatEssentials
          get { return username; }
       }
 
+      public string Avatar
+      {
+         get { return avatar; }
+      }
+
+      public string StarString
+      {
+         get { return stars; }
+      }
+
       public int UID
       {
          get { return uid; }
+      }
+
+      public long UnixJoinDate
+      {
+         get { return MyExtensions.DateExtensions.ToUnixTime(joinDate); }
       }
 
       //Set static user parameters (constants, probably from an options file)
@@ -173,6 +192,8 @@ namespace ChatEssentials
                lock(Lock)
                {
                   username = json.result.username;
+                  avatar = json.result.avatar;
+                  stars = json.result.starlevel;
                   staffChat = json.result.permissions.staffchat;
                   chatBanned = json.result.chatbanned;
                   bannedUntil = DateExtensions.FromUnixTime((double)json.result.banneduntil);
@@ -187,14 +208,14 @@ namespace ChatEssentials
          return true;
       }
       
-      public WarningJSONObject UpdateSpam(List<Message> messages, string current)
+      public WarningJSONObject UpdateSpam(List<UserMessageJSONObject> messages, string current)
       {
          WarningJSONObject warning = null;
 
          //Update spam score.
          //Look at all the messages and see how many messages in the 
          //last minute were theirs (up to 10). Increase spam score accordingly
-         List<Message> myMessages = messages.Where(x => 
+         List<UserMessageJSONObject> myMessages = messages.Where(x => 
             (DateTime.Now - x.PostTime()).TotalMinutes < 1 && x.uid == uid).ToList();
 
          //Update spam score based on last message length, how many previous
@@ -204,7 +225,7 @@ namespace ChatEssentials
          SpamScore += 5 + current.Length / 100
          + 4 * current.Split("\n".ToCharArray()).Count(x => string.IsNullOrWhiteSpace(x))//empty line
          + (int)(1.5 * (myMessages.Count > 10 ? 10 : myMessages.Count))//previous messages
-         + (int)(4.5 * (myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.text, current))));  //similarity    
+         + (int)(4.5 * (myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.message, current))));  //similarity    
 
          //Console.WriteLine(current + " -likeness- " + (int)(2 * myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.text, current))));
          //Update global spam score if they've been good
@@ -224,13 +245,13 @@ namespace ChatEssentials
             }
 
             warning = new WarningJSONObject();
-            warning.warning = "You have been blocked for " + seconds + " seconds for spamming.";
+            warning.message = "You have been blocked for " + seconds + " seconds for spamming.";
          }
          //Send warning if getting close
          else if (SpamScore > 60)
          {
             warning = new WarningJSONObject();
-            warning.warning = "Warning: Your spam score is high. Please wait a bit before posting again";
+            warning.message = "Warning: Your spam score is high. Please wait a bit before posting again";
          }
 
          return warning;

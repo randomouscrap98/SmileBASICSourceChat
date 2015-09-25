@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using ModuleSystem;
 using ChatEssentials;
 
-[assembly: AssemblyVersion("0.3.*")]
+[assembly: AssemblyVersion("0.4.*")]
 
 namespace ChatServer
 {
@@ -28,6 +28,7 @@ namespace ChatServer
       public const string ConfigFile = "config.xml";
       public const string ModuleConfigFile = "moduleConfig.xml";
       public const string OptionTag = "main";
+      public const string LogTag = "System";
 
       public static List<ModuleSystem.Module> ActiveModules
       {
@@ -78,7 +79,7 @@ namespace ChatServer
          logger.StartAutoDumping(options.GetAsType<int>(OptionTag, "loggerFileDumpInterval"));
          logger.StartInstantConsole();
 
-         logger.Log("This exe was built on: " + MyBuildDate().ToString());
+         logger.Log("This exe was built on: " + MyBuildDate().ToString(), LogTag);
 
          //Set up the module system
          loader = new ModuleLoader(logger);
@@ -87,7 +88,8 @@ namespace ChatServer
          //Oops, couldn't load the modules. What the heck?
          if (!loader.Setup("moduleConfig.xml", extraModules))
          {
-            logger.LogGeneral("Module loader failed. Cannot continue", MyExtensions.Logging.LogLevel.FatalError);
+            logger.LogGeneral("Module loader failed. Cannot continue", 
+               MyExtensions.Logging.LogLevel.FatalError, LogTag);
             Finish();
             return;
          }
@@ -98,13 +100,13 @@ namespace ChatServer
          if(!authServer.Start())
          {
             logger.LogGeneral("Authorization server could not be started!",
-               MyExtensions.Logging.LogLevel.FatalError, "Auth");
+               MyExtensions.Logging.LogLevel.FatalError, LogTag);
             Finish("Fatal error. Exiting");
             return;
          }
          else
          {
-            logger.Log ("Authorization server running on port " + authServer.Port);
+            logger.Log ("Authorization server running on port " + authServer.Port, LogTag);
          }
 
          //As an in-between, set some chat parameters
@@ -132,16 +134,18 @@ namespace ChatServer
 
          if (webSocketServer.IsListening) 
          {
-            logger.Log("Listening on port " + webSocketServer.Port + " with services:");
+            logger.Log("Chat Server listening on port " + webSocketServer.Port + " with services:", LogTag);
 
             foreach (var path in webSocketServer.WebSocketServices.Paths)
-               logger.Log ("- " + path);
+               logger.Log ("- " + path, LogTag);
          }
 
          //Link the auth server to the websocket server
          Chat.LinkAuthServer(authServer);
 
-         Console.WriteLine(">> Press Q to stop the server...");
+         Console.WriteLine(">> Press Q to nicely quit the server...");
+         Console.WriteLine(">> Press X to forcibly stop the server...");
+         //Console.WriteLine(">> Press / to type a command...");
 
          //Now enter the "server loop" and run forever?
          while(true)
@@ -149,23 +153,40 @@ namespace ChatServer
             if(Console.KeyAvailable)
             {
                ConsoleKeyInfo key = Console.ReadKey();
-               if(key.Key == ConsoleKey.Q)
+               if (key.Key == ConsoleKey.Q)
+               {
+                  Chat.MyBroadcast((new SystemMessageJSONObject() { message = "System is shutting down in 5 seconds for maintenance..." }).ToString());
+                  Thread.Sleep(5000);
                   break;
+               }
+               else if (key.Key == ConsoleKey.X)
+               {
+                  break;
+               }
             }
             Thread.Sleep(AuthServer.ThreadSleepMilliseconds);
          }
-
+            
          Finish();
+      }
+
+      private static void PrintCommandMenu()
+      {
+         Console.WriteLine("----------");
+         Console.WriteLine(" Commands ");
+         Console.WriteLine("----------");
+         Console.WriteLine();
+         Console.WriteLine(" S - output a system message");
       }
 
       //IDK a way to end everything.
       private static void Finish(string message = "Done")
       {
-         logger.Log("Stopping auth server...");
+         logger.Log("Stopping auth server...", LogTag);
          authServer.Stop();
-         logger.Log("Stopping chat server...");
+         logger.Log("Stopping chat server...", LogTag);
          webSocketServer.Stop();
-         logger.Log("Stopping logger...");
+         logger.Log("Stopping logger...", LogTag);
          logger.Log(message);
          logger.DumpToFile();
       }
