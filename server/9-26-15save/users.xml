@@ -1,0 +1,290 @@
+<SOAP-ENV:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:clr="http://schemas.microsoft.com/clr/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <SOAP-ENV:Body>
+    <a1:_x0031_1306_x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_ id="ref-1" xmlns:a1="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[ChatEssentials.User, ChatEssentials, Version=1.0.5747">
+      <Version>12</Version>
+      <Comparer href="#ref-2" />
+      <HashSize>17</HashSize>
+      <KeyValuePairs href="#ref-3" />
+    </a1:_x0031_1306_x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_>
+    <a2:IntEqualityComparer id="ref-2" xmlns:a2="http://schemas.microsoft.com/clr/ns/System.Collections.Generic">
+    </a2:IntEqualityComparer>
+    <SOAP-ENC:Array id="ref-3" xmlns:a3="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.KeyValuePair`2[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[ChatEssentials.User, ChatEssentials, Version=1.0.5747" SOAP-ENC:arrayType="a3:_x0031_1306_x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_[12]">
+      <item>
+        <key>2</key>
+        <value href="#ref-4" />
+      </item>
+      <item>
+        <key>3</key>
+        <value href="#ref-5" />
+      </item>
+      <item>
+        <key>18</key>
+        <value href="#ref-6" />
+      </item>
+      <item>
+        <key>15</key>
+        <value href="#ref-7" />
+      </item>
+      <item>
+        <key>4</key>
+        <value href="#ref-8" />
+      </item>
+      <item>
+        <key>6</key>
+        <value href="#ref-9" />
+      </item>
+      <item>
+        <key>16</key>
+        <value href="#ref-10" />
+      </item>
+      <item>
+        <key>20</key>
+        <value href="#ref-11" />
+      </item>
+      <item>
+        <key>10</key>
+        <value href="#ref-12" />
+      </item>
+      <item>
+        <key>23</key>
+        <value href="#ref-13" />
+      </item>
+      <item>
+        <key>12</key>
+        <value href="#ref-14" />
+      </item>
+      <item>
+        <key>11</key>
+        <value href="#ref-15" />
+      </item>
+    </SOAP-ENC:Array>
+    <a4:User id="ref-4" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>2</uid>
+      <username id="ref-16">randomouscrap98</username>
+      <avatar id="ref-17">/user_uploads/avatars/t1443123571.png</avatar>
+      <stars id="ref-18">☆☆☆☆☆</stars>
+      <joinDate>2015-09-22T01:56:07.0000000+00:00</joinDate>
+      <spamScore>13</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>true</staffChat>
+      <bannedUntil>2014-09-26T19:54:56.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T20:07:35.8937970+00:00</lastPing>
+      <lastPost>2015-09-26T20:02:41.3015760+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-19" />
+    </a4:User>
+    <a4:User id="ref-5" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>3</uid>
+      <username id="ref-20">Lumage</username>
+      <avatar id="ref-21">/user_uploads/avatars/t1443147654.PNG</avatar>
+      <stars id="ref-22">☆☆☆</stars>
+      <joinDate>2015-09-22T01:56:17.0000000+00:00</joinDate>
+      <spamScore>5</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>true</staffChat>
+      <bannedUntil>2014-09-26T19:52:27.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T20:02:22.3419400+00:00</lastPing>
+      <lastPost>2015-09-26T20:02:09.8189410+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-23" />
+    </a4:User>
+    <a4:User id="ref-6" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>18</uid>
+      <username id="ref-24">Perska</username>
+      <avatar id="ref-25">/user_uploads/avatars/t1442945446.png</avatar>
+      <stars id="ref-26" />
+      <joinDate>2015-09-22T18:05:08.0000000+00:00</joinDate>
+      <spamScore>0</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T14:29:18.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T14:29:18.2857150+00:00</lastPing>
+      <lastPost>2015-09-26T11:50:17.1734270+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-27" />
+    </a4:User>
+    <a4:User id="ref-7" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>15</uid>
+      <username id="ref-28">bluesun</username>
+      <avatar id="ref-29">/user_uploads/avatars/t1442931973.png</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-22T14:19:19.0000000+00:00</joinDate>
+      <spamScore>5</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T17:24:50.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T19:34:28.2635890+00:00</lastPing>
+      <lastPost>2015-09-26T11:56:35.3263110+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-30" />
+    </a4:User>
+    <a4:User id="ref-8" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>4</uid>
+      <username id="ref-31">Hansausage</username>
+      <avatar id="ref-32">/user_uploads/avatars/t1442887077.png</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-22T01:56:46.0000000+00:00</joinDate>
+      <spamScore>5</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>1970-01-01T00:00:00.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T19:55:49.2883820+00:00</lastPing>
+      <lastPost>2015-09-26T19:55:49.2883800+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-33" />
+    </a4:User>
+    <a4:User id="ref-9" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>6</uid>
+      <username id="ref-34">HylianHoundoom</username>
+      <avatar id="ref-35">/user_uploads/avatars/t1442888572.png</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-22T02:20:28.0000000+00:00</joinDate>
+      <spamScore>5</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T20:10:09.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T20:16:09.8534730+00:00</lastPing>
+      <lastPost>2015-09-26T20:12:22.3017170+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-36" />
+    </a4:User>
+    <a4:User id="ref-10" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>16</uid>
+      <username id="ref-37">ilovecopper</username>
+      <avatar id="ref-38">/user_uploads/avatars/t1442970185.jpg</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-22T15:52:51.0000000+00:00</joinDate>
+      <spamScore>5</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T17:55:12.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T17:55:12.7627340+00:00</lastPing>
+      <lastPost>2015-09-26T16:33:07.4182510+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-39" />
+    </a4:User>
+    <a4:User id="ref-11" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>20</uid>
+      <username id="ref-40">LeviCelJir</username>
+      <avatar id="ref-41">/user_uploads/avatars/t1442972725.png</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-23T01:44:27.0000000+00:00</joinDate>
+      <spamScore>0</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T18:56:36.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T18:56:36.7175580+00:00</lastPing>
+      <lastPost>2015-09-26T16:56:21.6906270+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-42" />
+    </a4:User>
+    <a4:User id="ref-12" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>10</uid>
+      <username id="ref-43">Sam</username>
+      <avatar id="ref-44">/user_uploads/avatars/t1442927537.png</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-22T02:39:28.0000000+00:00</joinDate>
+      <spamScore>7</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T17:00:35.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T17:19:01.4799340+00:00</lastPing>
+      <lastPost>2015-09-26T17:14:30.0339840+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-45" />
+    </a4:User>
+    <a4:User id="ref-13" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>23</uid>
+      <username id="ref-46">Elly</username>
+      <avatar id="ref-47">/user_uploads/avatars/t1443147602.PNG</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-23T22:39:45.0000000+00:00</joinDate>
+      <spamScore>6</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>1970-01-01T00:00:00.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T19:27:56.5779330+00:00</lastPing>
+      <lastPost>2015-09-26T18:21:33.7449370+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-48" />
+    </a4:User>
+    <a4:User id="ref-14" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>12</uid>
+      <username id="ref-49">Sparky</username>
+      <avatar id="ref-50">/user_uploads/avatars/t1442890481.jpg</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-22T02:46:15.0000000+00:00</joinDate>
+      <spamScore>7</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T19:30:40.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T19:59:46.2644530+00:00</lastPing>
+      <lastPost>2015-09-26T19:31:01.5790320+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-51" />
+    </a4:User>
+    <a4:User id="ref-15" xmlns:a4="http://schemas.microsoft.com/clr/nsassem/ChatEssentials/ChatEssentials%2C%20Version%3D1.0.5747.11306%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <uid>11</uid>
+      <username id="ref-52">BrianXP7</username>
+      <avatar id="ref-53">/user_uploads/avatars/t1443026364.jpg</avatar>
+      <stars href="#ref-26" />
+      <joinDate>2015-09-22T02:40:06.0000000+00:00</joinDate>
+      <spamScore>5</spamScore>
+      <globalSpamScore>0</globalSpamScore>
+      <staffChat>false</staffChat>
+      <bannedUntil>2014-09-26T19:54:30.0000000+00:00</bannedUntil>
+      <lastActive>false</lastActive>
+      <lastPing>2015-09-26T19:54:43.5089870+00:00</lastPing>
+      <lastPost>2015-09-26T19:54:38.1845930+00:00</lastPost>
+      <lastSpam>0001-01-01T00:00:00.0000000+00:00</lastSpam>
+      <blockedUntil>0001-01-01T00:00:00.0000000+00:00</blockedUntil>
+      <Lock href="#ref-54" />
+    </a4:User>
+    <xsd:anyType id="ref-19">
+    </xsd:anyType>
+    <xsd:anyType id="ref-23">
+    </xsd:anyType>
+    <xsd:anyType id="ref-27">
+    </xsd:anyType>
+    <xsd:anyType id="ref-30">
+    </xsd:anyType>
+    <xsd:anyType id="ref-33">
+    </xsd:anyType>
+    <xsd:anyType id="ref-36">
+    </xsd:anyType>
+    <xsd:anyType id="ref-39">
+    </xsd:anyType>
+    <xsd:anyType id="ref-42">
+    </xsd:anyType>
+    <xsd:anyType id="ref-45">
+    </xsd:anyType>
+    <xsd:anyType id="ref-48">
+    </xsd:anyType>
+    <xsd:anyType id="ref-51">
+    </xsd:anyType>
+    <xsd:anyType id="ref-54">
+    </xsd:anyType>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

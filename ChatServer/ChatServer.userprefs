@@ -1,15 +1,16 @@
 ﻿<Properties StartupItem="ChatServer/ChatServer.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../chat.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../modules/statisticsModule.cs">
     <Files>
-      <File FileName="../chat.cs" Line="348" Column="45" />
-      <File FileName="../user.cs" Line="199" Column="10" />
-      <File FileName="../auth.cs" Line="238" Column="19" />
-      <File FileName="../pm.cs" Line="11" Column="5" />
-      <File FileName="../main.cs" Line="16" Column="37" />
-      <File FileName="../StringExtensions.cs" Line="55" Column="7" />
-      <File FileName="../messages.cs" Line="117" Column="8" />
-      <File FileName="../modules/module.cs" Line="343" Column="38" />
+      <File FileName="../chat.cs" Line="1" Column="1" />
+      <File FileName="../user.cs" Line="1" Column="1" />
+      <File FileName="../main.cs" Line="1" Column="1" />
+      <File FileName="../Options.cs" Line="1" Column="1" />
+      <File FileName="../chatManager.cs" Line="1" Column="1" />
+      <File FileName="../MySerialize.cs" Line="1" Column="1" />
+      <File FileName="../modules/statisticsModule.cs" Line="121" Column="132" />
+      <File FileName="../modules/module.cs" Line="1" Column="1" />
+      <File FileName="../messages.cs" Line="151" Column="54" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

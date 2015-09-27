@@ -9,6 +9,7 @@ using ChatEssentials;
 
 namespace ChatEssentials
 {
+   [Serializable]
    public class User
    {
       private static int SpamBlockSeconds = 1;
@@ -25,7 +26,6 @@ namespace ChatEssentials
       private int globalSpamScore = 0;
 
       private bool staffChat = false;
-      private bool chatBanned = false;
       private DateTime bannedUntil = new DateTime(0);
 
       private bool lastActive = true;
@@ -34,7 +34,7 @@ namespace ChatEssentials
       private DateTime lastSpam = new DateTime(0);
       private DateTime blockedUntil = new DateTime (0);
 
-      private readonly Object Lock = new Object();
+      public readonly Object Lock = new Object();
 
       public User(int uid)
       {
@@ -101,7 +101,7 @@ namespace ChatEssentials
 
       public bool Banned
       {
-         get { return chatBanned; }
+         get { return bannedUntil > DateTime.Now; }
       }
       public DateTime BannedUntil
       {
@@ -195,8 +195,8 @@ namespace ChatEssentials
                   avatar = json.result.avatar;
                   stars = json.result.starlevel;
                   staffChat = json.result.permissions.staffchat;
-                  chatBanned = json.result.chatbanned;
                   bannedUntil = DateExtensions.FromUnixTime((double)json.result.banneduntil);
+                  joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
                }
             }
          }

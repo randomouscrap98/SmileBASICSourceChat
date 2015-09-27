@@ -1,0 +1,241 @@
+{
+  "2": {
+    "messageCount": 253,
+    "totalCharacters": 9663,
+    "totalUsers": 1415,
+    "allSeenUsers": [
+      2,
+      18,
+      12,
+      17,
+      3,
+      6,
+      10,
+      4,
+      22,
+      11,
+      19,
+      23,
+      20,
+      5,
+      25
+    ]
+  },
+  "18": {
+    "messageCount": 17,
+    "totalCharacters": 245,
+    "totalUsers": 39,
+    "allSeenUsers": [
+      2,
+      18,
+      12,
+      6
+    ]
+  },
+  "12": {
+    "messageCount": 105,
+    "totalCharacters": 13485,
+    "totalUsers": 359,
+    "allSeenUsers": [
+      2,
+      18,
+      12,
+      3,
+      6,
+      4,
+      11,
+      19,
+      23,
+      5,
+      20
+    ]
+  },
+  "23": {
+    "messageCount": 48,
+    "totalCharacters": 1135,
+    "totalUsers": 228,
+    "allSeenUsers": [
+      12,
+      23,
+      20,
+      16,
+      6,
+      10,
+      2,
+      11,
+      5
+    ]
+  },
+  "20": {
+    "messageCount": 3,
+    "totalCharacters": 40,
+    "totalUsers": 9,
+    "allSeenUsers": [
+      12,
+      23,
+      20
+    ]
+  },
+  "16": {
+    "messageCount": 3,
+    "totalCharacters": 47,
+    "totalUsers": 8,
+    "allSeenUsers": [
+      12,
+      16,
+      3
+    ]
+  },
+  "6": {
+    "messageCount": 8,
+    "totalCharacters": 137,
+    "totalUsers": 20,
+    "allSeenUsers": [
+      12,
+      6,
+      10,
+      23
+    ]
+  },
+  "10": {
+    "messageCount": 22,
+    "totalCharacters": 822,
+    "totalUsers": 131,
+    "allSeenUsers": [
+      12,
+      6,
+      10,
+      2,
+      17,
+      3,
+      11,
+      19
+    ]
+  },
+  "3": {
+    "messageCount": 249,
+    "totalCharacters": 9155,
+    "totalUsers": 1471,
+    "allSeenUsers": [
+      12,
+      3,
+      6,
+      10,
+      25,
+      4,
+      17,
+      2,
+      22,
+      11,
+      19,
+      18,
+      5,
+      20
+    ]
+  },
+  "25": {
+    "messageCount": 13,
+    "totalCharacters": 138,
+    "totalUsers": 72,
+    "allSeenUsers": [
+      12,
+      3,
+      6,
+      10,
+      25,
+      2,
+      23,
+      11,
+      5
+    ]
+  },
+  "4": {
+    "messageCount": 23,
+    "totalCharacters": 479,
+    "totalUsers": 127,
+    "allSeenUsers": [
+      12,
+      3,
+      6,
+      10,
+      4,
+      2,
+      17,
+      22,
+      11
+    ]
+  },
+  "17": {
+    "messageCount": 24,
+    "totalCharacters": 772,
+    "totalUsers": 141,
+    "allSeenUsers": [
+      12,
+      17,
+      3,
+      6,
+      10,
+      4,
+      2,
+      22,
+      18
+    ]
+  },
+  "22": {
+    "messageCount": 3,
+    "totalCharacters": 38,
+    "totalUsers": 21,
+    "allSeenUsers": [
+      2,
+      12,
+      17,
+      3,
+      6,
+      4,
+      22
+    ]
+  },
+  "11": {
+    "messageCount": 9,
+    "totalCharacters": 214,
+    "totalUsers": 45,
+    "allSeenUsers": [
+      2,
+      12,
+      3,
+      6,
+      11,
+      5
+    ]
+  },
+  "19": {
+    "messageCount": 80,
+    "totalCharacters": 2285,
+    "totalUsers": 519,
+    "allSeenUsers": [
+      2,
+      12,
+      3,
+      6,
+      11,
+      19,
+      10,
+      4
+    ]
+  },
+  "5": {
+    "messageCount": 33,
+    "totalCharacters": 658,
+    "totalUsers": 180,
+    "allSeenUsers": [
+      2,
+      12,
+      23,
+      6,
+      11,
+      5,
+      3,
+      20
+    ]
+  }
+}

@@ -82,6 +82,11 @@ namespace ChatServer
          return true;
       }
 
+      public bool Running
+      {
+         get { return authSpinner != null && authSpinner.IsAlive; }
+      }
+
       //Try to stop the auth server
       public bool Stop()
       {
@@ -117,6 +122,7 @@ namespace ChatServer
          //Deallocate thread if it's finally dead.
          if(!authSpinner.IsAlive)
          {
+            server.Stop();
             authSpinner = null;
             return true;
          }
@@ -227,7 +233,7 @@ namespace ChatServer
             //Start expiring any user codes that are no longer in the updated list
             foreach (int key in authCodes.Keys)
                if (!users.Contains(key))
-                  authCodes[key].StartExpire();
+                  authCodes[key].StartExpire(10);
                
             //Now remove any expired authcodes
             authCodes = authCodes.Where(
@@ -289,6 +295,11 @@ namespace ChatServer
          }
       }
 
+      public bool CheckAuth(int uid, string key)
+      {
+         return GetAuth(uid) == key;  
+      }
+
       //Generate an authentication key
       public string GenerateAuth()
       {
@@ -315,7 +326,8 @@ namespace ChatServer
       //Begin the expiration process
       public void StartExpire(int seconds = ExpireMinutes * 60)
       {
-         expireDate = DateTime.Now.AddSeconds(seconds);
+         if(expireDate.Ticks == 0)
+            expireDate = DateTime.Now.AddSeconds(seconds);
       }
 
       //Stop the expiration process
@@ -331,6 +343,11 @@ namespace ChatServer
          { 
             return expireDate.Ticks != 0 && DateTime.Now > expireDate; 
          }
+      }
+
+      public DateTime ExpiresOn
+      {
+         get { return expireDate; }
       }
    }
 }

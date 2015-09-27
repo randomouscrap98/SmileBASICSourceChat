@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Threading;
+using System.Linq;
 
 namespace ChatEssentials
 {
+   [Serializable]
    public abstract class JSONObject
    {
       public readonly string type;
@@ -92,6 +94,7 @@ namespace ChatEssentials
 
 
    //A message. It SHOULD be readonly, honestly.
+   [Serializable]
    public class UserMessageJSONObject : JSONObject
    {
       public readonly int uid;
@@ -105,6 +108,7 @@ namespace ChatEssentials
       private static long NextID = 0;
 
       private bool display = true;
+      private bool spamUpdate = true;
 
       public UserMessageJSONObject(User user, string message, string tag) : base("message")
       {
@@ -130,6 +134,24 @@ namespace ChatEssentials
          }
       }
 
+      public UserMessageJSONObject() : base("message")
+      {
+         uid = 0;
+         username = "default";
+         avatar = "";
+         stars = "";
+         message = "";
+         tag = "";
+         postTime = new DateTime(0);
+         id = -1;
+      }
+
+      public static void FindNextID(IEnumerable<UserMessageJSONObject> messages)
+      {
+         if(messages != null && messages.Count() > 0)
+            NextID = messages.Max(x => x.id) + 1;
+      }
+
       public string time
       {
          get { return postTime.ToString() + " UTC"; }
@@ -149,6 +171,21 @@ namespace ChatEssentials
       public void SetVisible()
       {
          display = true;
+      }
+
+      public void SetSpammable()
+      {
+         spamUpdate = true;
+      }
+
+      public void SetUnspammable()
+      {
+         spamUpdate = false;
+      }
+
+      public bool Spammable
+      {
+         get { return spamUpdate; }
       }
 
       public bool Display

@@ -52,6 +52,9 @@
     <Compile Include="..\..\modules\adminModule.cs">
       <Link>adminModule.cs</Link>
     </Compile>
+    <Compile Include="..\..\modules\statisticsModule.cs">
+      <Link>statisticsModule.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -62,6 +65,10 @@
     <ProjectReference Include="..\ChatEssentials\ChatEssentials.csproj">
       <Project>{11915F24-34FB-4C4D-8CE7-3F509F8D5A42}</Project>
       <Name>ChatEssentials</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MyExtensions\MyExtensions.csproj">
+      <Project>{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}</Project>
+      <Name>MyExtensions</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

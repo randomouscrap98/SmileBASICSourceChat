@@ -1,0 +1,23 @@
+{
+  "default": {},
+  "ModuleLoader": {
+    "moduleDLLFolder": "plugins",
+    "saveFolder": "save"
+  },
+  "PmModule": {
+    "enabled": true
+  },
+  "FunModule": {
+    "enabled": true,
+    "emoteLink": "http://development.smilebasicsource.com/emotes.json"
+  },
+  "DebugModule": {
+    "enabled": true
+  },
+  "GlobalModule": {
+    "enabled": true
+  },
+  "StatisticsModule": {
+    "enabled": true
+  }
+}

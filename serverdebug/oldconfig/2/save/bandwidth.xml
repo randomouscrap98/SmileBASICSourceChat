@@ -1,0 +1,85 @@
+<SOAP-ENV:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:clr="http://schemas.microsoft.com/clr/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <SOAP-ENV:Body>
+    <a1:BandwidthMonitor id="ref-1" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <BandwidthContainer_x002B_outgoingBytes href="#ref-2" />
+      <BandwidthContainer_x002B_incomingBytes href="#ref-3" />
+      <byteLock href="#ref-4" />
+    </a1:BandwidthMonitor>
+    <a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_ id="ref-2" xmlns:a2="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.List`1[[ChatServer.BandwidthWindow, ChatServer, Version=1.0.0">
+      <_items href="#ref-5" />
+      <_size>8</_size>
+      <_version>8</_version>
+    </a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_>
+    <a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_ id="ref-3" xmlns:a2="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.List`1[[ChatServer.BandwidthWindow, ChatServer, Version=1.0.0">
+      <_items href="#ref-6" />
+      <_size>4</_size>
+      <_version>4</_version>
+    </a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_>
+    <xsd:anyType id="ref-4">
+    </xsd:anyType>
+    <SOAP-ENC:Array id="ref-5" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull" SOAP-ENC:arrayType="a1:BandwidthWindow[8]">
+      <item href="#ref-7" />
+      <item href="#ref-8" />
+      <item href="#ref-9" />
+      <item href="#ref-10" />
+      <item href="#ref-11" />
+      <item href="#ref-12" />
+      <item href="#ref-13" />
+      <item href="#ref-14" />
+    </SOAP-ENC:Array>
+    <SOAP-ENC:Array id="ref-6" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull" SOAP-ENC:arrayType="a1:BandwidthWindow[4]">
+      <item href="#ref-15" />
+      <item href="#ref-16" />
+      <item href="#ref-17" />
+      <item href="#ref-18" />
+    </SOAP-ENC:Array>
+    <a1:BandwidthWindow id="ref-7" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:01:39.3889390+00:00</WindowBegin>
+      <Bytes>11609</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-8" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:03:38.9606990+00:00</WindowBegin>
+      <Bytes>464</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-9" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:05:52.9174650+00:00</WindowBegin>
+      <Bytes>149</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-10" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:21:14.8775510+00:00</WindowBegin>
+      <Bytes>1519</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-11" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:23:14.5664820+00:00</WindowBegin>
+      <Bytes>232</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-12" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:34:09.9157130+00:00</WindowBegin>
+      <Bytes>355</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-13" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:35:14.5668030+00:00</WindowBegin>
+      <Bytes>232</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-14" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:40:48.2171490+00:00</WindowBegin>
+      <Bytes>355</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-15" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:01:39.0181350+00:00</WindowBegin>
+      <Bytes>1720</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-16" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:21:14.6274860+00:00</WindowBegin>
+      <Bytes>218</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-17" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:34:09.9154620+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-18" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-27T05:40:48.2169970+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

@@ -1,0 +1,36 @@
+{
+  "2": {
+    "uid": 2,
+    "username": "randomouscrap98",
+    "avatar": "/user_uploads/avatars/t1443123571.png",
+    "stars": "☆☆☆☆☆",
+    "joinDate": "2015-09-22T01:56:07+00:00",
+    "spamScore": 7,
+    "globalSpamScore": 0,
+    "staffChat": true,
+    "bannedUntil": "2014-09-27T09:53:13+00:00",
+    "lastActive": false,
+    "lastPing": "2015-09-27T10:04:22.217849+00:00",
+    "lastPost": "2015-09-27T09:53:35.474311+00:00",
+    "lastSpam": "0001-01-01T00:00:00",
+    "blockedUntil": "0001-01-01T00:00:00",
+    "Lock": {}
+  },
+  "3": {
+    "uid": 3,
+    "username": "Lumage",
+    "avatar": "/user_uploads/avatars/t1443147654.PNG",
+    "stars": "☆☆☆",
+    "joinDate": "2015-09-22T01:56:17+00:00",
+    "spamScore": 0,
+    "globalSpamScore": 0,
+    "staffChat": true,
+    "bannedUntil": "2014-09-27T16:55:52+00:00",
+    "lastActive": false,
+    "lastPing": "2015-09-27T16:55:52.552272+00:00",
+    "lastPost": "2015-09-27T16:55:52.401095+00:00",
+    "lastSpam": "0001-01-01T00:00:00",
+    "blockedUntil": "0001-01-01T00:00:00",
+    "Lock": {}
+  }
+}

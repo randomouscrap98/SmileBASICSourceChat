@@ -80,55 +80,25 @@ namespace MyExtensions
       //Try to write out options to the given file. Returns success or not
       public bool WriteToFile(string filename)
       {
-         Stream OptionFileStream = null;
-
-         try
-         {
-            OptionFileStream = File.Create(filename);
-            //System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(optionData.GetType());
-            SoapFormatter serializer = new SoapFormatter();
-            serializer.Serialize(OptionFileStream, optionData);//optionData.Select(kv=>new OptionPair(){id = kv.Key,value=kv.Value}).ToArray());
-         }
-         catch (Exception e)
-         {
-            Console.WriteLine("Exception: " + e);
-            return false;
-         }
-         finally
-         {
-            if (OptionFileStream != null)
-               OptionFileStream.Close();
-         }
-
-         return true;
+         return MyExtensions.MySerialize.SaveObject<Dictionary<string, Dictionary<string, object>>>(filename, optionData);
       }
 
       //Try to load options from the given file. Returns success or not
       public bool LoadFromFile(string filename)
       {
-         Stream OptionFileStream = null;
-         try
-         {
-            OptionFileStream = File.OpenRead(filename);
-            //System.Xml.Serialization.XmlSerializer deserializer = new System.Xml.Serialization.XmlSerializer(typeof(OptionPair[]));
-            SoapFormatter deserializer = new SoapFormatter();
-            Dictionary<string, Dictionary<string, object>> tempOptions = 
-               (Dictionary<string, Dictionary<string, object>>)deserializer.Deserialize(OptionFileStream);
+         Dictionary<string, Dictionary<string, object>> tempOptions;
 
+         if (MyExtensions.MySerialize.LoadObject<Dictionary<string, Dictionary<string, object>>>(filename, out tempOptions))
+         {
             foreach(string key in tempOptions.Keys)
                AddOptions(key, tempOptions[key]);
+
+            return true;
          }
-         catch 
+         else
          {
             return false;
          }
-         finally
-         {
-            if (OptionFileStream != null)
-               OptionFileStream.Close();
-         }
-
-         return true;
       }
 
 //		public Options(string options) : this()

@@ -2,6 +2,7 @@
 
 folder=ChatServer/ChatServer/bin/Debug/
 exe=ChatServer.exe
+build=build.txt
 dlls=ChatServer/ModulePackage1/bin/Debug/ModulePackage1.dll
 serverFolder=server/
 
@@ -30,6 +31,7 @@ done
 mkdir -p $serverFolder
 cp $folder/*.dll $serverFolder
 cp $folder/$exe $serverFolder/chat.exe
+cp $folder/$build $serverFolder/$build
 mkdir -p $serverFolder/plugins
 cp $dlls $serverFolder/plugins
 cd $serverFolder 

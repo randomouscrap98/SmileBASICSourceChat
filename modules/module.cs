@@ -38,16 +38,40 @@ namespace ModuleSystem
          get { return this.GetType().Name; }
       }
 
+      public string DefaultSaveFile
+      {
+         get { return ModuleName + ".json"; }
+      }
+
+      /// <summary>
+      /// Retrieves an option with the given name. If you have options you want loaded from the module config file,
+      /// you can get the values from here.
+      /// </summary>
+      /// <returns>The option.</returns>
+      /// <param name="optionName">Option name.</param>
+      /// <typeparam name="T">The 1st type parameter.</typeparam>
       public T GetOption<T>(string optionName)
       {
          return options.GetAsType<T>(ModuleName, optionName);
       }
 
+      /// <summary>
+      /// Adds a logger to the list of loggers which are written with the Log() function. You don't
+      /// need to use this if you're not using some fancy shmancy custom logging.
+      /// </summary>
+      /// <param name="logger">Logger.</param>
       public void AddLogger(Logger logger)
       {
          loggers.Add(logger);
       }
 
+      /// <summary>
+      /// Easy way for modules to write to a log. The log file is set up automatically, so if you don't 
+      /// want to manage logs yourself (you shouldn't), just dump the output here. This also writes to any
+      /// logger you add with AddLogger()
+      /// </summary>
+      /// <param name="message">Message.</param>
+      /// <param name="level">Level.</param>
       protected void Log(string message, LogLevel level = LogLevel.Normal)
       {
          foreach (Logger logger in loggers)
@@ -60,6 +84,13 @@ namespace ModuleSystem
          this.options.AddOptions(ModuleName, options);
       }
 
+      /// <summary>
+      /// Given a username as a string, get the User object that matches this username.
+      /// </summary>
+      /// <returns><c>true</c>, if user from argument was found, <c>false</c> otherwise.</returns>
+      /// <param name="argument">username as string</param>
+      /// <param name="users">all users</param>
+      /// <param name="user">matched user</param>
       protected bool GetUserFromArgument(string argument, Dictionary<int, User> users, out User user)
       {
          user = null;
@@ -74,6 +105,10 @@ namespace ModuleSystem
          }
       }
 
+      /// <summary>
+      /// Modules can use this to add a generic error to their return from ProccessCommand.
+      /// </summary>
+      /// <param name="output">The data you'll be returning from ProcessCommand</param>
       protected void AddError(List<JSONObject> output)
       {
          ModuleJSONObject error = new ModuleJSONObject();
@@ -81,6 +116,51 @@ namespace ModuleSystem
          output.Add(error);
       }
 
+      /// <summary>
+      /// This is performed when the modules are loaded. You should load any necessary files here,
+      /// such as save data/etc. This is only called when the module is loaded, but could be called 
+      /// multiple times. 
+      /// </summary>
+      /// <returns><c>true</c>, if files were loaded, <c>false</c> otherwise.</returns>
+      public virtual bool LoadFiles()
+      {
+         return true;
+      }
+
+      /// <summary>
+      /// This is performed when the modules are saved. You should save any file data here, such
+      /// as save data/etc. This is called in regular intervals by the module manager, so make sure
+      /// you're not doing anything too time consuming here. 
+      /// </summary>
+      /// <returns><c>true</c>, if files were saved, <c>false</c> otherwise.</returns>
+      public virtual bool SaveFiles()
+      {
+         return true;
+      }
+
+      /// <summary>
+      /// All messages that come through the server are passed through here. If you want to perform analysis or 
+      /// something (that isn't part of a command), do it here.
+      /// </summary>
+      /// <param name="message">Message.</param>
+      /// <param name="user">User.</param>
+      /// <param name="users">Users.</param>
+      public virtual void ProcessMessage(UserMessageJSONObject message, User user, Dictionary<int, User> users)
+      {
+         //this function does nothing right now.
+      }
+
+      /// <summary>
+      /// This is the function you will be using most. If you set up your list of commands properly, the module manager
+      /// will call this function automatically when that command is parsed. You will get a copy of the user's command
+      /// containing all their arguments, the user that sent the command, and a list of all users in the chat right now.
+      /// Your function should return any output you'd like to produce for that command. I recommend doing a switch on the
+      /// command.Command field and using the cases for the command output logic.
+      /// </summary>
+      /// <returns>The command.</returns>
+      /// <param name="command">Command.</param>
+      /// <param name="user">User.</param>
+      /// <param name="users">Users.</param>
       public virtual List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
       {
          List<JSONObject> output = new List<JSONObject>();
@@ -88,6 +168,11 @@ namespace ModuleSystem
          return output;
       }
 
+      /// <summary>
+      /// The nickname of your module for users to see; defaults to your module name (without "module"). If you
+      /// name it the same as another module, your module will not load.
+      /// </summary>
+      /// <value>The nickname.</value>
       public virtual string Nickname
       {
          get { return ModuleName.ToLower().Replace("module", ""); }
@@ -114,7 +199,8 @@ namespace ModuleSystem
          //Set some default options.
          Dictionary<string, object> loaderOptions = new Dictionary<string, object>() 
          {
-            {"moduleDLLFolder", "plugins"}
+            {"moduleDLLFolder", "plugins"},
+            {"saveFolder", "save"}
          };
 
          options.AddOptions(LoaderName, loaderOptions);
@@ -124,6 +210,54 @@ namespace ModuleSystem
       public List<Module> ActiveModules
       {
          get { return activeModules; }
+      }
+
+      //Wrap module file loading so that it uses a custom directory.
+      public bool LoadWrapper(Module module)
+      {
+         try
+         {
+            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
+               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            Directory.CreateDirectory(saveDirectory);
+            Directory.SetCurrentDirectory(saveDirectory);
+
+            bool result = module.LoadFiles();
+
+            Directory.SetCurrentDirectory(currentDirectory);
+
+            return result;
+         }
+         catch
+         {
+            return false;
+         }
+      }
+
+      //Wrap module file saving so that it uses a custom directory
+      public bool SaveWrapper(Module module)
+      {
+         try
+         {
+            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
+               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            Directory.CreateDirectory(saveDirectory);
+            Directory.SetCurrentDirectory(saveDirectory);
+
+            bool result = module.SaveFiles();
+
+            Directory.SetCurrentDirectory(currentDirectory);
+
+            return result;
+         }
+         catch
+         {
+            return false;
+         }
       }
          
       //Run through the whole module setup process
@@ -187,9 +321,18 @@ namespace ModuleSystem
             //Only add this module if it is enabled
             if (options.GetAsType<bool>(tempModule.ModuleName, "enabled"))
             {
-               tempModule.AddLogger(logger);    //Add our global logger to the module
-               activeModules.Add(tempModule);
-               logger.Log("Module activated: " + tempModule.ModuleName, LoaderName);
+               //Only add this module if the files could be loaded.
+               if (LoadWrapper(tempModule) || (SaveWrapper(tempModule) && LoadWrapper(tempModule)))
+               {
+                  tempModule.AddLogger(logger);    //Add our global logger to the module
+                  activeModules.Add(tempModule);
+                  logger.Log("Module activated: " + tempModule.ModuleName, LoaderName);
+               }
+               else
+               {
+                  logger.LogGeneral("Could not activate module " + tempModule.ModuleName + ", LoadFiles() failed",
+                     MyExtensions.Logging.LogLevel.Error, LoaderName);
+               }
             }
          }
 

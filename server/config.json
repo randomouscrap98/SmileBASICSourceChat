@@ -1,0 +1,24 @@
+{
+  "default": {},
+  "main": {
+    "loggerBacklog": 100,
+    "loggerFileDumpInterval": 10,
+    "loggerFile": "log.txt",
+    "authServerPort": 45696,
+    "chatServerPort": 45695,
+    "chatTimeout": 9,
+    "messageBacklog": 1000,
+    "messageSend": 10,
+    "acceptedTags": "general, admin, offtopic",
+    "globalTag": "any",
+    "userUpdateInterval": 60,
+    "inactiveMinutes": 5,
+    "spamBlockSeconds": 20,
+    "buildHourModifier": -4,
+    "website": "http://development.smilebasicsource.com",
+    "shutdownSeconds": 5,
+    "saveFolder": "save",
+    "saveInterval": 300,
+    "moduleWaitSeconds": 5
+  }
+}

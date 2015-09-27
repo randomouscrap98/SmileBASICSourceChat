@@ -5,6 +5,7 @@ using System.Linq;
 namespace ChatServer
 {
    //Just a tiny class for a small portion of the bandwidth
+   [Serializable]
    public class BandwidthWindow
    {
       public readonly DateTime WindowBegin = DateTime.Now;
@@ -26,6 +27,7 @@ namespace ChatServer
    }
 
    //This adds editing abilities to the bandwidth container.
+   [Serializable]
    public class BandwidthMonitor : BandwidthContainer
    {
       //Generic way to add bytes (internal only, adds bytes to the given array)
@@ -52,6 +54,7 @@ namespace ChatServer
       }
    }
 
+   [Serializable]
    public class BandwidthContainer
    {
       public enum BytePowers
@@ -64,7 +67,7 @@ namespace ChatServer
 
       protected List<BandwidthWindow> outgoingBytes = new List<BandwidthWindow>();
       protected List<BandwidthWindow> incomingBytes = new List<BandwidthWindow>();
-      protected readonly Object byteLock = new object();
+      public readonly Object byteLock = new object();
 
       public BandwidthContainer() { }
 

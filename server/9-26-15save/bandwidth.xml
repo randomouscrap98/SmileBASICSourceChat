@@ -1,0 +1,1815 @@
+<SOAP-ENV:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:clr="http://schemas.microsoft.com/clr/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <SOAP-ENV:Body>
+    <a1:BandwidthMonitor id="ref-1" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <BandwidthContainer_x002B_outgoingBytes href="#ref-2" />
+      <BandwidthContainer_x002B_incomingBytes href="#ref-3" />
+      <byteLock href="#ref-4" />
+    </a1:BandwidthMonitor>
+    <a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_ id="ref-2" xmlns:a2="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.List`1[[ChatServer.BandwidthWindow, ChatServer, Version=1.0.0">
+      <_items href="#ref-5" />
+      <_size>194</_size>
+      <_version>194</_version>
+    </a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_>
+    <a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_ id="ref-3" xmlns:a2="http://schemas.microsoft.com/clr/ns/System.Collections.Generic.List`1[[ChatServer.BandwidthWindow, ChatServer, Version=1.0.0">
+      <_items href="#ref-6" />
+      <_size>164</_size>
+      <_version>164</_version>
+    </a2:_x0030__x002C__x0020_Culture_x003D_neutral_x002C__x0020_PublicKeyToken_x003D_null_x005D__x005D_>
+    <xsd:anyType id="ref-4">
+    </xsd:anyType>
+    <SOAP-ENC:Array id="ref-5" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull" SOAP-ENC:arrayType="a1:BandwidthWindow[256]">
+      <item href="#ref-7" />
+      <item href="#ref-8" />
+      <item href="#ref-9" />
+      <item href="#ref-10" />
+      <item href="#ref-11" />
+      <item href="#ref-12" />
+      <item href="#ref-13" />
+      <item href="#ref-14" />
+      <item href="#ref-15" />
+      <item href="#ref-16" />
+      <item href="#ref-17" />
+      <item href="#ref-18" />
+      <item href="#ref-19" />
+      <item href="#ref-20" />
+      <item href="#ref-21" />
+      <item href="#ref-22" />
+      <item href="#ref-23" />
+      <item href="#ref-24" />
+      <item href="#ref-25" />
+      <item href="#ref-26" />
+      <item href="#ref-27" />
+      <item href="#ref-28" />
+      <item href="#ref-29" />
+      <item href="#ref-30" />
+      <item href="#ref-31" />
+      <item href="#ref-32" />
+      <item href="#ref-33" />
+      <item href="#ref-34" />
+      <item href="#ref-35" />
+      <item href="#ref-36" />
+      <item href="#ref-37" />
+      <item href="#ref-38" />
+      <item href="#ref-39" />
+      <item href="#ref-40" />
+      <item href="#ref-41" />
+      <item href="#ref-42" />
+      <item href="#ref-43" />
+      <item href="#ref-44" />
+      <item href="#ref-45" />
+      <item href="#ref-46" />
+      <item href="#ref-47" />
+      <item href="#ref-48" />
+      <item href="#ref-49" />
+      <item href="#ref-50" />
+      <item href="#ref-51" />
+      <item href="#ref-52" />
+      <item href="#ref-53" />
+      <item href="#ref-54" />
+      <item href="#ref-55" />
+      <item href="#ref-56" />
+      <item href="#ref-57" />
+      <item href="#ref-58" />
+      <item href="#ref-59" />
+      <item href="#ref-60" />
+      <item href="#ref-61" />
+      <item href="#ref-62" />
+      <item href="#ref-63" />
+      <item href="#ref-64" />
+      <item href="#ref-65" />
+      <item href="#ref-66" />
+      <item href="#ref-67" />
+      <item href="#ref-68" />
+      <item href="#ref-69" />
+      <item href="#ref-70" />
+      <item href="#ref-71" />
+      <item href="#ref-72" />
+      <item href="#ref-73" />
+      <item href="#ref-74" />
+      <item href="#ref-75" />
+      <item href="#ref-76" />
+      <item href="#ref-77" />
+      <item href="#ref-78" />
+      <item href="#ref-79" />
+      <item href="#ref-80" />
+      <item href="#ref-81" />
+      <item href="#ref-82" />
+      <item href="#ref-83" />
+      <item href="#ref-84" />
+      <item href="#ref-85" />
+      <item href="#ref-86" />
+      <item href="#ref-87" />
+      <item href="#ref-88" />
+      <item href="#ref-89" />
+      <item href="#ref-90" />
+      <item href="#ref-91" />
+      <item href="#ref-92" />
+      <item href="#ref-93" />
+      <item href="#ref-94" />
+      <item href="#ref-95" />
+      <item href="#ref-96" />
+      <item href="#ref-97" />
+      <item href="#ref-98" />
+      <item href="#ref-99" />
+      <item href="#ref-100" />
+      <item href="#ref-101" />
+      <item href="#ref-102" />
+      <item href="#ref-103" />
+      <item href="#ref-104" />
+      <item href="#ref-105" />
+      <item href="#ref-106" />
+      <item href="#ref-107" />
+      <item href="#ref-108" />
+      <item href="#ref-109" />
+      <item href="#ref-110" />
+      <item href="#ref-111" />
+      <item href="#ref-112" />
+      <item href="#ref-113" />
+      <item href="#ref-114" />
+      <item href="#ref-115" />
+      <item href="#ref-116" />
+      <item href="#ref-117" />
+      <item href="#ref-118" />
+      <item href="#ref-119" />
+      <item href="#ref-120" />
+      <item href="#ref-121" />
+      <item href="#ref-122" />
+      <item href="#ref-123" />
+      <item href="#ref-124" />
+      <item href="#ref-125" />
+      <item href="#ref-126" />
+      <item href="#ref-127" />
+      <item href="#ref-128" />
+      <item href="#ref-129" />
+      <item href="#ref-130" />
+      <item href="#ref-131" />
+      <item href="#ref-132" />
+      <item href="#ref-133" />
+      <item href="#ref-134" />
+      <item href="#ref-135" />
+      <item href="#ref-136" />
+      <item href="#ref-137" />
+      <item href="#ref-138" />
+      <item href="#ref-139" />
+      <item href="#ref-140" />
+      <item href="#ref-141" />
+      <item href="#ref-142" />
+      <item href="#ref-143" />
+      <item href="#ref-144" />
+      <item href="#ref-145" />
+      <item href="#ref-146" />
+      <item href="#ref-147" />
+      <item href="#ref-148" />
+      <item href="#ref-149" />
+      <item href="#ref-150" />
+      <item href="#ref-151" />
+      <item href="#ref-152" />
+      <item href="#ref-153" />
+      <item href="#ref-154" />
+      <item href="#ref-155" />
+      <item href="#ref-156" />
+      <item href="#ref-157" />
+      <item href="#ref-158" />
+      <item href="#ref-159" />
+      <item href="#ref-160" />
+      <item href="#ref-161" />
+      <item href="#ref-162" />
+      <item href="#ref-163" />
+      <item href="#ref-164" />
+      <item href="#ref-165" />
+      <item href="#ref-166" />
+      <item href="#ref-167" />
+      <item href="#ref-168" />
+      <item href="#ref-169" />
+      <item href="#ref-170" />
+      <item href="#ref-171" />
+      <item href="#ref-172" />
+      <item href="#ref-173" />
+      <item href="#ref-174" />
+      <item href="#ref-175" />
+      <item href="#ref-176" />
+      <item href="#ref-177" />
+      <item href="#ref-178" />
+      <item href="#ref-179" />
+      <item href="#ref-180" />
+      <item href="#ref-181" />
+      <item href="#ref-182" />
+      <item href="#ref-183" />
+      <item href="#ref-184" />
+      <item href="#ref-185" />
+      <item href="#ref-186" />
+      <item href="#ref-187" />
+      <item href="#ref-188" />
+      <item href="#ref-189" />
+      <item href="#ref-190" />
+      <item href="#ref-191" />
+      <item href="#ref-192" />
+      <item href="#ref-193" />
+      <item href="#ref-194" />
+      <item href="#ref-195" />
+      <item href="#ref-196" />
+      <item href="#ref-197" />
+      <item href="#ref-198" />
+      <item href="#ref-199" />
+      <item href="#ref-200" />
+    </SOAP-ENC:Array>
+    <SOAP-ENC:Array id="ref-6" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull" SOAP-ENC:arrayType="a1:BandwidthWindow[256]">
+      <item href="#ref-201" />
+      <item href="#ref-202" />
+      <item href="#ref-203" />
+      <item href="#ref-204" />
+      <item href="#ref-205" />
+      <item href="#ref-206" />
+      <item href="#ref-207" />
+      <item href="#ref-208" />
+      <item href="#ref-209" />
+      <item href="#ref-210" />
+      <item href="#ref-211" />
+      <item href="#ref-212" />
+      <item href="#ref-213" />
+      <item href="#ref-214" />
+      <item href="#ref-215" />
+      <item href="#ref-216" />
+      <item href="#ref-217" />
+      <item href="#ref-218" />
+      <item href="#ref-219" />
+      <item href="#ref-220" />
+      <item href="#ref-221" />
+      <item href="#ref-222" />
+      <item href="#ref-223" />
+      <item href="#ref-224" />
+      <item href="#ref-225" />
+      <item href="#ref-226" />
+      <item href="#ref-227" />
+      <item href="#ref-228" />
+      <item href="#ref-229" />
+      <item href="#ref-230" />
+      <item href="#ref-231" />
+      <item href="#ref-232" />
+      <item href="#ref-233" />
+      <item href="#ref-234" />
+      <item href="#ref-235" />
+      <item href="#ref-236" />
+      <item href="#ref-237" />
+      <item href="#ref-238" />
+      <item href="#ref-239" />
+      <item href="#ref-240" />
+      <item href="#ref-241" />
+      <item href="#ref-242" />
+      <item href="#ref-243" />
+      <item href="#ref-244" />
+      <item href="#ref-245" />
+      <item href="#ref-246" />
+      <item href="#ref-247" />
+      <item href="#ref-248" />
+      <item href="#ref-249" />
+      <item href="#ref-250" />
+      <item href="#ref-251" />
+      <item href="#ref-252" />
+      <item href="#ref-253" />
+      <item href="#ref-254" />
+      <item href="#ref-255" />
+      <item href="#ref-256" />
+      <item href="#ref-257" />
+      <item href="#ref-258" />
+      <item href="#ref-259" />
+      <item href="#ref-260" />
+      <item href="#ref-261" />
+      <item href="#ref-262" />
+      <item href="#ref-263" />
+      <item href="#ref-264" />
+      <item href="#ref-265" />
+      <item href="#ref-266" />
+      <item href="#ref-267" />
+      <item href="#ref-268" />
+      <item href="#ref-269" />
+      <item href="#ref-270" />
+      <item href="#ref-271" />
+      <item href="#ref-272" />
+      <item href="#ref-273" />
+      <item href="#ref-274" />
+      <item href="#ref-275" />
+      <item href="#ref-276" />
+      <item href="#ref-277" />
+      <item href="#ref-278" />
+      <item href="#ref-279" />
+      <item href="#ref-280" />
+      <item href="#ref-281" />
+      <item href="#ref-282" />
+      <item href="#ref-283" />
+      <item href="#ref-284" />
+      <item href="#ref-285" />
+      <item href="#ref-286" />
+      <item href="#ref-287" />
+      <item href="#ref-288" />
+      <item href="#ref-289" />
+      <item href="#ref-290" />
+      <item href="#ref-291" />
+      <item href="#ref-292" />
+      <item href="#ref-293" />
+      <item href="#ref-294" />
+      <item href="#ref-295" />
+      <item href="#ref-296" />
+      <item href="#ref-297" />
+      <item href="#ref-298" />
+      <item href="#ref-299" />
+      <item href="#ref-300" />
+      <item href="#ref-301" />
+      <item href="#ref-302" />
+      <item href="#ref-303" />
+      <item href="#ref-304" />
+      <item href="#ref-305" />
+      <item href="#ref-306" />
+      <item href="#ref-307" />
+      <item href="#ref-308" />
+      <item href="#ref-309" />
+      <item href="#ref-310" />
+      <item href="#ref-311" />
+      <item href="#ref-312" />
+      <item href="#ref-313" />
+      <item href="#ref-314" />
+      <item href="#ref-315" />
+      <item href="#ref-316" />
+      <item href="#ref-317" />
+      <item href="#ref-318" />
+      <item href="#ref-319" />
+      <item href="#ref-320" />
+      <item href="#ref-321" />
+      <item href="#ref-322" />
+      <item href="#ref-323" />
+      <item href="#ref-324" />
+      <item href="#ref-325" />
+      <item href="#ref-326" />
+      <item href="#ref-327" />
+      <item href="#ref-328" />
+      <item href="#ref-329" />
+      <item href="#ref-330" />
+      <item href="#ref-331" />
+      <item href="#ref-332" />
+      <item href="#ref-333" />
+      <item href="#ref-334" />
+      <item href="#ref-335" />
+      <item href="#ref-336" />
+      <item href="#ref-337" />
+      <item href="#ref-338" />
+      <item href="#ref-339" />
+      <item href="#ref-340" />
+      <item href="#ref-341" />
+      <item href="#ref-342" />
+      <item href="#ref-343" />
+      <item href="#ref-344" />
+      <item href="#ref-345" />
+      <item href="#ref-346" />
+      <item href="#ref-347" />
+      <item href="#ref-348" />
+      <item href="#ref-349" />
+      <item href="#ref-350" />
+      <item href="#ref-351" />
+      <item href="#ref-352" />
+      <item href="#ref-353" />
+      <item href="#ref-354" />
+      <item href="#ref-355" />
+      <item href="#ref-356" />
+      <item href="#ref-357" />
+      <item href="#ref-358" />
+      <item href="#ref-359" />
+      <item href="#ref-360" />
+      <item href="#ref-361" />
+      <item href="#ref-362" />
+      <item href="#ref-363" />
+      <item href="#ref-364" />
+    </SOAP-ENC:Array>
+    <a1:BandwidthWindow id="ref-7" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:47:57.4080870+00:00</WindowBegin>
+      <Bytes>18960</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-8" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:49:19.4237820+00:00</WindowBegin>
+      <Bytes>26718</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-9" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:50:21.5943220+00:00</WindowBegin>
+      <Bytes>45656</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-10" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:51:42.3603170+00:00</WindowBegin>
+      <Bytes>22820</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-11" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:52:48.9844670+00:00</WindowBegin>
+      <Bytes>46224</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-12" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:53:50.6217370+00:00</WindowBegin>
+      <Bytes>21432</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-13" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:54:56.0017640+00:00</WindowBegin>
+      <Bytes>36984</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-14" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:55:56.8180820+00:00</WindowBegin>
+      <Bytes>28128</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-15" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:57:03.7740390+00:00</WindowBegin>
+      <Bytes>22458</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-16" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:58:05.9918570+00:00</WindowBegin>
+      <Bytes>11274</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-17" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:59:11.3083330+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-18" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:03:56.7522420+00:00</WindowBegin>
+      <Bytes>220</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-19" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:05:05.9757610+00:00</WindowBegin>
+      <Bytes>3354</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-20" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:07:13.5537750+00:00</WindowBegin>
+      <Bytes>2969</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-21" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:13:05.9759250+00:00</WindowBegin>
+      <Bytes>221</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-22" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:14:25.0074720+00:00</WindowBegin>
+      <Bytes>344</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-23" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:20:05.9760890+00:00</WindowBegin>
+      <Bytes>221</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-24" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:43:33.8785120+00:00</WindowBegin>
+      <Bytes>344</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-25" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:46:02.8715800+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-26" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:50:17.1809570+00:00</WindowBegin>
+      <Bytes>4241</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-27" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:52:05.9770540+00:00</WindowBegin>
+      <Bytes>221</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-28" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:55:26.2754590+00:00</WindowBegin>
+      <Bytes>21966</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-29" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:56:26.3034650+00:00</WindowBegin>
+      <Bytes>5878</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-30" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:57:47.5409740+00:00</WindowBegin>
+      <Bytes>5888</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-31" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:59:06.0940730+00:00</WindowBegin>
+      <Bytes>5700</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-32" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:00:55.5039880+00:00</WindowBegin>
+      <Bytes>338</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-33" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:03:26.1015230+00:00</WindowBegin>
+      <Bytes>220</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-34" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:05:05.9775000+00:00</WindowBegin>
+      <Bytes>220</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-35" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:25:20.5661930+00:00</WindowBegin>
+      <Bytes>467</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-36" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:31:26.1033350+00:00</WindowBegin>
+      <Bytes>220</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-37" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:57:28.1708840+00:00</WindowBegin>
+      <Bytes>343</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-38" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T13:03:26.1051520+00:00</WindowBegin>
+      <Bytes>220</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-39" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:29:18.2856500+00:00</WindowBegin>
+      <Bytes>3314</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-40" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:42:06.5734450+00:00</WindowBegin>
+      <Bytes>9348</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-41" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:56:41.2631220+00:00</WindowBegin>
+      <Bytes>3460</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-42" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:59:26.3337000+00:00</WindowBegin>
+      <Bytes>2979</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-43" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:04:41.1065000+00:00</WindowBegin>
+      <Bytes>221</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-44" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:22:57.1586570+00:00</WindowBegin>
+      <Bytes>3928</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-45" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:25:49.4847720+00:00</WindowBegin>
+      <Bytes>6474</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-46" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:27:11.3959590+00:00</WindowBegin>
+      <Bytes>23316</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-47" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:28:19.9303420+00:00</WindowBegin>
+      <Bytes>6184</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-48" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:33:41.1076010+00:00</WindowBegin>
+      <Bytes>1522</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-49" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:35:47.2367670+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-50" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:41:05.9855310+00:00</WindowBegin>
+      <Bytes>1522</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-51" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:44:22.8275330+00:00</WindowBegin>
+      <Bytes>6304</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-52" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:47:05.9858210+00:00</WindowBegin>
+      <Bytes>698</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-53" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:48:06.5792080+00:00</WindowBegin>
+      <Bytes>944</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-54" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:49:57.1180350+00:00</WindowBegin>
+      <Bytes>698</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-55" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:53:41.1084290+00:00</WindowBegin>
+      <Bytes>700</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-56" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:57:30.9219070+00:00</WindowBegin>
+      <Bytes>822</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-57" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:00:00.8117720+00:00</WindowBegin>
+      <Bytes>344</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-58" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:01:02.2988030+00:00</WindowBegin>
+      <Bytes>3956</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-59" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:02:11.8402370+00:00</WindowBegin>
+      <Bytes>693</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-60" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:03:50.0857110+00:00</WindowBegin>
+      <Bytes>344</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-61" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:08:02.1429820+00:00</WindowBegin>
+      <Bytes>220</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-62" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:09:05.9867740+00:00</WindowBegin>
+      <Bytes>221</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-63" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:17:00.5232210+00:00</WindowBegin>
+      <Bytes>344</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-64" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:21:19.7420940+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-65" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:25:35.8679960+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-66" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:30:41.1097160+00:00</WindowBegin>
+      <Bytes>221</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-67" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:32:51.0059710+00:00</WindowBegin>
+      <Bytes>9955</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-68" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:38:50.9366330+00:00</WindowBegin>
+      <Bytes>565</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-69" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:45:39.6924880+00:00</WindowBegin>
+      <Bytes>14186</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-70" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:50:53.6832560+00:00</WindowBegin>
+      <Bytes>822</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-71" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:54:20.5606310+00:00</WindowBegin>
+      <Bytes>6680</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-72" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:56:21.6981800+00:00</WindowBegin>
+      <Bytes>6425</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-73" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:00:35.6783490+00:00</WindowBegin>
+      <Bytes>4821</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-74" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:02:02.0774830+00:00</WindowBegin>
+      <Bytes>3758</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-75" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:03:19.2836910+00:00</WindowBegin>
+      <Bytes>6636</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-76" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:04:55.0321130+00:00</WindowBegin>
+      <Bytes>496</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-77" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:06:39.5827410+00:00</WindowBegin>
+      <Bytes>7374</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-78" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:07:39.5832950+00:00</WindowBegin>
+      <Bytes>2400</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-79" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:09:15.9374570+00:00</WindowBegin>
+      <Bytes>2030</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-80" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:11:00.2402190+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-81" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:12:31.2843240+00:00</WindowBegin>
+      <Bytes>23864</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-82" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:13:31.9639250+00:00</WindowBegin>
+      <Bytes>26870</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-83" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:14:35.7007840+00:00</WindowBegin>
+      <Bytes>8175</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-84" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:18:06.6722710+00:00</WindowBegin>
+      <Bytes>2591</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-85" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:19:06.7732700+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-86" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:22:42.3025500+00:00</WindowBegin>
+      <Bytes>5384</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-87" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:24:35.6187460+00:00</WindowBegin>
+      <Bytes>22816</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-88" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:26:54.9521100+00:00</WindowBegin>
+      <Bytes>934</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-89" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:29:55.0905960+00:00</WindowBegin>
+      <Bytes>820</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-90" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:34:14.5791930+00:00</WindowBegin>
+      <Bytes>13868</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-91" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:35:26.1159440+00:00</WindowBegin>
+      <Bytes>9385</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-92" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:38:21.7371450+00:00</WindowBegin>
+      <Bytes>8020</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-93" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:39:52.7950070+00:00</WindowBegin>
+      <Bytes>936</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-94" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:41:22.7282850+00:00</WindowBegin>
+      <Bytes>29525</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-95" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:42:24.3432090+00:00</WindowBegin>
+      <Bytes>5652</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-96" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:43:26.1109470+00:00</WindowBegin>
+      <Bytes>372</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-97" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:45:18.6468490+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-98" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:46:18.6684000+00:00</WindowBegin>
+      <Bytes>496</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-99" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:47:18.9915690+00:00</WindowBegin>
+      <Bytes>13697</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-100" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:48:45.3135570+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-101" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:50:09.1101640+00:00</WindowBegin>
+      <Bytes>2948</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-102" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:51:47.5701800+00:00</WindowBegin>
+      <Bytes>442</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-103" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:54:15.7416410+00:00</WindowBegin>
+      <Bytes>18677</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-104" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:55:18.6582760+00:00</WindowBegin>
+      <Bytes>67152</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-105" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:56:22.7197570+00:00</WindowBegin>
+      <Bytes>31902</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-106" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:58:06.6230650+00:00</WindowBegin>
+      <Bytes>22872</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-107" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:59:18.6746910+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-108" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:00:50.9398070+00:00</WindowBegin>
+      <Bytes>2456</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-109" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:02:02.0808390+00:00</WindowBegin>
+      <Bytes>2460</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-110" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:05:15.2444560+00:00</WindowBegin>
+      <Bytes>2075</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-111" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:09:13.1469080+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-112" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:13:09.1623500+00:00</WindowBegin>
+      <Bytes>1827</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-113" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:14:18.2519000+00:00</WindowBegin>
+      <Bytes>1582</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-114" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:18:59.0766750+00:00</WindowBegin>
+      <Bytes>20185</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-115" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:19:59.0777740+00:00</WindowBegin>
+      <Bytes>372</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-116" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:21:15.2942370+00:00</WindowBegin>
+      <Bytes>26440</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-117" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:22:59.0719780+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-118" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:23:59.1018710+00:00</WindowBegin>
+      <Bytes>4486</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-119" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:26:27.2770370+00:00</WindowBegin>
+      <Bytes>1582</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-120" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:28:12.3412820+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-121" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:29:58.9929520+00:00</WindowBegin>
+      <Bytes>1458</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-122" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:31:03.3724010+00:00</WindowBegin>
+      <Bytes>19957</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-123" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:32:19.6311590+00:00</WindowBegin>
+      <Bytes>9473</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-124" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:33:22.7906330+00:00</WindowBegin>
+      <Bytes>9631</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-125" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:34:22.7952760+00:00</WindowBegin>
+      <Bytes>19384</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-126" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:35:32.1146190+00:00</WindowBegin>
+      <Bytes>53705</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-127" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:36:40.6193400+00:00</WindowBegin>
+      <Bytes>62294</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-128" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:37:42.8900360+00:00</WindowBegin>
+      <Bytes>26801</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-129" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:38:52.1670800+00:00</WindowBegin>
+      <Bytes>18203</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-130" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:40:03.9466920+00:00</WindowBegin>
+      <Bytes>18395</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-131" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:41:11.5969500+00:00</WindowBegin>
+      <Bytes>1824</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-132" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:42:14.9552370+00:00</WindowBegin>
+      <Bytes>620</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-133" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:43:19.6884030+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-134" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:44:45.1976200+00:00</WindowBegin>
+      <Bytes>496</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-135" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:46:19.6286500+00:00</WindowBegin>
+      <Bytes>18262</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-136" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:47:19.6298060+00:00</WindowBegin>
+      <Bytes>10824</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-137" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:48:31.9665330+00:00</WindowBegin>
+      <Bytes>9312</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-138" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:49:35.7200040+00:00</WindowBegin>
+      <Bytes>27239</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-139" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:50:51.2058800+00:00</WindowBegin>
+      <Bytes>59457</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-140" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:51:55.6184220+00:00</WindowBegin>
+      <Bytes>46851</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-141" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:53:06.4498660+00:00</WindowBegin>
+      <Bytes>23491</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-142" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:54:24.2335850+00:00</WindowBegin>
+      <Bytes>8634</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-143" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:56:21.3957780+00:00</WindowBegin>
+      <Bytes>21553</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-144" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:57:52.5862430+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-145" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:59:39.5898700+00:00</WindowBegin>
+      <Bytes>9123</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-146" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:01:16.0572690+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-147" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:02:18.9956930+00:00</WindowBegin>
+      <Bytes>2584</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-148" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:03:57.2494330+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-149" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:07:47.9313720+00:00</WindowBegin>
+      <Bytes>35290</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-150" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:09:09.3232610+00:00</WindowBegin>
+      <Bytes>71852</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-151" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:10:13.1921960+00:00</WindowBegin>
+      <Bytes>57358</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-152" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:11:18.0233030+00:00</WindowBegin>
+      <Bytes>33962</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-153" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:12:25.6571290+00:00</WindowBegin>
+      <Bytes>53898</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-154" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:13:26.8511170+00:00</WindowBegin>
+      <Bytes>70894</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-155" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:14:26.9708650+00:00</WindowBegin>
+      <Bytes>82112</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-156" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:15:37.7025070+00:00</WindowBegin>
+      <Bytes>73902</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-157" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:16:46.3875520+00:00</WindowBegin>
+      <Bytes>47727</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-158" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:18:33.4104780+00:00</WindowBegin>
+      <Bytes>25530</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-159" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:20:09.8382920+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-160" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:21:18.2559750+00:00</WindowBegin>
+      <Bytes>2952</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-161" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:22:36.9306080+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-162" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:23:53.2524810+00:00</WindowBegin>
+      <Bytes>1818</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-163" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:25:55.5269900+00:00</WindowBegin>
+      <Bytes>51731</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-164" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:26:58.2303870+00:00</WindowBegin>
+      <Bytes>45667</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-165" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:28:02.7850430+00:00</WindowBegin>
+      <Bytes>39194</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-166" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:29:11.2443080+00:00</WindowBegin>
+      <Bytes>68152</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-167" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:30:12.6047000+00:00</WindowBegin>
+      <Bytes>92610</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-168" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:31:40.3924330+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-169" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:32:41.3995330+00:00</WindowBegin>
+      <Bytes>7056</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-170" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:33:41.6486730+00:00</WindowBegin>
+      <Bytes>34374</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-171" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:34:47.2407210+00:00</WindowBegin>
+      <Bytes>51081</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-172" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:35:56.7734090+00:00</WindowBegin>
+      <Bytes>16860</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-173" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:37:23.7091950+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-174" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:38:34.4601100+00:00</WindowBegin>
+      <Bytes>13223</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-175" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:39:44.1669840+00:00</WindowBegin>
+      <Bytes>16405</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-176" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:40:57.2988440+00:00</WindowBegin>
+      <Bytes>12534</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-177" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:42:23.7122200+00:00</WindowBegin>
+      <Bytes>3963</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-178" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:43:23.7137820+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-179" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:44:39.9925960+00:00</WindowBegin>
+      <Bytes>7559</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-180" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:46:06.1944560+00:00</WindowBegin>
+      <Bytes>3720</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-181" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:48:18.2569160+00:00</WindowBegin>
+      <Bytes>7455</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-182" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:50:39.9926980+00:00</WindowBegin>
+      <Bytes>3735</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-183" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:52:27.9511620+00:00</WindowBegin>
+      <Bytes>86301</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-184" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:53:29.8176600+00:00</WindowBegin>
+      <Bytes>86486</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-185" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:54:30.5954950+00:00</WindowBegin>
+      <Bytes>83636</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-186" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:55:34.8768890+00:00</WindowBegin>
+      <Bytes>106177</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-187" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:58:37.0358800+00:00</WindowBegin>
+      <Bytes>58001</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-188" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:59:46.2645890+00:00</WindowBegin>
+      <Bytes>14234</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-189" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:00:48.6214240+00:00</WindowBegin>
+      <Bytes>32432</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-190" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:01:51.8002080+00:00</WindowBegin>
+      <Bytes>63633</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-191" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:02:53.9938030+00:00</WindowBegin>
+      <Bytes>3044</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-192" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:05:39.9949690+00:00</WindowBegin>
+      <Bytes>2572</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-193" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:07:22.6330570+00:00</WindowBegin>
+      <Bytes>2572</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-194" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:10:09.7954330+00:00</WindowBegin>
+      <Bytes>11090</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-195" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:12:09.8355280+00:00</WindowBegin>
+      <Bytes>17320</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-196" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:13:10.7761800+00:00</WindowBegin>
+      <Bytes>248</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-197" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:15:09.8409520+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-198" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:16:09.8535210+00:00</WindowBegin>
+      <Bytes>124</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-199" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:21:23.6271550+00:00</WindowBegin>
+      <Bytes>3730</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-200" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:23:34.2641260+00:00</WindowBegin>
+      <Bytes>6813</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-201" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:47:56.8120580+00:00</WindowBegin>
+      <Bytes>1713</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-202" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:48:57.3979480+00:00</WindowBegin>
+      <Bytes>828</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-203" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:49:59.2704830+00:00</WindowBegin>
+      <Bytes>1429</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-204" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:51:06.0865570+00:00</WindowBegin>
+      <Bytes>1225</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-205" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:52:06.1028230+00:00</WindowBegin>
+      <Bytes>796</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-206" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:53:07.2490590+00:00</WindowBegin>
+      <Bytes>1514</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-207" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:54:42.6587700+00:00</WindowBegin>
+      <Bytes>1499</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-208" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:55:47.0371970+00:00</WindowBegin>
+      <Bytes>1290</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-209" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:56:50.2989630+00:00</WindowBegin>
+      <Bytes>1213</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-210" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:57:56.8034890+00:00</WindowBegin>
+      <Bytes>564</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-211" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T10:59:11.3082290+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-212" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:05:57.0065050+00:00</WindowBegin>
+      <Bytes>271</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-213" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:07:13.5536660+00:00</WindowBegin>
+      <Bytes>273</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-214" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:14:25.0073340+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-215" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:43:33.8783650+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-216" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:46:02.8714710+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-217" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:50:17.1733280+00:00</WindowBegin>
+      <Bytes>219</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-218" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:55:26.2676070+00:00</WindowBegin>
+      <Bytes>1027</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-219" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:56:26.3033580+00:00</WindowBegin>
+      <Bytes>519</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-220" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:57:47.5408660+00:00</WindowBegin>
+      <Bytes>479</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-221" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T11:59:06.0939670+00:00</WindowBegin>
+      <Bytes>236</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-222" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:25:20.5660570+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-223" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T12:57:28.1707360+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-224" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:29:18.2781800+00:00</WindowBegin>
+      <Bytes>219</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-225" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:42:06.5661050+00:00</WindowBegin>
+      <Bytes>674</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-226" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:56:41.2431950+00:00</WindowBegin>
+      <Bytes>218</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-227" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T14:59:26.3335910+00:00</WindowBegin>
+      <Bytes>352</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-228" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:22:57.1506990+00:00</WindowBegin>
+      <Bytes>218</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-229" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:25:49.4846230+00:00</WindowBegin>
+      <Bytes>299</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-230" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:27:11.3958460+00:00</WindowBegin>
+      <Bytes>813</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-231" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:28:19.9295270+00:00</WindowBegin>
+      <Bytes>157</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-232" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:34:29.0733360+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-233" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:35:47.2366530+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-234" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:41:45.9403450+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-235" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:44:22.8271930+00:00</WindowBegin>
+      <Bytes>228</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-236" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:48:06.5790620+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-237" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T15:57:30.9217490+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-238" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:01:02.2677310+00:00</WindowBegin>
+      <Bytes>218</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-239" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:02:11.8401210+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-240" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:03:50.0855610+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-241" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:17:00.5230790+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-242" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:21:19.7419800+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-243" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:25:35.8678820+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-244" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:32:50.9938970+00:00</WindowBegin>
+      <Bytes>386</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-245" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:39:07.7955880+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-246" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:45:39.6844080+00:00</WindowBegin>
+      <Bytes>767</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-247" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:50:53.6831310+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-248" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:54:20.5605180+00:00</WindowBegin>
+      <Bytes>484</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-249" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T16:56:21.6905410+00:00</WindowBegin>
+      <Bytes>693</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-250" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:00:35.6604130+00:00</WindowBegin>
+      <Bytes>298</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-251" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:03:19.2750880+00:00</WindowBegin>
+      <Bytes>535</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-252" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:04:55.0320020+00:00</WindowBegin>
+      <Bytes>316</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-253" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:07:06.2245740+00:00</WindowBegin>
+      <Bytes>297</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-254" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:09:15.9373450+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-255" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:11:00.2401110+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-256" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:12:31.2775120+00:00</WindowBegin>
+      <Bytes>474</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-257" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:13:31.9638090+00:00</WindowBegin>
+      <Bytes>578</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-258" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:14:35.7006700+00:00</WindowBegin>
+      <Bytes>413</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-259" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:18:06.6721580+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-260" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:19:06.7731630+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-261" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:22:42.3024390+00:00</WindowBegin>
+      <Bytes>244</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-262" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:24:50.9849470+00:00</WindowBegin>
+      <Bytes>840</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-263" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:29:55.0904860+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-264" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:34:14.5719270+00:00</WindowBegin>
+      <Bytes>390</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-265" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:35:55.0873440+00:00</WindowBegin>
+      <Bytes>247</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-266" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:38:21.7370090+00:00</WindowBegin>
+      <Bytes>277</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-267" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:41:22.7203580+00:00</WindowBegin>
+      <Bytes>910</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-268" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:42:24.3430830+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-269" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:43:26.1108340+00:00</WindowBegin>
+      <Bytes>237</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-270" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:45:18.6467350+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-271" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:46:18.6682890+00:00</WindowBegin>
+      <Bytes>316</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-272" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:47:33.1778900+00:00</WindowBegin>
+      <Bytes>354</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-273" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:48:45.3134470+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-274" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:50:09.1100520+00:00</WindowBegin>
+      <Bytes>316</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-275" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:51:47.5700660+00:00</WindowBegin>
+      <Bytes>228</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-276" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:54:15.7415280+00:00</WindowBegin>
+      <Bytes>650</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-277" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:55:18.6581630+00:00</WindowBegin>
+      <Bytes>1221</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-278" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:56:22.7195950+00:00</WindowBegin>
+      <Bytes>818</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-279" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:58:06.6224390+00:00</WindowBegin>
+      <Bytes>672</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-280" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T17:59:18.6745770+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-281" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:05:15.2443460+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-282" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:09:13.1467980+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-283" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:13:09.1621900+00:00</WindowBegin>
+      <Bytes>237</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-284" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:14:42.1678440+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-285" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:18:59.0689330+00:00</WindowBegin>
+      <Bytes>476</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-286" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:19:59.0776630+00:00</WindowBegin>
+      <Bytes>237</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-287" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:21:15.2936300+00:00</WindowBegin>
+      <Bytes>584</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-288" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:22:59.0718440+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-289" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:23:59.1017670+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-290" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:26:27.2769270+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-291" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:28:12.3411720+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-292" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:31:03.3722920+00:00</WindowBegin>
+      <Bytes>491</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-293" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:32:19.6310500+00:00</WindowBegin>
+      <Bytes>319</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-294" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:33:22.7905230+00:00</WindowBegin>
+      <Bytes>342</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-295" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:34:22.7951570+00:00</WindowBegin>
+      <Bytes>770</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-296" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:35:32.1140120+00:00</WindowBegin>
+      <Bytes>1152</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-297" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:36:40.6169970+00:00</WindowBegin>
+      <Bytes>1515</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-298" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:37:42.8878240+00:00</WindowBegin>
+      <Bytes>634</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-299" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:38:52.1664380+00:00</WindowBegin>
+      <Bytes>612</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-300" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:40:03.9432210+00:00</WindowBegin>
+      <Bytes>613</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-301" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:41:11.5967920+00:00</WindowBegin>
+      <Bytes>237</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-302" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:42:14.9551030+00:00</WindowBegin>
+      <Bytes>395</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-303" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:43:19.6882910+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-304" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:44:45.1975060+00:00</WindowBegin>
+      <Bytes>316</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-305" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:46:19.6285380+00:00</WindowBegin>
+      <Bytes>662</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-306" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:47:19.6296940+00:00</WindowBegin>
+      <Bytes>482</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-307" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:48:31.9664180+00:00</WindowBegin>
+      <Bytes>380</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-308" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:49:35.7185780+00:00</WindowBegin>
+      <Bytes>716</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-309" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:50:51.2057670+00:00</WindowBegin>
+      <Bytes>1576</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-310" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:51:55.6183090+00:00</WindowBegin>
+      <Bytes>1145</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-311" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:53:06.4486140+00:00</WindowBegin>
+      <Bytes>615</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-312" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:54:24.2257260+00:00</WindowBegin>
+      <Bytes>455</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-313" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:56:21.3955970+00:00</WindowBegin>
+      <Bytes>526</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-314" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T18:57:52.5861290+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-315" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:01:16.0571500+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-316" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:02:19.2856730+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-317" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:03:57.2493270+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-318" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:07:47.9312580+00:00</WindowBegin>
+      <Bytes>802</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-319" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:09:09.2856240+00:00</WindowBegin>
+      <Bytes>1376</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-320" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:10:13.1907890+00:00</WindowBegin>
+      <Bytes>1312</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-321" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:11:18.0188460+00:00</WindowBegin>
+      <Bytes>920</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-322" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:12:25.6570150+00:00</WindowBegin>
+      <Bytes>1145</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-323" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:13:26.8510050+00:00</WindowBegin>
+      <Bytes>1743</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-324" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:14:26.9695320+00:00</WindowBegin>
+      <Bytes>1467</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-325" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:15:37.7007670+00:00</WindowBegin>
+      <Bytes>1186</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-326" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:16:46.3867770+00:00</WindowBegin>
+      <Bytes>735</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-327" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:18:33.4103680+00:00</WindowBegin>
+      <Bytes>592</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-328" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:20:09.8381830+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-329" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:21:33.0906470+00:00</WindowBegin>
+      <Bytes>316</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-330" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:22:36.9304950+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-331" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:25:55.5192880+00:00</WindowBegin>
+      <Bytes>983</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-332" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:26:58.2302780+00:00</WindowBegin>
+      <Bytes>982</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-333" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:28:02.7840130+00:00</WindowBegin>
+      <Bytes>844</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-334" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:29:11.2435170+00:00</WindowBegin>
+      <Bytes>1078</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-335" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:30:12.6019620+00:00</WindowBegin>
+      <Bytes>1250</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-336" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:31:40.3923210+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-337" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:32:41.3994240+00:00</WindowBegin>
+      <Bytes>191</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-338" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:33:41.6481730+00:00</WindowBegin>
+      <Bytes>618</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-339" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:34:47.2399410+00:00</WindowBegin>
+      <Bytes>607</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-340" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:36:23.7009860+00:00</WindowBegin>
+      <Bytes>241</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-341" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:37:23.7090850+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-342" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:38:34.4600010+00:00</WindowBegin>
+      <Bytes>377</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-343" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:39:44.1662120+00:00</WindowBegin>
+      <Bytes>220</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-344" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:40:57.2987370+00:00</WindowBegin>
+      <Bytes>313</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-345" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:42:23.7121110+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-346" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:43:23.7136690+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-347" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:45:36.7444560+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-348" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:52:27.9439370+00:00</WindowBegin>
+      <Bytes>1372</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-349" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:53:27.9454650+00:00</WindowBegin>
+      <Bytes>1319</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-350" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:54:30.5876110+00:00</WindowBegin>
+      <Bytes>1174</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-351" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:55:34.8767810+00:00</WindowBegin>
+      <Bytes>1105</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-352" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:58:37.0357670+00:00</WindowBegin>
+      <Bytes>738</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-353" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T19:59:46.2643880+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-354" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:00:48.6205650+00:00</WindowBegin>
+      <Bytes>162</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-355" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:01:51.7993620+00:00</WindowBegin>
+      <Bytes>1468</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-356" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:02:57.6022470+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-357" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:06:34.1725550+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-358" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:07:35.8937350+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-359" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:10:09.7782270+00:00</WindowBegin>
+      <Bytes>218</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-360" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:11:09.7906110+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-361" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:12:09.8354150+00:00</WindowBegin>
+      <Bytes>261</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-362" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:13:10.7760700+00:00</WindowBegin>
+      <Bytes>158</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-363" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:15:09.8408410+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+    <a1:BandwidthWindow id="ref-364" xmlns:a1="http://schemas.microsoft.com/clr/nsassem/ChatServer/ChatServer%2C%20Version%3D1.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Dnull">
+      <WindowBegin>2015-09-26T20:16:09.8534100+00:00</WindowBegin>
+      <Bytes>79</Bytes>
+    </a1:BandwidthWindow>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
