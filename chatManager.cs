@@ -128,7 +128,7 @@ namespace ChatServer
       //Start the save process
       private void SaveTimerElapsed(object source, System.Timers.ElapsedEventArgs e)
       {
-         Logger.Log("Started the save event", LogTag);
+         Logger.LogGeneral("Started the save event", MyExtensions.Logging.LogLevel.Debug, LogTag);
          SaveData();
       }
 
@@ -368,6 +368,16 @@ namespace ChatServer
          lock (userLock)
          {
             return users.Where(x => activeUIDs.Contains(x.Key)).ToDictionary(k => k.Key, v => v.Value);
+         }
+      }
+
+      public Dictionary<int, UserInfo> UsersForModules()
+      {
+         List<int> loggedInUsers = LoggedInUsers().Keys.ToList();
+
+         lock (userLock)
+         {
+            return users.Select(x => new UserInfo(x.Value, loggedInUsers.Contains(x.Key))).ToDictionary(k => k.UID, v => v);
          }
       }
 

@@ -19,6 +19,7 @@
     "shutdownSeconds": 5,
     "saveFolder": "save",
     "saveInterval": 300,
-    "moduleWaitSeconds": 5
+    "moduleWaitSeconds": 5,
+    "fakeAuthentication": false
   }
 }

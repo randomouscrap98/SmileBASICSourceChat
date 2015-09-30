@@ -1,0 +1,12 @@
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/PortedModules.dll.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/PortedModules.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/obj/Debug/PortedModules.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/obj/Debug/PortedModules.dll.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/ChatEssentials.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/ChatEssentials.dll.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/Module.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/Module.dll.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/MyExtensions.dll
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/MyExtensions.dll.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/PortedModules/bin/Debug/Newtonsoft.Json.dll

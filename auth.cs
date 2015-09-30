@@ -53,7 +53,7 @@ namespace ChatServer
       }
 
       //This should (hopefully) start the authorization server
-      public bool Start()
+      public virtual bool Start()
       {
          //Oops, we already have a spinner for authorization stuff
          if(authSpinner != null)
@@ -82,13 +82,13 @@ namespace ChatServer
          return true;
       }
 
-      public bool Running
+      public virtual bool Running
       {
          get { return authSpinner != null && authSpinner.IsAlive; }
       }
 
       //Try to stop the auth server
-      public bool Stop()
+      public virtual bool Stop()
       {
          //We're already stopped.
          if(authSpinner == null)
@@ -226,7 +226,7 @@ namespace ChatServer
       }
 
       //Update the list of users who should have an authorization code
-      public void UpdateUserList(List<int> users)
+      public virtual void UpdateUserList(List<int> users)
       {
          lock(authLock)
          {
@@ -283,7 +283,7 @@ namespace ChatServer
       }
 
       //Get the authorization code for the given user.
-      public string GetAuth(int uid)
+      public virtual string GetAuth(int uid)
       {
          lock(authLock)
          {
@@ -295,7 +295,7 @@ namespace ChatServer
          }
       }
 
-      public bool CheckAuth(int uid, string key)
+      public virtual bool CheckAuth(int uid, string key)
       {
          return GetAuth(uid) == key;  
       }
@@ -348,6 +348,47 @@ namespace ChatServer
       public DateTime ExpiresOn
       {
          get { return expireDate; }
+      }
+   }
+
+   //A fake authentication server. It literally does nothing.
+   public class AuthServerFake : AuthServer
+   {
+      private bool running = false;
+
+      public AuthServerFake(int port, MyExtensions.Logging.Logger logger = null) : base(port, logger){ }
+
+      public override bool CheckAuth(int uid, string key)
+      {
+         return true;
+      }
+
+      public override string GetAuth(int uid)
+      {
+         return "Chickens";
+      }
+
+      public override bool Running
+      {
+         get { return running; }
+      }
+
+      public override bool Start()
+      {
+         Log("STARTING A FAKE AUTHENTICATION SERVER!!!");
+         running = true;
+         return true;
+      }
+
+      public override bool Stop()
+      {
+         running = false;
+         return true;
+      }
+
+      public override void UpdateUserList(List<int> users)
+      {
+         //Do nothing because lol
       }
    }
 }

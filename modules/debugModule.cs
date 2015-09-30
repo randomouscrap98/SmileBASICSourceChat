@@ -12,7 +12,7 @@ namespace ModulePackage1
          commands.Add(new ModuleCommand("spamscore", new List<CommandArgument> (), "check personal spam score"));
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
+      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
          List<JSONObject> outputs = new List<JSONObject>();
 

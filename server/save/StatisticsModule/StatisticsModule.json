@@ -1,8 +1,8 @@
 {
   "2": {
-    "messageCount": 253,
-    "totalCharacters": 9663,
-    "totalUsers": 1415,
+    "messageCount": 1815,
+    "totalCharacters": 61581,
+    "totalUsers": 18202,
     "allSeenUsers": [
       2,
       18,
@@ -18,24 +18,42 @@
       23,
       20,
       5,
-      25
+      25,
+      16,
+      24,
+      15,
+      21
     ]
   },
   "18": {
-    "messageCount": 17,
-    "totalCharacters": 245,
-    "totalUsers": 39,
+    "messageCount": 165,
+    "totalCharacters": 2955,
+    "totalUsers": 1113,
     "allSeenUsers": [
       2,
       18,
       12,
-      6
+      6,
+      16,
+      17,
+      23,
+      20,
+      3,
+      10,
+      25,
+      4,
+      22,
+      11,
+      19,
+      5,
+      24,
+      15
     ]
   },
   "12": {
-    "messageCount": 105,
-    "totalCharacters": 13485,
-    "totalUsers": 359,
+    "messageCount": 1332,
+    "totalCharacters": 39035,
+    "totalUsers": 10946,
     "allSeenUsers": [
       2,
       18,
@@ -47,13 +65,21 @@
       19,
       23,
       5,
-      20
+      20,
+      16,
+      10,
+      24,
+      17,
+      25,
+      22,
+      15,
+      21
     ]
   },
   "23": {
-    "messageCount": 48,
-    "totalCharacters": 1135,
-    "totalUsers": 228,
+    "messageCount": 404,
+    "totalCharacters": 8878,
+    "totalUsers": 2748,
     "allSeenUsers": [
       12,
       23,
@@ -63,44 +89,98 @@
       10,
       2,
       11,
-      5
+      5,
+      3,
+      4,
+      24,
+      18,
+      17,
+      25,
+      22,
+      19
     ]
   },
   "20": {
-    "messageCount": 3,
-    "totalCharacters": 40,
-    "totalUsers": 9,
+    "messageCount": 30,
+    "totalCharacters": 752,
+    "totalUsers": 360,
     "allSeenUsers": [
       12,
       23,
-      20
+      20,
+      2,
+      3,
+      10,
+      11,
+      5,
+      4,
+      18,
+      16,
+      17,
+      6,
+      25,
+      22,
+      19,
+      24,
+      15,
+      21
     ]
   },
   "16": {
-    "messageCount": 3,
-    "totalCharacters": 47,
-    "totalUsers": 8,
+    "messageCount": 255,
+    "totalCharacters": 6641,
+    "totalUsers": 3686,
     "allSeenUsers": [
       12,
       16,
-      3
+      3,
+      2,
+      11,
+      5,
+      18,
+      17,
+      23,
+      20,
+      6,
+      10,
+      25,
+      4,
+      22,
+      19,
+      24,
+      15
     ]
   },
   "6": {
-    "messageCount": 8,
-    "totalCharacters": 137,
-    "totalUsers": 20,
+    "messageCount": 169,
+    "totalCharacters": 5908,
+    "totalUsers": 2061,
     "allSeenUsers": [
       12,
       6,
       10,
-      23
+      23,
+      2,
+      18,
+      16,
+      17,
+      20,
+      3,
+      25,
+      4,
+      22,
+      11,
+      19,
+      5,
+      24,
+      15,
+      21
     ]
   },
   "10": {
-    "messageCount": 22,
-    "totalCharacters": 822,
-    "totalUsers": 131,
+    "messageCount": 579,
+    "totalCharacters": 29947,
+    "totalUsers": 4613,
     "allSeenUsers": [
       12,
       6,
@@ -109,13 +189,24 @@
       17,
       3,
       11,
-      19
+      19,
+      16,
+      5,
+      23,
+      20,
+      4,
+      24,
+      18,
+      25,
+      22,
+      15,
+      21
     ]
   },
   "3": {
-    "messageCount": 249,
-    "totalCharacters": 9155,
-    "totalUsers": 1471,
+    "messageCount": 1549,
+    "totalCharacters": 45129,
+    "totalUsers": 16888,
     "allSeenUsers": [
       12,
       3,
@@ -130,13 +221,18 @@
       19,
       18,
       5,
-      20
+      20,
+      16,
+      23,
+      24,
+      15,
+      21
     ]
   },
   "25": {
-    "messageCount": 13,
-    "totalCharacters": 138,
-    "totalUsers": 72,
+    "messageCount": 17,
+    "totalCharacters": 230,
+    "totalUsers": 129,
     "allSeenUsers": [
       12,
       3,
@@ -146,13 +242,22 @@
       2,
       23,
       11,
-      5
+      5,
+      18,
+      16,
+      17,
+      20,
+      4,
+      22,
+      19,
+      24,
+      15
     ]
   },
   "4": {
-    "messageCount": 23,
-    "totalCharacters": 479,
-    "totalUsers": 127,
+    "messageCount": 437,
+    "totalCharacters": 10814,
+    "totalUsers": 5298,
     "allSeenUsers": [
       12,
       3,
@@ -162,7 +267,17 @@
       2,
       17,
       22,
-      11
+      11,
+      23,
+      20,
+      5,
+      24,
+      18,
+      16,
+      25,
+      19,
+      15,
+      21
     ]
   },
   "17": {
@@ -182,9 +297,9 @@
     ]
   },
   "22": {
-    "messageCount": 3,
-    "totalCharacters": 38,
-    "totalUsers": 21,
+    "messageCount": 11,
+    "totalCharacters": 291,
+    "totalUsers": 69,
     "allSeenUsers": [
       2,
       12,
@@ -192,26 +307,41 @@
       3,
       6,
       4,
-      22
+      22,
+      18,
+      5
     ]
   },
   "11": {
-    "messageCount": 9,
-    "totalCharacters": 214,
-    "totalUsers": 45,
+    "messageCount": 898,
+    "totalCharacters": 18954,
+    "totalUsers": 11486,
     "allSeenUsers": [
       2,
       12,
       3,
       6,
       11,
-      5
+      5,
+      16,
+      10,
+      23,
+      20,
+      4,
+      24,
+      18,
+      17,
+      25,
+      22,
+      19,
+      15,
+      21
     ]
   },
   "19": {
-    "messageCount": 80,
-    "totalCharacters": 2285,
-    "totalUsers": 519,
+    "messageCount": 262,
+    "totalCharacters": 7465,
+    "totalUsers": 3596,
     "allSeenUsers": [
       2,
       12,
@@ -220,13 +350,24 @@
       11,
       19,
       10,
-      4
+      4,
+      18,
+      16,
+      17,
+      23,
+      20,
+      25,
+      22,
+      5,
+      24,
+      15,
+      21
     ]
   },
   "5": {
-    "messageCount": 33,
-    "totalCharacters": 658,
-    "totalUsers": 180,
+    "messageCount": 938,
+    "totalCharacters": 47544,
+    "totalUsers": 11804,
     "allSeenUsers": [
       2,
       12,
@@ -235,7 +376,95 @@
       11,
       5,
       3,
-      20
+      20,
+      16,
+      10,
+      4,
+      18,
+      17,
+      25,
+      22,
+      19,
+      24,
+      15,
+      21
+    ]
+  },
+  "24": {
+    "messageCount": 453,
+    "totalCharacters": 12712,
+    "totalUsers": 7098,
+    "allSeenUsers": [
+      2,
+      12,
+      3,
+      10,
+      4,
+      11,
+      24,
+      23,
+      18,
+      16,
+      17,
+      20,
+      6,
+      25,
+      22,
+      19,
+      5,
+      15,
+      21
+    ]
+  },
+  "15": {
+    "messageCount": 1,
+    "totalCharacters": 2,
+    "totalUsers": 18,
+    "allSeenUsers": [
+      2,
+      18,
+      12,
+      16,
+      17,
+      23,
+      20,
+      3,
+      6,
+      10,
+      25,
+      4,
+      22,
+      11,
+      19,
+      5,
+      24,
+      15
+    ]
+  },
+  "21": {
+    "messageCount": 2,
+    "totalCharacters": 28,
+    "totalUsers": 38,
+    "allSeenUsers": [
+      2,
+      18,
+      12,
+      16,
+      17,
+      23,
+      20,
+      3,
+      6,
+      10,
+      25,
+      4,
+      22,
+      11,
+      19,
+      5,
+      24,
+      15,
+      21
     ]
   }
 }

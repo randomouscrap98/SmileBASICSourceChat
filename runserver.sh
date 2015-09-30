@@ -3,7 +3,7 @@
 folder=ChatServer/ChatServer/bin/Debug/
 exe=ChatServer.exe
 build=build.txt
-dlls=ChatServer/ModulePackage1/bin/Debug/ModulePackage1.dll
+dlls="ChatServer/ModulePackage1/bin/Debug/ModulePackage1.dll ChatServer/PortedModules/bin/Debug/PortedModules.dll"
 serverFolder=server/
 
 #Oops, some important files don't exist
@@ -12,7 +12,7 @@ then
    echo "Missing ChatServer executable. Make sure it has been built"
    echo "using monodevelop."
    exit 1
-elif [ ! -f $dlls ]
+elif [ ! -f "$dlls" ]
 then
    echo "Missing Module package dll. Make sure it has been built"
    exit 1

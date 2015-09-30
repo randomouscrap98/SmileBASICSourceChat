@@ -10,13 +10,18 @@ using System.Text.RegularExpressions;
 
 namespace ModuleSystem
 {
+   public delegate void CommandCallback(List<JSONObject> output, int callerUID);
+
    public abstract class Module
    {
+      protected string generalHelp = "";
       protected List<ModuleCommand> commands = new List<ModuleCommand>();
+
       private Options options = new Options();
       private List<Logger> loggers = new List<Logger>(); 
 
       public readonly Object Lock = new Object();
+      public event CommandCallback OnExtraCommandOutput;
 
       public Module()
       {
@@ -26,6 +31,20 @@ namespace ModuleSystem
       public List<ModuleCommand> Commands
       {
          get { return commands; }
+      }
+
+      public Dictionary<string, string> ArgumentHelp
+      {
+         get
+         {
+            return commands.SelectMany(x => x.Arguments.Where(y => y.Type == ArgumentType.Custom)).GroupBy(x => x.Name)
+               .Select(x => x.First()).ToDictionary(x => x.Name, y => y.Regex);
+         }
+      }
+
+      public string GeneralHelp
+      {
+         get { return generalHelp; }
       }
 
       public Options ModuleOptions
@@ -91,7 +110,7 @@ namespace ModuleSystem
       /// <param name="argument">username as string</param>
       /// <param name="users">all users</param>
       /// <param name="user">matched user</param>
-      protected bool GetUserFromArgument(string argument, Dictionary<int, User> users, out User user)
+      protected bool GetUserFromArgument(string argument, Dictionary<int, UserInfo> users, out UserInfo user)
       {
          user = null;
          try
@@ -114,6 +133,11 @@ namespace ModuleSystem
          ModuleJSONObject error = new ModuleJSONObject();
          error.message = "An internal error occurred for the " + Nickname + " module";
          output.Add(error);
+      }
+
+      protected void ExtraCommandOutput(List<JSONObject> outputs, int callerUID)
+      {
+         OnExtraCommandOutput(outputs, callerUID);
       }
 
       /// <summary>
@@ -145,7 +169,7 @@ namespace ModuleSystem
       /// <param name="message">Message.</param>
       /// <param name="user">User.</param>
       /// <param name="users">Users.</param>
-      public virtual void ProcessMessage(UserMessageJSONObject message, User user, Dictionary<int, User> users)
+      public virtual void ProcessMessage(UserMessageJSONObject message, UserInfo user, Dictionary<int, UserInfo> users)
       {
          //this function does nothing right now.
       }
@@ -161,11 +185,22 @@ namespace ModuleSystem
       /// <param name="command">Command.</param>
       /// <param name="user">User.</param>
       /// <param name="users">Users.</param>
-      public virtual List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
+      public virtual List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
          List<JSONObject> output = new List<JSONObject>();
 
          return output;
+      }
+
+      /// <summary>
+      /// Occurs when a user joins the chat. Do not perform processing intensive things here, as the user has to wait
+      /// for this to finish before entering.
+      /// </summary>
+      /// <param name="user">User joining the chat</param>
+      /// <param name="users">User session.</param>
+      public virtual List<JSONObject> OnUserJoin(UserInfo user, Dictionary<int, UserInfo> users)
+      {
+         return new List<JSONObject>();
       }
 
       /// <summary>
@@ -277,24 +312,33 @@ namespace ModuleSystem
             StringExtensions.PathFixer(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)) +
             StringExtensions.PathFixer(options.GetAsType<string>(LoaderName, "moduleDLLFolder"));
 
-         //Step two: load all DLLs in user specified folder
-         try
+         Directory.CreateDirectory(dllDirectory);
+
+         if (Directory.Exists(dllDirectory))
          {
-            string[] files = Directory.GetFiles(dllDirectory, "*.dll");
-
-            dlls.Clear();
-
-            foreach(string file in files)
+            //Step two: load all DLLs in user specified folder
+            try
             {
-               logger.Log("Found plugin: " + file);
-               dlls.Add(Assembly.LoadFile(file));
+               string[] files = Directory.GetFiles(dllDirectory, "*.dll");
+
+               dlls.Clear();
+
+               foreach (string file in files)
+               {
+                  logger.Log("Found plugin: " + file);
+                  dlls.Add(Assembly.LoadFile(file));
+               }
+            }
+            catch (Exception e)
+            {
+               logger.Error("Cannot load modules from directory: " + dllDirectory, LoaderName);
+               logger.Error("Exception: " + e);
+               return false;
             }
          }
-         catch (Exception e)
+         else
          {
-            logger.Error("Cannot load modules from directory: " + dllDirectory, LoaderName);
-            logger.Error("Exception: " + e);
-            return false;
+            logger.Error("Plugin directory could not be found: " + dllDirectory);
          }
 
          allModuleTypes.Clear();
@@ -345,7 +389,9 @@ namespace ModuleSystem
          foreach(Module module in activeModules)
          {
             if (moduleOptions.ContainsKey(module.ModuleName))
+            {
                module.ModuleOptions.AddOptions(moduleOptions[module.ModuleName]);
+            }
          }
 
          //Step 6: check for command or nickname collisions
@@ -418,6 +464,8 @@ namespace ModuleSystem
                   return @"[0-9]+";
                case ArgumentType.Module:
                   return @"[^\s]+";
+               case ArgumentType.Keyword:
+                  return Name;
                case ArgumentType.Custom:
                   return customRegex;
                default:
@@ -434,6 +482,7 @@ namespace ModuleSystem
       Integer,
       Word,
       Module,
+      Keyword,
       Custom
    }
 
@@ -462,7 +511,12 @@ namespace ModuleSystem
             string display = CommandStart + Command;
 
             foreach (CommandArgument argument in Arguments)
-               display += " [" + (argument.Type == ArgumentType.User ? "?" : "") + argument.Name + "]";
+            {
+               if (argument.Type == ArgumentType.Keyword)
+                  display += " " + argument.Name;
+               else
+                  display += " [" + (argument.Type == ArgumentType.User ? "?" : "") + argument.Name + "]";
+            }
 
             display += " => " + Description;
 

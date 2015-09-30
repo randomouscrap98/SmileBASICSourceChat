@@ -1,10 +1,46 @@
 {
   "2": {
-    "messageCount": 12,
-    "totalCharacters": 134,
-    "totalUsers": 12,
+    "messageCount": 112,
+    "totalCharacters": 1683,
+    "totalUsers": 298,
     "allSeenUsers": [
-      2
+      2,
+      11,
+      12,
+      21,
+      18
+    ]
+  },
+  "12": {
+    "messageCount": 41,
+    "totalCharacters": 693,
+    "totalUsers": 151,
+    "allSeenUsers": [
+      12,
+      2,
+      11,
+      21
+    ]
+  },
+  "11": {
+    "messageCount": 1,
+    "totalCharacters": 2,
+    "totalUsers": 2,
+    "allSeenUsers": [
+      2,
+      11
+    ]
+  },
+  "18": {
+    "messageCount": 1,
+    "totalCharacters": 5,
+    "totalUsers": 5,
+    "allSeenUsers": [
+      2,
+      11,
+      12,
+      21,
+      18
     ]
   }
 }

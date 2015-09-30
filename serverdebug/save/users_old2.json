@@ -1,0 +1,29 @@
+{
+  "2": {
+    "uid": 2,
+    "username": "randomouscrap98",
+    "avatar": "/user_uploads/avatars/t1443123571.png",
+    "stars": "☆☆☆☆☆",
+    "joinDate": "2015-09-22T01:56:07+00:00",
+    "spamScore": 5,
+    "globalSpamScore": 0,
+    "staffChat": true,
+    "bannedUntil": "2014-09-28T02:48:23+00:00",
+    "lastActive": true,
+    "lastPing": "2015-09-28T02:48:23.449743+00:00",
+    "lastPost": "2015-09-28T02:48:23.449742+00:00",
+    "lastSpam": "0001-01-01T00:00:00",
+    "blockedUntil": "0001-01-01T00:00:00",
+    "sessions": [
+      {
+        "enterDate": "2015-09-28T02:47:52.018465+00:00",
+        "leaveDate": "2015-09-28T02:47:52.018469+00:00"
+      },
+      {
+        "enterDate": "2015-09-28T02:48:14.454025+00:00",
+        "leaveDate": "2015-09-28T02:48:14.454027+00:00"
+      }
+    ],
+    "Lock": {}
+  }
+}

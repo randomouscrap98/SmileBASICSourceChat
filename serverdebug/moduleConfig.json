@@ -19,5 +19,13 @@
   },
   "StatisticsModule": {
     "enabled": true
+  },
+  "CollectGameModule": {
+    "enabled": true,
+    "rankup": 50,
+    "exchange": 500,
+    "maxWithdraw": 100,
+    "maxLovers": 20,
+    "journalStyle": "style=\"font-family:'Courier New', Courier, monospace; line-height: 100%; display: block;\""
   }
 }

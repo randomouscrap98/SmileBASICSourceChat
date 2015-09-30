@@ -30,14 +30,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
-    <Reference Include="System.Xml.Serialization" />
-    <Reference Include="System.Xml" />
-    <Reference Include="MonoDevelop.Core, Version=2.6.0.0, Culture=neutral">
-      <Package>monodevelop</Package>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=c7439020c8fedf87">
-      <Package>monodevelop</Package>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +50,12 @@
     </Compile>
     <Compile Include="..\..\MySerialize.cs">
       <Link>MySerialize.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SpecialPoint.cs">
+      <Link>SpecialPoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MathExtensions.cs">
+      <Link>MathExtensions.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Runtime.Serialization.Formatters.Soap;
-using System.Xml;
 
 namespace MyExtensions
 {

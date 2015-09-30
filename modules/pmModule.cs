@@ -18,7 +18,7 @@ namespace ModulePackage1
          });
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, User user, Dictionary<int, User> users)
+      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
          List<JSONObject> outputs = new List<JSONObject>();
          ModuleJSONObject output = new ModuleJSONObject();
@@ -27,10 +27,11 @@ namespace ModulePackage1
          {
             case "pm":
                //First, make sure this even works
-               User recipient;
+               UserInfo recipient;
                output = new ModuleJSONObject();
 
-               if (!GetUserFromArgument(command.Arguments[0], users, out recipient))
+               if (!GetUserFromArgument(command.Arguments[0], 
+                  users.Where(x => x.Value.LoggedIn).ToDictionary(x => x.Key, y => y.Value), out recipient))
                {
                   AddError(outputs);
                   break;

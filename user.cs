@@ -9,6 +9,101 @@ using ChatEssentials;
 
 namespace ChatEssentials
 {
+   public class UserSession
+   {
+      private DateTime enterDate = new DateTime(0);
+      private DateTime leaveDate = new DateTime(0);
+
+      //user just entered
+      public void SetEnterNow()
+      {
+         enterDate = DateTime.Now;
+         leaveDate = new DateTime(enterDate.Ticks);
+      }
+
+      //user just left
+      public void SetLeaveNow()
+      {
+         leaveDate = DateTime.Now;
+      }
+
+      public DateTime EnterDate
+      {
+         get { return enterDate; }
+      }
+
+      public DateTime LeaveDate
+      {
+         get { return leaveDate; }
+      }
+
+      public TimeSpan Time
+      {
+         get 
+         { 
+            if (Left)
+               return (leaveDate - enterDate);
+            else
+               return (DateTime.Now - enterDate);
+         }
+      }
+
+      public bool Entered
+      {
+         get { return enterDate.Ticks != 0; }
+      }
+
+      public bool Left
+      {
+         get { return leaveDate.Ticks != 0 && leaveDate.Ticks != enterDate.Ticks; }
+      }
+   }
+
+   //Just information on User
+   public class UserInfo
+   {
+      public readonly bool LoggedIn;
+      public readonly int UID;
+      public readonly string Username;
+      public readonly string Avatar;
+      public readonly string StarString;
+      public readonly long UnixJoinDate;
+      public readonly DateTime LastPost;
+      public readonly DateTime LastPing;
+      public readonly bool Active;
+      public readonly bool Banned;
+      public readonly DateTime BannedUntil;
+      public readonly DateTime BlockedUntil;
+      public readonly int SpamScore;
+      public readonly int GlobalSpamScore;
+      public readonly int SecondsToUnblock;
+      public readonly bool CanStaffChat;
+      public readonly TimeSpan TotalChatTime;
+      public readonly TimeSpan AverageSessionTime;
+
+      public UserInfo(User user, bool loggedIn)
+      {
+         LoggedIn = loggedIn;
+         UID = user.UID;
+         Username = user.Username;
+         Avatar = user.Avatar;
+         StarString = user.StarString;
+         UnixJoinDate = user.UnixJoinDate;
+         LastPing = user.LastPing;
+         LastPost = user.LastPost;
+         Active = user.Active;
+         Banned = user.Banned;
+         BannedUntil = user.BannedUntil;
+         BlockedUntil = user.BlockedUntil;
+         SpamScore = user.SpamScore;
+         GlobalSpamScore = user.GlobalSpamScore;
+         SecondsToUnblock = user.SecondsToUnblock;
+         CanStaffChat = user.CanStaffChat;
+         TotalChatTime = user.TotalChatTime;
+         AverageSessionTime = user.AverageSessionTime;
+      }
+   }
+
    [Serializable]
    public class User
    {
@@ -33,6 +128,7 @@ namespace ChatEssentials
       private DateTime lastPost = DateTime.Now;
       private DateTime lastSpam = new DateTime(0);
       private DateTime blockedUntil = new DateTime (0);
+      private List<UserSession> sessions = new List<UserSession>();
 
       public readonly Object Lock = new Object();
 
@@ -147,6 +243,31 @@ namespace ChatEssentials
          }
       }
 
+      public TimeSpan TotalChatTime
+      {
+         get
+         {
+            lock (Lock)
+            {
+               return new TimeSpan(sessions.Sum(x => x.Time.Ticks));
+            }
+         }
+      }
+
+      public TimeSpan AverageSessionTime
+      {
+         get
+         {
+            lock (Lock)
+            {
+               if (sessions.Count == 0)
+                  return new TimeSpan(0);
+               
+               return new TimeSpan(TotalChatTime.Ticks / sessions.Count);
+            }
+         }
+      }
+
       //This function should be called when posts are made.
       public void PerformOnPost()
       {
@@ -172,6 +293,67 @@ namespace ChatEssentials
          {
             lastActive = Active;
          }
+      }
+
+      public bool PerformOnChatEnter()
+      {
+         PerformOnPing();
+         bool result = false;
+
+         lock (Lock)
+         {
+            //If it's empty or we have no open sessions, add a new one
+            if (sessions.Count == 0 || sessions.All(x => x.Entered))
+            {
+               sessions.Add(new UserSession());
+               result = true;
+            }
+
+            try
+            {
+               //Look for the last session that hasn't entered yet and set the entry to now.
+               sessions.Last(x => !x.Entered).SetEnterNow();
+            }
+            catch
+            {
+               return false;
+            }
+         }
+
+         return result && (sessions.Count(x => !x.Left) == 1);
+      }
+
+      public bool PerformOnChatLeave()
+      {
+         bool result = true;
+
+         lock (Lock)
+         {
+            //You shouldn't be leaving in this case. Come on now
+            if (sessions.Count == 0 || sessions.All(x => x.Left))
+            {
+               result = false;
+            }
+            else
+            {
+               //If we have more than one open session, this is bad
+               if (sessions.Count(x => !x.Left) > 1)
+                  result = false;
+               
+               try
+               {
+                  //Close ALLL open sessions.
+                  foreach(UserSession session in sessions.Where(x => !x.Left))
+                     session.SetLeaveNow();
+               }
+               catch
+               {
+                  return false;
+               }
+            }
+         }
+
+         return result && sessions.All(x => x.Left);
       }
 
       public bool PullInfoFromQueryPage()

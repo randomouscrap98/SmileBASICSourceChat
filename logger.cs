@@ -24,7 +24,7 @@ namespace MyExtensions.Logging
       {
          //First, try to create the file if it doesn't exist
          if (!File.Exists (logFile) && !string.IsNullOrWhiteSpace(logFile))
-            File.Create (logFile);
+            File.Create (logFile).Close();
 
          //If it still doesn't exist, that means it's not accessible
          if (File.Exists (logFile))

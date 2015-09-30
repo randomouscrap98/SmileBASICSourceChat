@@ -21,7 +21,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "0.5.3.0";
+      public const string Version = "0.5.8.0";
 
       private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -76,7 +76,8 @@ namespace ChatServer
                { "shutdownSeconds", 5 },
                { "saveFolder", "save" },
                { "saveInterval", 300 },
-               { "moduleWaitSeconds", 5 }
+               { "moduleWaitSeconds", 5 },
+               { "fakeAuthentication", false } 
             };
 
             //Set up and read options. We need to do this first so that the values can be used for init
@@ -121,7 +122,10 @@ namespace ChatServer
             }
 
             //First set up the auth server
-            authServer = new AuthServer(options.GetAsType<int>(OptionTag, "authServerPort"), logger);
+            if(GetOption<bool>("fakeAuthentication"))
+               authServer = new AuthServerFake(GetOption<int>("authServerPort"), logger);
+            else
+               authServer = new AuthServer(GetOption<int>("authServerPort"), logger);
 
             if (!authServer.Start())
             {
