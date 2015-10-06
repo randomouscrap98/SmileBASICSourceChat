@@ -20,6 +20,9 @@
     "saveFolder": "save",
     "saveInterval": 300,
     "moduleWaitSeconds": 5,
-    "fakeAuthentication": false
+    "fakeAuthentication": false,
+    "consoleLogLevel": "Normal",
+    "fileLogLevel": "Debug",
+    "languageURL": "/languages/chatserver.json"
   }
 }

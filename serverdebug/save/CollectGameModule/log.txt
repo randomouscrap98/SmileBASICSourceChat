@@ -1,0 +1,8 @@
+[09/30/15 12:05:18]{Debug}(ChatManager): Started the save event
+[09/30/15 12:05:18]{Debug}(ChatManager): Saved bandwidth data to file
+[09/30/15 12:05:18]{Debug}(ChatManager): Saved user data to file
+[09/30/15 12:05:18]{Debug}(ChatManager): Saved messages to file
+[09/30/15 12:05:18]{Debug}(ChatManager): Saved PmModule data
+[09/30/15 12:05:18]{Debug}(ChatManager): Saved FunModule data
+[09/30/15 12:05:18]{Debug}(ChatManager): Saved DebugModule data
+[09/30/15 12:05:18]{Debug}(ChatManager): Saved StatisticsModule data

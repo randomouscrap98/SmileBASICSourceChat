@@ -37,6 +37,10 @@ namespace ChatEssentials
    public class WarningJSONObject : JSONObject
    {
       public WarningJSONObject() : base("warning") {}
+      public WarningJSONObject(string message) : base("warning")
+      {
+         this.message = message;
+      }
       public string message = "";
    }
 
@@ -44,6 +48,10 @@ namespace ChatEssentials
    public class SystemMessageJSONObject : JSONObject
    {
       public SystemMessageJSONObject() : base("system") {}
+      public SystemMessageJSONObject(string message) : base("system")
+      {
+         this.message = message;
+      }
       public string message = "";
    }
 
@@ -59,6 +67,7 @@ namespace ChatEssentials
    {
       public UserListJSONObject() : base("userList") {}
       public List<UserJSONObject> users = new List<UserJSONObject>();
+      public List<RoomJSONObject> rooms = new List<RoomJSONObject>();
    }
 
    //A single user within the UserList JSON object
@@ -79,6 +88,19 @@ namespace ChatEssentials
          stars = user.StarString;
          active = user.Active;
          joined = user.UnixJoinDate;
+      }
+   }
+
+   //A single PM room within the UserList JSON Object
+   public class RoomJSONObject
+   {
+      public readonly string name = "";
+      public readonly List<int> users = new List<int>();
+
+      public RoomJSONObject(PMRoom room)
+      {
+         name = room.Name;
+         users = room.Users.ToList();
       }
    }
 
@@ -109,6 +131,7 @@ namespace ChatEssentials
 
       private bool display = true;
       private bool spamUpdate = true;
+      //private bool isCommand = false;
 
       public UserMessageJSONObject(User user, string message, string tag) : base("message")
       {
@@ -163,6 +186,11 @@ namespace ChatEssentials
          return postTime;
       }
 
+//      public void SetCommand()
+//      {
+//         isCommand = true;
+//      }
+
       public void SetHidden()
       {
          display = false;
@@ -192,5 +220,10 @@ namespace ChatEssentials
       {
          get { return display; }
       }
+
+//      public bool IsCommand
+//      {
+//         get { return isCommand; }
+//      }
    }
 }

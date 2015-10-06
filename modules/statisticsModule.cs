@@ -125,8 +125,11 @@ namespace ModulePackage1
             Log("Added new user: " + user.Username);
          }
             
-         userStatistics[user.UID].AddMessage(message.message);
-         userStatistics[user.UID].AddUsers(users.Where(x => x.Value.LoggedIn).Select(x => x.Value.UID).ToList());
+         if (message.Display)
+         {
+            userStatistics[user.UID].AddMessage(message.message);
+            userStatistics[user.UID].AddUsers(users.Where(x => x.Value.LoggedIn).Select(x => x.Value.UID).ToList());
+         }
       }
 
       //THIS is the function you're looking for. When the chat server detects a command for your module, it passes it along

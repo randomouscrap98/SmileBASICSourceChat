@@ -15,11 +15,14 @@
     "inactiveMinutes": 1,
     "spamBlockSeconds": 20,
     "buildHourModifier": -4,
-    "website": "http://development.smilebasicsource.com",
+    "website": "http://randomouscrap98.smilebasicsource.com",
     "shutdownSeconds": 5,
     "saveFolder": "save",
     "saveInterval": 300,
     "moduleWaitSeconds": 5,
-    "fakeAuthentication": true
+    "fakeAuthentication": false,
+    "consoleLogLevel": "Debug",
+    "fileLogLevel": "SuperDebug",
+    "languageURL": "/languages/chatserver.json"
   }
 }

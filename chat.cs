@@ -44,7 +44,13 @@ namespace ChatServer
 
       public MyExtensions.Logging.Logger Logger
       {
-         get { return manager.Logger; }
+         get 
+         {
+            if (manager != null)
+               return manager.Logger;
+            else
+               return new MyExtensions.Logging.Logger(10);
+         }
       }
 
       //This should be the ONLY place where the active state changes
@@ -73,6 +79,11 @@ namespace ChatServer
          }
       }
 
+      public bool ShowMessages
+      {
+         get { return !ThisUser.Banned && !ThisUser.Blocked; }
+      }
+
       public string UserLogString
       {
          get
@@ -98,6 +109,47 @@ namespace ChatServer
          }
       }
 
+      public void MySend(LanguageTagParameters parameters, JSONObject container)
+      {
+         string message = manager.ConvertTag(parameters);
+
+         if (container is WarningJSONObject)
+         {
+            ((WarningJSONObject)container).message = message;
+         }
+         else if (container is SystemMessageJSONObject)
+         {
+            ((SystemMessageJSONObject)container).message = message;
+         }
+         else
+         {
+            Logger.Warning("Didn't get a proper container for a language tag. Using system message as default");
+            ((SystemMessageJSONObject)container).message = message;
+         }
+
+         MySend(container.ToString());
+      }
+
+      public WarningJSONObject NewWarningFromTag(LanguageTagParameters parameters)
+      {
+         return new WarningJSONObject(manager.ConvertTag(parameters));
+      }
+
+      public SystemMessageJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters)
+      {
+         return new SystemMessageJSONObject(manager.ConvertTag(parameters));
+      }
+
+      public LanguageTagParameters QuickParams(ChatTags tag)
+      {
+         return new LanguageTagParameters(tag, ThisUser);
+      }
+
+//      public void FillContainer(LanguageTagParameters parameters, JSONObject container)
+//      {
+//
+//      }
+
       protected override void OnOpen()
       {
          //I don't know what we're doing for OnOpen yet.
@@ -117,16 +169,22 @@ namespace ChatServer
          if (authenticated)
          {
             if (!ThisUser.PerformOnChatLeave())
-               Logger.Warning("User session timer is in an invalid state!");
-            
-            manager.Broadcast((new SystemMessageJSONObject() { message = username + " has left the chat." }).ToString());
+               Logger.Warning("User session timer was in an invalid state!");
+
+            if(ShowMessages)
+               manager.Broadcast(QuickParams(ChatTags.Leave), new SystemMessageJSONObject());
          }
       }
 
       protected override void OnError(ErrorEventArgs e)
       {
-         Logger.Error("UID: " + uid + " - " + e.Message, "WebSocket");
-         Logger.Error(e.Exception.ToString(), "WebSocket");
+         if(e.Message != null)
+            Logger.Error("UID: " + uid + " - " + e.Message, "WebSocket");
+         if(e.Exception != null)
+            Logger.Error(e.Exception.ToString(), "WebSocket");
+
+         //OK let's see what happens here
+         //OnClose(null);
          //base.OnError(e);
       }
 
@@ -199,14 +257,18 @@ namespace ChatServer
                      
                         uid = newUser;
 
-                        List<Chat> exclusion = new List<Chat>();
-                        exclusion.Add(this);
-
                         //BEFORE adding, broadcast the "whatever has entered the chat" message
-                        manager.Broadcast((new SystemMessageJSONObject() { 
-                           message = ThisUser.Username + " has entered the chat."
-                        }).ToString(),
-                           exclusion);
+                        if (ShowMessages)
+                        {
+                           manager.Broadcast(QuickParams(ChatTags.Join), new SystemMessageJSONObject(),
+                              new List<Chat> { this });
+                        }
+                        
+                        MySend(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome)).ToString());
+                        ChatTags enterSpamWarning = ThisUser.JoinSpam();
+
+                        if (enterSpamWarning != ChatTags.None)
+                           MySend(NewWarningFromTag(QuickParams(enterSpamWarning)).ToString());
 
                         //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
                         if (!ThisUser.PerformOnChatEnter())
@@ -214,8 +276,8 @@ namespace ChatServer
 
                         manager.BroadcastUserList();
 
-                        Logger.Log("Authentication complete: UID " + uid + " maps to username " + ThisUser.Username
-                        + (ThisUser.CanStaffChat ? "(staff)" : ""));
+                        Logger.Log("Authentication complete: UID " + uid + " maps to username " + ThisUser.Username +
+                        (ThisUser.CanStaffChat ? "(staff)" : ""));
                         response.result = true;
 
                         List<JSONObject> outputs = new List<JSONObject>();
@@ -268,38 +330,35 @@ namespace ChatServer
                string tag = json.tag;
 
                //These first things don't increase spam score in any way
-               if(string.IsNullOrWhiteSpace(message))
+               if (string.IsNullOrWhiteSpace(message))
                {
                   response.errors.Add("No empty messages please");
                }
-               else if(!manager.CheckKey(uid, key))
+               else if (!manager.CheckKey(uid, key))
                {
                   Logger.LogGeneral("Got invalid key " + key + " from " + UserLogString);
                   response.errors.Add("Your key is invalid");
                }
-               else if (ThisUser.BlockedUntil >= DateTime.Now)
+               else if (ThisUser.Blocked)
                {
-                  response.errors.Add("You are blocked for " + 
-                     ThisUser.SecondsToUnblock + " second(s) for spamming");
+                  response.errors.Add(NewWarningFromTag(QuickParams(ChatTags.Blocked)).message);
                }
                else if (ThisUser.Banned)
                {
-                  response.errors.Add("You are banned from chat for " + 
-                     StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now));
+                  response.errors.Add("You are banned from chat for " +
+                  StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now));
                }
                else if (tag == "admin" && !ThisUser.CanStaffChat)
                {
                   response.errors.Add("You can't post messages here. I'm sorry.");
                }
-               else if (!manager.AllAcceptedTags.Contains(tag))
+               else if (!manager.ValidTagForUser(UID, tag))
                {
                   response.errors.Add("Your post has an unrecognized tag. Cannot display");
                }
                else
                {
-                  //List<int> loggedIn = manager.LoggedInUsers().Keys();
                   Dictionary<int, UserInfo> currentUsers = manager.UsersForModules();
-                  //Dictionary<int, User> currentUsers = manager.LoggedInUsers();
                   List<JSONObject> outputs = new List<JSONObject>();
                   UserMessageJSONObject userMessage = new UserMessageJSONObject(ThisUser, message, tag);
                   UserCommand userCommand;
@@ -307,10 +366,10 @@ namespace ChatServer
                   string commandError = "";
 
                   //Step 1: parse a possible command. If no command is parsed, no module will be written.
-                  if(TryCommandParse(userMessage, out commandModule, out userCommand, out commandError))
+                  if (TryCommandParse(userMessage, out commandModule, out userCommand, out commandError))
                   {
                      //We found a command. Send it off to the proper module and get the output
-                     if(Monitor.TryEnter(commandModule.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
+                     if (Monitor.TryEnter(commandModule.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
                      {
                         try
                         {
@@ -329,11 +388,12 @@ namespace ChatServer
                      }
 
                      //do not update spam score if command module doesn't want it
-                     if(!userCommand.MatchedCommand.ShouldUpdateSpamScore)
+                     if (!userCommand.MatchedCommand.ShouldUpdateSpamScore)
                         userMessage.SetUnspammable();
 
                      //For now, simply capture all commands no matter what.
                      userMessage.SetHidden();
+                     //userMessage.SetCommand();
 
                      Logger.LogGeneral("Module " + commandModule.ModuleName + " processed command from " + UserLogString, 
                         MyExtensions.Logging.LogLevel.Debug);
@@ -341,7 +401,7 @@ namespace ChatServer
                   else
                   {
                      //If an error was given, add it to our response
-                     if(!string.IsNullOrWhiteSpace(commandError))
+                     if (!string.IsNullOrWhiteSpace(commandError))
                      {
                         response.errors.Add("Command error: " + commandError);
                         userMessage.SetHidden();
@@ -349,24 +409,24 @@ namespace ChatServer
                      }
                   }
 
-                  WarningJSONObject warning = manager.SendMessage(userMessage);
+                  ChatTags warning = manager.AddMessage(userMessage);
 
-                  if(warning != null)
-                     outputs.Add(warning);
-                  
+                  if (warning != ChatTags.None)
+                     outputs.Add(NewWarningFromTag(QuickParams(warning)));
+
                   response.result = response.errors.Count == 0;
 
                   //Now send out userlist if active status changed
                   UpdateActiveUserList(null, null);
 
                   //Since we added a new message, we need to broadcast.
-                  if(response.result && userMessage.Display)
+                  if (response.result && userMessage.Display)
                      manager.BroadcastMessageList();
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
-                  foreach(Module module in manager.GetModuleListCopy())
+                  foreach (Module module in manager.GetModuleListCopy())
                   {
-                     if(Monitor.TryEnter(module.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
+                     if (Monitor.TryEnter(module.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
                      {
                         try
                         {
@@ -399,6 +459,28 @@ namespace ChatServer
                //response.errors.Add("Message was missing fields");
             }
          }
+         else if (type == "createroom")
+         {
+            try
+            {
+               List<int> users = json.users.ToObject<List<int>>();
+               string error;
+
+               if(!manager.CreatePMRoom(new HashSet<int>(users), ThisUser.UID, out error))
+               {
+                  response.errors.Add(error);
+               }
+               else
+               {
+                  MySend((new SystemMessageJSONObject("You created a chat room for " + string.Join(", ", users.Select(x => manager.GetUser(x).Username)))).ToString());
+                  manager.BroadcastUserList();
+               }
+            }
+            catch
+            {
+               response.errors.Add("Could not parse PM creation room message");
+            }
+         }
          else if (type == "request")
          {
             try
@@ -407,12 +489,12 @@ namespace ChatServer
 
                if(wanted == "userList")
                {
-                  MySend(manager.ChatUserList());
+                  MySend(manager.ChatUserList(UID));
                   response.result = true;
                }
                else if (wanted == "messageList")
                {
-                  MySend(manager.ChatMessageList());
+                  MySend(manager.ChatMessageList(UID));
                   response.result = true;
                }
                else
@@ -457,8 +539,8 @@ namespace ChatServer
                ModuleJSONObject tempJSON = jsonMessage as ModuleJSONObject;
                tempJSON.uid = uid;
 
-               if(string.IsNullOrWhiteSpace(tempJSON.tag))
-                  tempJSON.tag = defaultTag;
+               //if(string.IsNullOrWhiteSpace(tempJSON.tag))
+               tempJSON.tag = manager.GlobalTag;
 
                if(tempJSON.broadcast)
                { 
@@ -509,20 +591,21 @@ namespace ChatServer
             foreach(ModuleCommand command in module.Commands)
             {
                Match match = Regex.Match(message.message, command.FullRegex, RegexOptions.Singleline);
+               //Match partialMatch = Regex.Match(message.message, command.CommandRegex, RegexOptions.Singleline);
 
                //This command matched, so preparse the command and get out of here.
-               if(match.Success)
+               if (match.Success)
                {
                   //Build arguments from regex.
                   List<string> arguments = new List<string>();
-                  for(int i = 2; i < match.Groups.Count; i++)
+                  for (int i = 2; i < match.Groups.Count; i++)
                      arguments.Add(match.Groups[i].Value.Trim());
 
                   //We have a user command. Cool, but will it parse? Ehhhh.
                   tempUserCommand = new UserCommand(match.Groups[1].Value, arguments, message, command);
 
                   //Now preprocess the command to make sure certain standard fields check out (like username)
-                  for( int i = 0; i < command.Arguments.Count; i++)
+                  for (int i = 0; i < command.Arguments.Count; i++)
                   {
                      //Users need to exist. If not, throw error.
                      if (command.Arguments[i].Type == ArgumentType.User)
@@ -560,6 +643,13 @@ namespace ChatServer
                   break;
                }
             }
+         }
+
+         if (commandModule == null && ModuleCommand.IsACommand(message.message))
+         {
+            //OOPS! A command was parsed but it wasn't parsed correctly. Doop
+            error = "Command not recognized. Maybe something was misspelled, or you were missing arguments";
+            return false;
          }
 
          userCommand = new UserCommand(tempUserCommand);

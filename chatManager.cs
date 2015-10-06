@@ -38,8 +38,10 @@ namespace ChatServer
 
       private readonly ModuleLoader loader;
       private readonly AuthServer authServer;
+      private readonly LanguageTags languageTags;
       private readonly HashSet<Chat> activeChatters = new HashSet<Chat>();
       private readonly Dictionary<int, User> users = new Dictionary<int, User>();
+      private Dictionary<string, PMRoom> rooms = new Dictionary<string, PMRoom>();
       private readonly System.Timers.Timer saveTimer;
 
       public readonly MyExtensions.Logging.Logger Logger = MyExtensions.Logging.Logger.DefaultLogger;
@@ -50,13 +52,15 @@ namespace ChatServer
 
       //Set up the logger when building the chat provider. Logging will go out to a file and the console
       //if possible. Otherwise, log to the default logger (which is like throwing them away)
-      public ChatManager(ModuleLoader loader, AuthServer authServer, int maxMessageKeep, int maxMessageSend,
-         int saveInterval, int maxModuleWait, string acceptedTags, string globalTag, string saveFolder, 
+      public ChatManager(ModuleLoader loader, AuthServer authServer, LanguageTags languageTags, 
+         int maxMessageKeep, int maxMessageSend, int saveInterval, int maxModuleWait, 
+         string acceptedTags, string globalTag, string saveFolder, 
          MyExtensions.Logging.Logger logger = null)
       {
          this.modules = loader.ActiveModules;
          this.authServer = authServer;
          this.loader = loader;
+         this.languageTags = languageTags;
 
          MaxMessageKeep = maxMessageKeep;
          MaxMessageSend = maxMessageSend;
@@ -79,11 +83,11 @@ namespace ChatServer
          if (MySerialize.LoadObject<BandwidthMonitor>(SavePath(BandwidthFile), out tempMonitor))
          {
             Bandwidth = tempMonitor;
-            Logger.LogGeneral("Loaded bandwidth data from file", MyExtensions.Logging.LogLevel.Debug, LogTag);
+            Log("Loaded bandwidth data from file", MyExtensions.Logging.LogLevel.Debug);
          }
          else
          {
-            Logger.Error("Couldn't load bandwidth data! Defaulting to empty bandwidth", LogTag);
+            Log("Couldn't load bandwidth data! Defaulting to empty bandwidth", MyExtensions.Logging.LogLevel.Error);
          }
 
          //Attempt to load the users in the constructor. Again, not a big deal if it doesn't load.
@@ -92,11 +96,11 @@ namespace ChatServer
          if (MySerialize.LoadObject<Dictionary<int, User>>(SavePath(UserFile), out tempUsers))
          {
             users = tempUsers;
-            Logger.LogGeneral("Loaded user data from file", MyExtensions.Logging.LogLevel.Debug, LogTag);
+            Log("Loaded user data from file", MyExtensions.Logging.LogLevel.Debug);
          }
          else
          {
-            Logger.Error("Couldn't load user data! Defaulting to empty user dictionary", LogTag);
+            Log("Couldn't load user data! Defaulting to empty user dictionary", MyExtensions.Logging.LogLevel.Error);
          }
 
          //Attempt to load the users in the constructor. Again, not a big deal if it doesn't load.
@@ -106,11 +110,12 @@ namespace ChatServer
          {
             messages = tempMessages;
             UserMessageJSONObject.FindNextID(messages);
-            Logger.LogGeneral("Loaded messages from file", MyExtensions.Logging.LogLevel.Debug, LogTag);
+            PMRoom.FindNextID(messages.Select(x => x.tag).ToList());
+            Log("Loaded messages from file", MyExtensions.Logging.LogLevel.Debug);
          }
          else
          {
-            Logger.Error("Couldn't load messages! Defaulting to empty message list", LogTag);
+            Log("Couldn't load messages! Defaulting to empty message list", MyExtensions.Logging.LogLevel.Error);
          }
 
          //now set up the save file timer
@@ -125,11 +130,16 @@ namespace ChatServer
          SaveData();
       }
 
+      private void Log(string message, MyExtensions.Logging.LogLevel level = MyExtensions.Logging.LogLevel.Normal)
+      {
+         Logger.LogGeneral(message, level, LogTag);
+      }
+
       //Start the save process
       private void SaveTimerElapsed(object source, System.Timers.ElapsedEventArgs e)
       {
-         Logger.LogGeneral("Started the save event", MyExtensions.Logging.LogLevel.Debug, LogTag);
          SaveData();
+         Log("Saved chat data to files");
       }
 
       //Forces file save for all pertinent manager data
@@ -141,27 +151,32 @@ namespace ChatServer
             {
                lock (Bandwidth.byteLock)
                {
+                  Log("Enter bandwidth lock", MyExtensions.Logging.LogLevel.Locks);
                   if (MySerialize.SaveObject<BandwidthMonitor>(SavePath(BandwidthFile), Bandwidth))
-                     Logger.LogGeneral("Saved bandwidth data to file", MyExtensions.Logging.LogLevel.Debug, LogTag);
+                     Log("Saved bandwidth data to file", MyExtensions.Logging.LogLevel.Debug);
                   else
-                     Logger.Error("Couldn't save bandwidth data to file!", LogTag);
+                     Log("Couldn't save bandwidth data to file!", MyExtensions.Logging.LogLevel.Error);
+                  Log("Exit bandwidth lock", MyExtensions.Logging.LogLevel.Locks);
                }
 
                lock (userLock)
                {
-                  
+                  Log("Enter user lock", MyExtensions.Logging.LogLevel.Locks);
                   if (MySerialize.SaveObject<Dictionary<int, User>>(SavePath(UserFile), users))
-                     Logger.LogGeneral("Saved user data to file", MyExtensions.Logging.LogLevel.Debug, LogTag);
+                     Log("Saved user data to file", MyExtensions.Logging.LogLevel.Debug);
                   else
-                     Logger.Error("Couldn't save user data to file!", LogTag);
+                     Log("Couldn't save user data to file!", MyExtensions.Logging.LogLevel.Error);
+                  Log("Exit user lock", MyExtensions.Logging.LogLevel.Locks);
                }
 
                lock (managerLock)
                {
+                  Log("Enter manager save lock", MyExtensions.Logging.LogLevel.Locks);
                   if (MySerialize.SaveObject<List<UserMessageJSONObject>>(SavePath(MessageFile), messages))
-                     Logger.LogGeneral("Saved messages to file", MyExtensions.Logging.LogLevel.Debug, LogTag);
+                     Log("Saved messages to file", MyExtensions.Logging.LogLevel.Debug);
                   else
-                     Logger.Error("Couldn't save messages to file!", LogTag);
+                     Log("Couldn't save messages to file!", MyExtensions.Logging.LogLevel.Error);
+                  Log("Exit manager save lock", MyExtensions.Logging.LogLevel.Locks);
                }
 
                //Save all module data
@@ -205,55 +220,120 @@ namespace ChatServer
 
       public User GetUser(int uid)
       {
+         User user = new User(0);
          lock (userLock)
          {
+            Log("Enter getuser lock", MyExtensions.Logging.LogLevel.Locks);
             if (users.ContainsKey(uid))
-               return users[uid];
+               user = users[uid];
+            Log("Exit getuser lock", MyExtensions.Logging.LogLevel.Locks);
          }
 
-         return new User(0);
+         return user;
       }
 
       public bool UserExists(int uid)
       {
+         bool userExists = false;
          lock (userLock)
          {
-            return users.ContainsKey(uid);
+            Log("Enter userexists lock", MyExtensions.Logging.LogLevel.Locks);
+            userExists = users.ContainsKey(uid);
+            Log("Exit userexists lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         return userExists;
       }
 
       public int UserLookup(string username)
       {
+         int userID = -1;
+
          lock (userLock)
          {
+            Log("Enter userlookup lock", MyExtensions.Logging.LogLevel.Locks);
+
             try
             {
-               return users.First(x => x.Value.Username == username).Key;
+               userID = users.First(x => x.Value.Username == username).Key;
             }
             catch
             {
-               return -1;
+               userID = -1;
             }
+
+            Log("Exit userlookup lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         return userID;
+      }
+
+      public List<string> AllAcceptedTagsForUser(int user)
+      {
+         lock (managerLock)
+         {
+            return AllAcceptedTags.Union(rooms.Where(x => x.Value.Users.Contains(user)).Select(x => x.Key)).ToList();
+         }
+      }
+
+      public bool ValidTagForUser(int user, string tag)
+      {
+         return AllAcceptedTagsForUser(user).Contains(tag);
+      }
+
+      public bool CreatePMRoom(HashSet<int> users, int creator, out string error)
+      {
+         error = "";
+         bool result = true;
+
+         lock(managerLock)
+         {
+            Log("Enter createpmroom lock", MyExtensions.Logging.LogLevel.Locks);
+
+            if (users.Count < 2)
+            {
+               error = "There's not enough people to make the room";
+               result = false;
+            }
+            else if (rooms.Any(x => x.Value.Users.SetEquals(users)))
+            {
+               error = "There's already a room with this exact set of people!";
+               result = false;
+            }
+            else
+            {
+               PMRoom newRoom = new PMRoom(users, creator, TimeSpan.FromHours(1));
+               rooms.Add(newRoom.Name, newRoom);
+            }
+
+            Log("Exit createpmroom lock", MyExtensions.Logging.LogLevel.Locks);
+         }
+
+         return result;
       }
 
       //ONLY the registration of a new user. It has nothing to do with authentication
       private bool TryRegister(int uid, string key)
       {
+         bool good = false;
          lock (userLock)
          {
+            Log("Enter register lock", MyExtensions.Logging.LogLevel.Locks);
+
             if (users.ContainsKey(uid))
             {
-               return true;
+               good = true;
             }
             else if (authServer.CheckAuth(uid, key))
             {
                users.Add(uid, new User(uid));
-               return true;
+               good = true;
             }
+
+            Log("Exit register lock", MyExtensions.Logging.LogLevel.Locks);
          }
 
-         return false;
+         return good;
       }
          
       /// <summary>
@@ -279,9 +359,11 @@ namespace ChatServer
                }
                lock (managerLock)
                {
+                  Log("Enter authenticate lock", MyExtensions.Logging.LogLevel.Locks);
                   duplicates = activeChatters.Where(x => x.UID == uid).ToList();
                   activeChatters.RemoveWhere(x => x.UID == uid);
                   activeChatters.Add(chatSession);
+                  Log("Exit authenticate lock", MyExtensions.Logging.LogLevel.Locks);
                }
                return true;
             }
@@ -301,17 +383,22 @@ namespace ChatServer
       /// <param name="chatSession">Current Chat Session</param>
       public void LeaveChat(Chat chatSession)
       {
+         //string userList = ChatUserList();
          lock (managerLock)
          {
+            Log("Enter leavechat lock", MyExtensions.Logging.LogLevel.Locks);
             activeChatters.Remove(chatSession);
             authServer.UpdateUserList(activeChatters.Select(x => x.UID).ToList());
-            Broadcast(ChatUserList());
+            //Broadcast(userList);
+            Log("Exit leavechat lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         BroadcastUserList();
       }
 
-      public WarningJSONObject SendMessage(UserMessageJSONObject message)
+      public ChatTags AddMessage(UserMessageJSONObject message)
       {
-         WarningJSONObject warning = null;
+         ChatTags warning = ChatTags.None;
 
          User user = GetUser(message.uid);
 
@@ -320,7 +407,9 @@ namespace ChatServer
          {
             lock(managerLock)
             {
-               warning = user.UpdateSpam(messages, message.message);
+               Log("Enter messagespam lock", MyExtensions.Logging.LogLevel.Locks);
+               warning = user.MessageSpam(messages, message.message);
+               Log("Exit messagespam lock", MyExtensions.Logging.LogLevel.Locks);
             }
          }
 
@@ -329,8 +418,14 @@ namespace ChatServer
          {
             lock(managerLock)
             {
+               Log("Enter message add lock", MyExtensions.Logging.LogLevel.Locks);
                messages.Add(message);
                messages = messages.Skip(Math.Max(0, messages.Count() - MaxMessageKeep)).ToList();
+
+               if (rooms.ContainsKey(message.tag))
+                  rooms[message.tag].OnMessage();
+               
+               Log("Exit message add lock", MyExtensions.Logging.LogLevel.Locks);
             }
             user.PerformOnPost();
          }
@@ -342,6 +437,7 @@ namespace ChatServer
       {
          lock (managerLock)
          {
+            Log("Enter sendmessage lock", MyExtensions.Logging.LogLevel.Locks);
             foreach (int user in message.recipients.Distinct())
             {
                if (activeChatters.Any(x => x.UID == user))
@@ -349,6 +445,7 @@ namespace ChatServer
                else
                   Logger.LogGeneral("Recipient " + user + " in module message was not found", MyExtensions.Logging.LogLevel.Warning);
             }
+            Log("Leave sendmessage lock", MyExtensions.Logging.LogLevel.Locks);
          }
       }
          
@@ -362,46 +459,70 @@ namespace ChatServer
 
          lock (managerLock)
          {
+            Log("Enter loggedinactive lock", MyExtensions.Logging.LogLevel.Locks);
             activeUIDs = activeChatters.Select(x => x.UID).ToList();
+            Log("exit loggedinactive lock", MyExtensions.Logging.LogLevel.Locks);
          }
-         
+
+         Dictionary<int, User> returns;
+
          lock (userLock)
          {
-            return users.Where(x => activeUIDs.Contains(x.Key)).ToDictionary(k => k.Key, v => v.Value);
+            Log("Enter loggedinuserget lock", MyExtensions.Logging.LogLevel.Locks);
+            returns = users.Where(x => activeUIDs.Contains(x.Key)).ToDictionary(k => k.Key, v => v.Value);
+            Log("exit loggedinuserget lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         return returns;
       }
 
       public Dictionary<int, UserInfo> UsersForModules()
       {
          List<int> loggedInUsers = LoggedInUsers().Keys.ToList();
+         Dictionary<int, UserInfo> returns;
 
          lock (userLock)
          {
-            return users.Select(x => new UserInfo(x.Value, loggedInUsers.Contains(x.Key))).ToDictionary(k => k.UID, v => v);
+            Log("Enter usersformodules lock", MyExtensions.Logging.LogLevel.Locks);
+            returns = users.Select(x => new UserInfo(x.Value, loggedInUsers.Contains(x.Key))).ToDictionary(k => k.UID, v => v);
+            Log("Exit usersformodules lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         return returns;
       }
 
       //Get a JSON string representing a list of users currently in chat. Do NOT call this while locking on userLock
-      public string ChatUserList()
+      public string ChatUserList(int caller)
       {
          UserListJSONObject userList = new UserListJSONObject();
-         userList.users = LoggedInUsers().Select(x => new UserJSONObject(x.Value)).ToList();
+
+         lock (managerLock)
+         {
+            //First, let's get rid of old rooms
+            rooms = rooms.Where(x => !x.Value.HasExpired).ToDictionary(x => x.Key, y => y.Value);
+
+            //Now we can finally do the user thing
+            userList.users = LoggedInUsers().Select(x => new UserJSONObject(x.Value)).ToList();
+            userList.rooms = rooms.Where(x => x.Value.Users.Contains(caller)).Select(x => new RoomJSONObject(x.Value)).ToList();
+         }
          return userList.ToString();
       }
 
       //Get a JSON string representing a list of the last 10 messages
-      public string ChatMessageList()
+      public string ChatMessageList(int user)
       {
          MessageListJSONObject jsonMessages = new MessageListJSONObject();
          List<UserMessageJSONObject> visibleMessages; 
 
          lock (managerLock)
          {
+            Log("Enter chatmessagelist lock", MyExtensions.Logging.LogLevel.Locks);
             //Messages are all readonly, so it's OK to have just references
             visibleMessages = messages.Where(x => x.Display).ToList();
+            Log("Exit chatmessagelist lock", MyExtensions.Logging.LogLevel.Locks);
          }
 
-         foreach (string tag in AllAcceptedTags.Where(x => x != GlobalTag))
+         foreach (string tag in AllAcceptedTagsForUser(user).Where(x => x != GlobalTag))
          {
             List<UserMessageJSONObject> tagMessages = visibleMessages.Where(x => x.tag == tag).ToList();
             for (int i = 0; i < Math.Min(MaxMessageSend, tagMessages.Count); i++)
@@ -424,19 +545,53 @@ namespace ChatServer
 
          lock (managerLock)
          {
+            Log("Enter broadcast lock", MyExtensions.Logging.LogLevel.Locks);
             foreach (Chat chatter in activeChatters.Except(exclude))
                chatter.MySend(message);
+            Log("Exit broadcast lock", MyExtensions.Logging.LogLevel.Locks);
          }
+      }
+
+      public void Broadcast(LanguageTagParameters parameters, JSONObject container, List<Chat> exclude = null)
+      {
+         if (exclude == null)
+            exclude = new List<Chat>();
+
+         lock (managerLock)
+         {
+            Log("Enter broadcast tag lock", MyExtensions.Logging.LogLevel.Locks);
+            foreach (Chat chatter in activeChatters.Except(exclude))
+            {
+               parameters.UpdateUser(chatter.ThisUser);  //Update the message to reflect user preferences
+               chatter.MySend(parameters, container);    //Send a tag message by filling the container with the tag parameters
+            }
+            Log("Exit broadcast tag lock", MyExtensions.Logging.LogLevel.Locks);
+         }
+      }
+
+      public string ConvertTag(LanguageTagParameters parameters)
+      {
+         return languageTags.GetTag(parameters);
       }
 
       public void BroadcastUserList()
       {
-         Broadcast(ChatUserList());
+         lock (managerLock)
+         {
+            foreach (Chat chatter in activeChatters)
+               chatter.MySend(ChatUserList(chatter.UID));
+         }
+         //Broadcast(ChatUserList());
       }
 
       public void BroadcastMessageList()
       {
-         Broadcast(ChatMessageList());
+         lock (managerLock)
+         {
+            foreach (Chat chatter in activeChatters)
+               chatter.MySend(ChatMessageList(chatter.UID));
+         }
+         //Broadcast(ChatMessageList());
       }
 
       public bool CheckKey(int uid, string key)

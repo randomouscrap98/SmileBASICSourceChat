@@ -1,0 +1,12 @@
+[10/05/15 04:55:54](System): Will start auto-dumping logs
+[10/05/15 04:55:55](System): ChatServer v0.7.3.2, built on 10/5/2015 4:55:40 PM
+[10/05/15 04:55:55]{Error}(ModuleLoader): Cannot get options file: moduleConfig.json
+[10/05/15 04:55:55](ModuleLoader): Using default loader options
+[10/05/15 04:55:55]{Debug}(ModuleLoader): Found module: GlobalModule
+[10/05/15 04:55:56](System): Authorization server running on port 45696
+[10/05/15 04:55:56]{Debug}(LanguageTags): Trying to load language from URL: http://development.smilebasicsource.com/languages/chatserver.json
+[10/05/15 04:55:57]{Error}(ChatManager): Couldn't load bandwidth data! Defaulting to empty bandwidth
+[10/05/15 04:55:57]{Error}(ChatManager): Couldn't load user data! Defaulting to empty user dictionary
+[10/05/15 04:55:57]{Error}(ChatManager): Couldn't load messages! Defaulting to empty message list
+[10/05/15 04:55:57](System): Chat Server listening on port 45695 with services:
+[10/05/15 04:55:57](System): - /chat

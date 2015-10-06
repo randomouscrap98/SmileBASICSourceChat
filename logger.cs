@@ -10,18 +10,27 @@ namespace MyExtensions.Logging
    //which should be able to handle most use cases.
    public class Logger
    {
+      public const LogLevel DefaultConsoleLogLevel = LogLevel.Normal;
+      public const LogLevel DefaultFileLogLevel = LogLevel.Normal;
+
       private Queue<LogMessage> messages = new Queue<LogMessage>();
       private readonly object messageLock = new object();
       private Timer autoDumpTimer = new Timer();
       private readonly string logFile = "";
       public readonly int MaxMessages = 1000;
       private bool instantConsole = false;
+      private LogLevel minConsoleLevel;
+      private LogLevel minFileLevel;
 
       public static readonly Logger DefaultLogger = new Logger(100);
 
       //If you want to log to a file, you must specify it in the constructor
-      public Logger(int maxMessages = -1, string logFile = "")
+      public Logger(int maxMessages = -1, string logFile = "", LogLevel minConsoleLevel = DefaultConsoleLogLevel, 
+         LogLevel minFileLevel = DefaultFileLogLevel)
       {
+         this.minConsoleLevel = minConsoleLevel;
+         this.minFileLevel = minFileLevel;
+
          //First, try to create the file if it doesn't exist
          if (!File.Exists (logFile) && !string.IsNullOrWhiteSpace(logFile))
             File.Create (logFile).Close();
@@ -86,7 +95,7 @@ namespace MyExtensions.Logging
          {
             foreach (LogMessage message in messages)
             {
-               if (!message.WasLoggedBy ("console"))
+               if (!message.WasLoggedBy ("console") && message.Level >= minConsoleLevel)
                {
                   Console.WriteLine (message.ToString ());
                   message.SetLoggedBy ("console");
@@ -108,7 +117,7 @@ namespace MyExtensions.Logging
          {
             foreach (LogMessage message in messages)
             {
-               if (!message.WasLoggedBy ("file"))
+               if (!message.WasLoggedBy ("file") && message.Level >= minFileLevel)
                {
                   File.AppendAllText (logFile, message.ToString () + Environment.NewLine);
                   message.SetLoggedBy ("file");
@@ -159,6 +168,8 @@ namespace MyExtensions.Logging
 
    public enum LogLevel
    {
+      Locks = 1,
+      SuperDebug,
       Debug,
       Normal,
       Warning,

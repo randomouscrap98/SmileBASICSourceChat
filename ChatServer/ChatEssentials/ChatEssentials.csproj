@@ -43,6 +43,12 @@
     <Compile Include="..\..\user.cs">
       <Link>user.cs</Link>
     </Compile>
+    <Compile Include="..\..\LanguageTags.cs">
+      <Link>LanguageTags.cs</Link>
+    </Compile>
+    <Compile Include="..\..\pm.cs">
+      <Link>pm.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

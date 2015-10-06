@@ -524,6 +524,19 @@ namespace ModuleSystem
          }
       }
 
+      public static bool IsACommand(string message)
+      {
+         return Regex.IsMatch(message, @"^\s*" + CommandStart + @"\S");
+      }
+
+//      public string CommandRegex
+//      {
+//         get
+//         {
+//            return @"^\s*" + CommandStart + "(" + Command + @")";
+//         }
+//      }
+
       //Return the regex that will be able to parse this command
       public string FullRegex
       {

@@ -73,7 +73,7 @@ namespace MyExtensions
                minLength = subLength;
          }
 
-         return 0.9 * ((double)minLength / shorter.Length) + 0.1 * ((double)LevenshteinDistance(s1, s2) / longer.Length);
+         return 0.95 * ((double)minLength / shorter.Length) + 0.05 * ((double)LevenshteinDistance(s1, s2) / longer.Length);
 
          //return (double)LevenshteinDistance(s1, s2) / Math.Max(s1.Length, s2.Length);
       }

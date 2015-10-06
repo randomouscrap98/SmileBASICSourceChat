@@ -12,10 +12,10 @@ then
    echo "Missing ChatServer executable. Make sure it has been built"
    echo "using monodevelop."
    exit 1
-elif [ ! -f "$dlls" ]
-then
-   echo "Missing Module package dll. Make sure it has been built"
-   exit 1
+#elif [ ! -f "$dlls" ]
+#then
+#   echo "Missing Module package dll. Make sure it has been built"
+#   exit 1
 fi
 
 #Parse command line arguments

@@ -21,7 +21,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "0.5.8.0";
+      public const string Version = "0.8.0.0";
 
       private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -77,7 +77,10 @@ namespace ChatServer
                { "saveFolder", "save" },
                { "saveInterval", 300 },
                { "moduleWaitSeconds", 5 },
-               { "fakeAuthentication", false } 
+               { "fakeAuthentication", false },
+               { "consoleLogLevel", "Normal" },
+               { "fileLogLevel", "Debug" },
+               { "languageURL", "/languages/chatserver.json" }
             };
 
             //Set up and read options. We need to do this first so that the values can be used for init
@@ -101,12 +104,20 @@ namespace ChatServer
             //Before we do anything else, set up folders for data
             Directory.CreateDirectory(MyExtensions.StringExtensions.PathFixer(GetOption<string>("saveFolder")));
 
+            //Set up the desired logging levels before setting up the logger
+            MyExtensions.Logging.LogLevel fileLogLevel = MyExtensions.Logging.Logger.DefaultFileLogLevel;
+            MyExtensions.Logging.LogLevel consoleLogLevel = MyExtensions.Logging.Logger.DefaultConsoleLogLevel;
+
+            Enum.TryParse(GetOption<string>("fileLogLevel"), out fileLogLevel);
+            Enum.TryParse(GetOption<string>("consoleLogLevel"), out consoleLogLevel);
+
             //Set up the logger
-            logger = new MyExtensions.Logging.Logger(GetOption<int>("loggerBacklog"), GetOption<string>("loggerFile"));
+            logger = new MyExtensions.Logging.Logger(GetOption<int>("loggerBacklog"), GetOption<string>("loggerFile"),
+               consoleLogLevel, fileLogLevel);
             logger.StartAutoDumping(GetOption<int>("loggerFileDumpInterval"));
             logger.StartInstantConsole();
 
-            logger.Log("This exe was built on: " + MyBuildDate().ToString(), LogTag);
+            logger.Log("ChatServer v" + Version + ", built on " + MyBuildDate().ToString(), LogTag);
 
             //Set up the module system
             loader = new ModuleLoader(logger);
@@ -121,7 +132,7 @@ namespace ChatServer
                return;
             }
 
-            //First set up the auth server
+            //Set up the auth server
             if(GetOption<bool>("fakeAuthentication"))
                authServer = new AuthServerFake(GetOption<int>("authServerPort"), logger);
             else
@@ -138,8 +149,14 @@ namespace ChatServer
                logger.Log("Authorization server running on port " + authServer.Port, LogTag);
             }
 
+            //Set up languages
+            LanguageTags languageTags = new LanguageTags(logger);
+
+            if(!languageTags.InitFromURL(GetOption<string>("website") + GetOption<string>("languageURL")))
+               logger.Warning("Couldn't load language tags! Hopefully the default will suffice");
+
             //Set up the chat manager (the program that provides data to each chat instance)
-            manager = new ChatManager(loader, authServer,
+            manager = new ChatManager(loader, authServer, languageTags,
                GetOption<int>("messageBacklog"), GetOption<int>("messageSend"),
                GetOption<int>("saveInterval"), GetOption<int>("moduleWaitSeconds"),
                GetOption<string>("acceptedTags"), GetOption<string>("globalTag"),

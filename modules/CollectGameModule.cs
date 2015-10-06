@@ -27,46 +27,28 @@ namespace WikiaChatLogger
 
 		private CollectionGenerator generator = new CollectionGenerator();
 		private BackgroundWorker chanceSimulator = new BackgroundWorker();
-		//private Random localRandom = new Random();
+      private Random localRandom = new Random();
 
 		public CollectGameModule()
 		{
-         /*
-         " /cgamedraw <1-" + MaxWithdraw + "> [X" + CollectionManager.MinMultiplier + "-" + CollectionManager.MaxMultiplier + "] ....................- Get item(s) (second number increases chance + cost)\n" +
-         " /cgamechance <X1-" + CollectionManager.MaxMultiplier + "> .........................- See the chance of a new item for a given multiplier\n" +
-         " /cgamerestock ................................- Restock your coins (possible once every " + CollectionManager.RestockHours + " hour(s))\n" +
-         " /cgamestock [m] ..............................- See your own collection (m == mobile friendly)\n" +
-         X" /cgamecoins ..................................- See just your coins\n" +
-         " /cgametopitems ...............................- See your top items in number\n" +
-         " /cgameamount <itemID> ........................- How much you have of given item (Example: /amount B2)\n" +
-         " /cgamecompare <player> .......................- Compare your inventory to another's to see the differences\n" +
-         " /cgamequery <itemIDs> ........................- See who has the given item(s)\n" +
-         X" /cgamesell <amount> <itemID> .................- Sell item to shop for " + CollectionManager.IndividualSellPrice + " coins\n" +
-         " /cgamesell <itemIDs> to <player> for <price> .- Sell item(s) to player (player gets item in journal, but item destroyed).\n" +
-         " /cgamesellall <itemIDs> ......................- Sell all of the given item(s) to the shop for " + CollectionManager.IndividualSellPrice + " coins\n" +
-         " /cgamesellallall .............................- Sell everything\n" +
-         " /cgamebuy <itemIDs> from <player> for <price> - Buy item(s) from player (player gets item in journal, but item destroyed).\n" +
-         " /cgamegive <itemIDs> to <player> .............- Give away an item (or items) (player gets item in journal, but item destroyed)\n" +
-         " /cgametrade <itemIDs> for <itemIDs> with <plyr> - Trade item(s) with a player.\n" +
-         " /cgamequicktrade <player> ....................- Create an even trade for the top unique items with player\n" +
-         " /cgameaccept .................................- Accept a selling offer\n" +
-         " /cgamedecline ................................- Decline a selling offer\n" +
-         " /cgamerankup .................................- Increase rank and reset journal (when journal complete).\n" +
-         " /cgametop ....................................- See top collectors\n" +
-         " /cgameclose ..................................- See collectors around your rank\n" +
-         " /cgamestats ..................................- See your permanent stats (must be at least rank 1)\n" +
-         " /cgamelove <player> ..........................- Give player everything they need that you have\n" +
-         " /cgameaddlove <player> .......................- Add a player to your love list\n" +
-         " /cgameremovelove <player> ....................- Remove a player from your love list\n" +
-         " /cgameloveall ................................- Love everyone on your list (in order of least amount to give to most)\n" +
-         " /cgamelovelist ...............................- Show the list of people on your love list\n");*/
-
          AddOptions(new Dictionary<string, object> {
             { "rankup", 50 },
             { "exchange", 500 },
             { "maxWithdraw", 100 },
             { "maxLovers", 20 },
-            { "journalStyle", "style=\"font-family:'Courier New', Courier, monospace; line-height: 100%;\"" }
+            { "journalStyle", "style=\"font-family:'Courier New', Courier, monospace; line-height: 100%;\"" },
+            { "jealousyHours", 24 },
+            { "jealousyCoins", 1000 },
+            { "hugSayings", "How nice!, You smile a bit!, You wonder why., How eccentric!, How lovely!, " +
+               "You're pretty happy about it! Your HP was restored by 10 points!, You became confused!, " +
+               "Your defense fell!, Your spirits rose!, Maybe the world isn't so bad after all., " +
+               "You cry a little., You cry a little inside., You burst into tears on their shoulder!, " +
+               "You're a little uncomfortable., You want to return the favor., Your stress ebbs away., " +
+               "You feel like you understand each other a bit better!, You feel warm inside., " + 
+               "*doki doki desu!*, This isn't so bad., You get a little nostalgic., " +
+               "You want another one!, You value their friendship a bit more!, You're overcome with a tidal wave of emotions!, " +
+               "You wish more people were like this!, The world isn't such a dark place anymore., " +
+               "You feel a bit better!" }
          });
 
          generalHelp = "In cgame, you collect items by using your hourly coins to draw random items. " +
@@ -103,7 +85,8 @@ namespace WikiaChatLogger
             }, "Compare your inventory against another's for possible trades."),
             new ModuleCommand("cgamequery", new List<CommandArgument> {
                itemList
-            }, "Compare your inventory against another's for possible trades."),
+            }, "See who has the given items"),
+            new ModuleCommand("cgamequeryall", new List<CommandArgument>(), "See who has any item you need"),
             new ModuleCommand("cgamesell", new List<CommandArgument> {
                itemList,
                player,
@@ -117,9 +100,7 @@ namespace WikiaChatLogger
             new ModuleCommand("cgameshopsell", new List<CommandArgument> {
                itemList
             }, "Sell item(s) to shop (low trade price). All of the item is sold."),
-            new ModuleCommand("cgameshopsellall", new List<CommandArgument> {
-               itemList
-            }, "Sell all items to shop (low trade price)"),
+            new ModuleCommand("cgameshopsellall", new List<CommandArgument>(), "Sell all items to shop (low trade price)"),
             new ModuleCommand("cgamegive", new List<CommandArgument> {
                itemList,
                player
@@ -143,6 +124,11 @@ namespace WikiaChatLogger
             }, "Remove a player from your love list"),
             new ModuleCommand("cgameloveall", new List<CommandArgument>(), "Love everyone on your list"),
             new ModuleCommand("cgamelovelist", new List<CommandArgument>(), "Players on your love list"),
+            new ModuleCommand("cgamejealousy", new List<CommandArgument>(), "Take items from other players (careful!)"),
+            new ModuleCommand("cgamecheckjealousy", new List<CommandArgument>(), "Check what you'll get from jealousy"),
+            new ModuleCommand("cgamehug", new List<CommandArgument> {
+               player
+            }, "Give a hug to reduce jealousy", true),
             new ModuleCommand("cgameaccept", new List<CommandArgument>(), "Accept trade/sell/buy offer"),
             new ModuleCommand("cgamedecline", new List<CommandArgument>(), "Decline trade/sell/buy offer"),
             new ModuleCommand("cgamerankup", new List<CommandArgument>(), "Reset journal and go to next rank"),
@@ -174,6 +160,23 @@ namespace WikiaChatLogger
       public string JournalStyle
       {
          get { return GetOption<string>("journalStyle"); }
+      }
+      public TimeSpan JealousyTime
+      {
+         get { return TimeSpan.FromHours(GetOption<double>("jealousyHours")); }
+      }
+      public int JealousyCoins
+      {
+         get { return GetOption<int>("jealousyCoins"); }
+      }
+
+      public List<string> HugSayings
+      {
+         get 
+         { 
+            return GetOption<string>("hugSayings").Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+               .Select(x => x.Trim()).ToList(); 
+         }
       }
 
 		// Perform the chance calculations on a background thread
@@ -403,7 +406,7 @@ namespace WikiaChatLogger
                //We had a multiplier!
                if(command.Arguments.Count == 2)
                {
-                  if (!int.TryParse(command.Arguments[1].Substring(1), out multiplier))
+                  if (!int.TryParse(command.Arguments[1].ToLower().Replace("x", ""), out multiplier))
                      return QuickQuit("The multiplier is invalid", true);
                   else if (multiplier > CollectionManager.MaxMultiplier || multiplier < CollectionManager.MinMultiplier)
                      return QuickQuit("Your multiplier is out of range. Use values from " + 
@@ -463,7 +466,7 @@ namespace WikiaChatLogger
    				int multiplier = 1;
 
                //Oops, bad multiplier
-               if (!int.TryParse(command.Arguments[0].Substring(1), out multiplier))
+               if (!int.TryParse(command.Arguments[0].ToLower().Replace("x", ""), out multiplier))
                   return QuickQuit("The multiplier is invalid!", true);
    				else if (multiplier > CollectionManager.MaxMultiplier || multiplier < CollectionManager.MinMultiplier)
                   return QuickQuit("Your multiplier is out of range. Use a value between " + 
@@ -598,41 +601,8 @@ namespace WikiaChatLogger
    			}
    			#endregion
 
-   			//Sell to shop
-   //			#region sellShop
-   //			match = Regex.Match(message, @"^\s*/cgamesell\s+([0-9]+)\s+([a-zA-Z][0-9])\s*$");
-   //			if (match.Success)
-   //			{
-   //				int amount;
-   //				SpecialPoint point = SpecialPoint.Parse(match.Groups[2].Value);
-   //
-   //				//Oops, bad amount number
-   //				if (!int.TryParse(match.Groups[1].Value, out amount))
-   //					return username + ", your sell amount is out of bounds";
-   //
-   //				//Ugh, bad point
-   //				if (!CollectionManager.ValidPoint(point))
-   //					return username + ", that point is out of range.";
-   //
-   //				//User doesn't have any of that item
-   //				if (collectors[username].Inventory[point] == 0)
-   //					return username + ", you don't have any " + CollectionSymbols.GetPointAndSymbol(point) + " items to sell.";
-   //
-   //				//Can't sell if you put in a bad amount
-   //				if (collectors[username].Inventory[point] < amount)
-   //					return username + ", you only have " + collectors[username].Inventory[point] + " of item " + CollectionSymbols.GetPointAndSymbol(point) + ".";
-   //
-   //				for (int i = 0; i < amount; i++)
-   //					collectors[username].SellItem(point, CollectionManager.IndividualSellPrice);
-   //
-   //				return username + ", you sold " + amount + " of item " + CollectionSymbols.GetPointAndSymbol(point) + " for " + (CollectionManager.IndividualSellPrice * amount) + " coins.\n" +
-   //					"You now have " + collectors[username].Coins + " coins.";
-   //			}
-   //			#endregion
-
    			//Sell to player
    			#region sellPlayer
-   			//match = Regex.Match(message, @"^\s*/cgamesell\s+(([a-zA-Z][0-9]\s*)+)\s+to\s+(.+)\s+for\s+([0-9]+)\s*$");
             else if (cmd == "cgamesell")
    			{
                if(!GetUserFromArgument(command.Arguments[1], users, out player))
@@ -695,7 +665,6 @@ namespace WikiaChatLogger
 
    			//Buy from player
    			#region buyPlayer
-   			//match = Regex.Match(message, @"^\s*/cgamebuy\s+(([a-zA-Z][0-9]\s*)+)\s+from\s+(.+)\s+for\s+([0-9]+)\s*$");
             else if (cmd == "cgamebuy")
    			{
                if(!GetUserFromArgument(command.Arguments[1], users, out player))
@@ -754,7 +723,6 @@ namespace WikiaChatLogger
 
    			//Give away an item
    			#region give
-   			//match = Regex.Match(message, @"^\s*/cgamegive\s+(([a-zA-Z][0-9]\s*)+)\s+to\s+(.+)\s*$");
             else if (cmd == "cgamegive")
    			{
                if(!GetUserFromArgument(command.Arguments[1], users, out player))
@@ -796,7 +764,6 @@ namespace WikiaChatLogger
 
    			//Trade items with another player
    			#region trade
-   			//match = Regex.Match(message, @"^\s*/cgametrade\s+(([a-zA-Z][0-9]\s*)+)\s+for\s+(([a-zA-Z][0-9]\s*)+)\s+with\s+(.+)\s*$");
             else if (cmd == "cgametrade")
    			{
    				//Get the other user
@@ -824,8 +791,8 @@ namespace WikiaChatLogger
 
    				try
    				{
-   					myPoints = ExtractPoints(command.Arguments[1], user);
-                  theirPoints = ExtractPoints(command.Arguments[3], player);
+   					myPoints = ExtractPoints(command.Arguments[0], user);
+                  theirPoints = ExtractPoints(command.Arguments[2], player);
    				}
    				catch (Exception e)
    				{
@@ -877,14 +844,18 @@ namespace WikiaChatLogger
    				{
    					//Get the total amount of that item we can sell
    					int pointAmount = collectors[myUID].Inventory[point];
-   					totalAmount += pointAmount;
+   					//totalAmount += pointAmount;
 
    					//Sell it all
    					for (int i = 0; i < pointAmount; i++)
-   						collectors[myUID].SellItem(point, CollectionManager.IndividualSellPrice);
+                  {
+                     int sellPrice = CollectionManager.SellPrice(point, collectors[myUID]);
+                     collectors[myUID].SellItem(point, sellPrice);
+                     totalAmount += sellPrice;
+                  }
    				}
 
-               return QuickQuit("You sold " + PrintPointList(points) + " for " + (totalAmount * CollectionManager.IndividualSellPrice) + " coins.");
+               return QuickQuit("You sold all " + PrintPointList(points) + " for " + totalAmount + " coins.");
    			}
    			#endregion
 
@@ -899,14 +870,18 @@ namespace WikiaChatLogger
    				{
    					//Get the total amount of that item we can sell
    					int pointAmount = collectors[myUID].Inventory[point];
-   					totalAmount += pointAmount;
+   					//totalAmount += pointAmount;
 
    					//Sell it all
    					for (int i = 0; i < pointAmount; i++)
-   						collectors[myUID].SellItem(point, CollectionManager.IndividualSellPrice);
+                  {
+                     int sellPrice = CollectionManager.SellPrice(point, collectors[myUID]);
+                     collectors[myUID].SellItem(point, sellPrice);
+                     totalAmount += sellPrice;
+                  }
    				}
 
-               return QuickQuit("You sold everything for " + (totalAmount * CollectionManager.IndividualSellPrice) + " coins.");
+               return QuickQuit("You sold everything for " + totalAmount + " coins.");
    			}
    			#endregion
 
@@ -1001,8 +976,7 @@ namespace WikiaChatLogger
    				if (collectors[myUID].Stars < 1)
                   return QuickQuit("You must be at least rank 1 to see your permanent collection game stats");
 
-   				return QuickQuit("Your permanent stats for the collection game: \n\n Total Coins Collected: " + collectors[myUID].TotalCoins +
-                  "\n Total Items Collected: " + collectors[myUID].ForeverJournal.TotalObtained());
+               return QuickQuit(collectors[myUID].ForeverStats());
    			}
    			#endregion
 
@@ -1021,35 +995,24 @@ namespace WikiaChatLogger
                   return QuickQuit(e.Message, true);
    				}
 
-               Dictionary<int, List<SpecialPoint>> whoHasPoints = new Dictionary<int,List<SpecialPoint>>();
-
-               foreach (var collector in collectors)
-               {
-                  whoHasPoints.Add(collector.Key, new List<SpecialPoint>());
-                  foreach (SpecialPoint point in points)
-                  {
-                     if (collector.Value.Inventory.HasItem(point))
-                         whoHasPoints[collector.Key].Add(point);
-                  }
-               }
-
-               var whoReallyHasPoints = whoHasPoints.ToList().Where(x => x.Value.Count > 0).OrderByDescending(x => x.Value.Count).ToList();
-
-   				if (whoReallyHasPoints.Count == 0)
-                  return QuickQuit("Nobody has item".Pluralify(points.Count) + " " + PrintPointList(points));
-
-   				string output = "These people have item".Pluralify(points.Count) + " " + PrintPointList(points) + ":";
-   				for (int i = 0; i < Math.Min(whoReallyHasPoints.Count, 5); i++)
-   					output += "\n* " + users[whoReallyHasPoints[i].Key].Username + " - " + PrintPointList(whoReallyHasPoints[i].Value);
-
-               return QuickQuit(output);
+               return QuickQuit(GetQuery(points, users));
    			}
+
+            if(cmd == "cgamequeryall")
+            {
+               List<SpecialPoint> points = collectors[myUID].Journal.Unobtained();
+
+               return QuickQuit(GetQuery(points, users));
+            }
    			#endregion
 
    			#region cgamelove
    			//match = Regex.Match(message, @"^\s*/cgamelove\s+(.+)\s*$");
             else if (cmd == "cgamelove") //match.Success)
    			{
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+               
                //Get the other user
                if(!GetUserFromArgument(command.Arguments[0], users, out player))
                {
@@ -1065,6 +1028,9 @@ namespace WikiaChatLogger
             //match = Regex.Match(message, @"^\s*/cgameaddlove\s+(.+)\s*$");
             else if(cmd == "cgameaddlove")//match.Success)
             {
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+               
                //Get the other user
                if(!GetUserFromArgument(command.Arguments[0], users, out player))
                {
@@ -1092,6 +1058,9 @@ namespace WikiaChatLogger
             //match = Regex.Match(message, @"^\s*/cgameremovelove\s+(.+)\s*$");
             else if (cmd == "cgameremovelove")//match.Success)
             {
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+               
                //Get the other user
                if(!GetUserFromArgument(command.Arguments[0], users, out player))
                {
@@ -1109,6 +1078,9 @@ namespace WikiaChatLogger
             #region cgamelovelist
             else if (cmd == "cgamelovelist")//Regex.IsMatch(message, @"^\s*/cgamelovelist\s*$"))
             {
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+               
                List<int> lovers = collectors[myUID].GetLovers();
 
                if(lovers.Count == 0)
@@ -1127,6 +1099,9 @@ namespace WikiaChatLogger
             #region cgameloveall
             if (cmd == "cgameloveall")//Regex.IsMatch(message, @"^\s*/cgameloveall\s*$"))
             {
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+               
                List<Tuple<int, int>> giveCounts = new List<Tuple<int,int>>();
                List<int> lovers = collectors[myUID].GetLovers().Where(x => collectors.ContainsKey(x) && users.ContainsKey(x)).ToList();
 
@@ -1153,6 +1128,101 @@ namespace WikiaChatLogger
             }
             #endregion
 
+            if(cmd == "cgamecheckjealousy")
+            {
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+
+               var canSteal = GetJealousy(myUID);
+
+               return QuickQuit("If you tap into the darkness in your twisted heart now, you'll get " + canSteal.Count + " item".Pluralify(canSteal.Count) +
+                  " plus " + JealousyCoins * users.Count(x => x.Value.LoggedIn) + " coins (1000 coins for each logged in user)");
+            }
+
+            if(cmd == "cgamejealousy")
+            {
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+
+               Dictionary<SpecialPoint, int> gonnaSteal = GetJealousy(myUID);
+               HashSet<int> usersToInform = new HashSet<int>();
+
+               if(gonnaSteal.Count == 0)
+                  return QuickQuit("Your jealousy couldn't change the fact that nobody had any items you needed");
+
+               foreach(KeyValuePair<SpecialPoint, int> steal in gonnaSteal)
+               {
+                  PerformGive(steal.Value, myUID, new List<SpecialPoint> { steal.Key });
+                  usersToInform.Add(steal.Value);
+               }
+
+               collectors[myUID].JealousyPerformed(gonnaSteal.Count);
+
+               foreach(int userID in usersToInform)
+               {
+                  ModuleJSONObject userOutput = new ModuleJSONObject();
+                  int itemCount = gonnaSteal.Count(x => x.Value == userID);
+                  userOutput.message = user.Username + " took " + itemCount + " item".Pluralify(itemCount) + " from you!";
+                  userOutput.recipients.Add(userID);
+                  outputs.Add(userOutput);
+               }
+
+               int getCoins = JealousyCoins * users.Count(x => x.Value.LoggedIn);
+               collectors[myUID].GetCoins(getCoins);
+
+               //WarningJSONObject warnOutput = new WarningJSONObject();
+               mainOutput.message = "In a fit of jealousy, " + user.Username + " used the darkness in their twisted heart to " +
+                  "generate " + getCoins + " coins and steal " + gonnaSteal.Count + " item".Pluralify(gonnaSteal.Count) + 
+                  " from unsuspecting users. 8(>_<)8";
+               mainOutput.broadcast = true;
+               outputs.Add(mainOutput);
+
+//               ModuleJSONObject coinMessage = new ModuleJSONObject();
+//               coinMessage.message = "You also got " + getCoins + " coins.";
+//               outputs.Add(coinMessage);
+
+               return outputs;
+            }
+
+            if(cmd == "cgamehug")
+            {
+               if(CheckIfJealous(myUID, out outputs))
+                  return outputs;
+
+               //Get the other user
+               if(!GetUserFromArgument(command.Arguments[0], users, out player))
+               {
+                  AddError(outputs);
+                  return outputs;
+               }
+
+               if (!collectors.ContainsKey(player.UID))
+                  return QuickQuit(NotAPlayer(player));
+
+               if(myUID == player.UID)
+                  return QuickQuit("You can't hug yourself!", true);
+
+               if(CollectionManager.PerformHug(collectors, myUID, player.UID, JealousyTime))
+               {
+                  ModuleJSONObject playerOutput = new ModuleJSONObject();
+                  playerOutput.recipients.Add(player.UID);
+                  playerOutput.message = "You were hugged by " + user.Username + ". The darkness in your heart receded a bit!";
+                  mainOutput.message = "You gave " + player.Username + " a hug and cheered them up a bit!";
+                  outputs.Add(mainOutput);
+                  outputs.Add(playerOutput);
+                  return outputs;
+               }
+               else
+               {
+                  ModuleJSONObject playerOutput = new ModuleJSONObject();
+                  playerOutput.recipients.Add(player.UID);
+                  playerOutput.message = "You were hugged by " + user.Username + ". " + HugSayings[localRandom.Next(HugSayings.Count)];
+                  mainOutput.message = "You gave " + player.Username + " a hug. What a nice person!";
+                  outputs.Add(mainOutput);
+                  outputs.Add(playerOutput);
+                  return outputs;
+               }
+            }
          }
          catch(Exception e)
          {
@@ -1167,10 +1237,77 @@ namespace WikiaChatLogger
          return new List<JSONObject>();
 		}
 
+      public string GetQuery(List<SpecialPoint> points, Dictionary<int, UserInfo> users)
+      {
+         Dictionary<int, List<SpecialPoint>> whoHasPoints = new Dictionary<int,List<SpecialPoint>>();
+
+         foreach (var collector in collectors)
+         {
+            whoHasPoints.Add(collector.Key, new List<SpecialPoint>());
+            foreach (SpecialPoint point in points)
+            {
+               if (collector.Value.Inventory.HasItem(point))
+                  whoHasPoints[collector.Key].Add(point);
+            }
+         }
+
+         var whoReallyHasPoints = whoHasPoints.ToList().Where(x => x.Value.Count > 0).OrderByDescending(x => x.Value.Count).ToList();
+
+         if (whoReallyHasPoints.Count == 0)
+            return "Nobody has item".Pluralify(points.Count) + " " + PrintPointList(points);
+
+         string output = "These people have item".Pluralify(points.Count) + " " + PrintPointList(points) + ":";
+         for (int i = 0; i < Math.Min(whoReallyHasPoints.Count, 5); i++)
+            output += "\n* " + users[whoReallyHasPoints[i].Key].Username + " - " + PrintPointList(whoReallyHasPoints[i].Value);
+
+         return output;
+      }
+
+      public Dictionary<SpecialPoint, int> GetJealousy(int uid)
+      {
+         Dictionary<SpecialPoint, int> gonnaSteal = new Dictionary<SpecialPoint, int>();
+
+         foreach(SpecialPoint point in collectors[uid].RareList.Select(x => CollectionManager.PointFrom1DIndex(x)))
+         {
+            //we don't care about items we already have
+            if(collectors[uid].Journal.HasItem(point))
+               continue;
+
+            try
+            {
+               gonnaSteal.Add(point, collectors.Where(x => x.Value.Inventory[point] >= 1).OrderByDescending(x => x.Value.Inventory[point]).First().Key);
+            }
+            catch
+            {
+               continue;
+            }
+         }
+
+         return gonnaSteal;
+      }
+
+      public bool CheckIfJealous(int uid, out List<JSONObject> outputs)
+      {
+         outputs = new List<JSONObject>();
+
+         if (!collectors.ContainsKey(uid))
+            return false;
+
+         if (collectors[uid].JealousTimeLeft.Ticks <= 0)
+            return false;
+
+         outputs = QuickQuit("Your twisted heart is still filled with hatred and jealousy. You should be fine in " +
+            StringExtensions.LargestTime(collectors[uid].JealousTimeLeft));
+         return true;
+      }
+
       public List<JSONObject> PerformLove(UserInfo user, UserInfo player)
       {
          List<JSONObject> outputs = new List<JSONObject>();
 
+         if (CheckIfJealous(player.UID, out outputs))
+            return QuickQuit("The intense dark aura surrounding " + player.Username + " prevents you from loving them :'(");
+         
          //Oops, the user entered the wrong player
          if (!collectors.ContainsKey(player.UID))
             return QuickQuit(NotAPlayer(player));
@@ -1182,6 +1319,8 @@ namespace WikiaChatLogger
             return QuickQuit("It was a nice gesture, but you don't have any unique items to give to " + player.Username + ".");
 
          PerformGive(user.UID, player.UID, myUnique);
+         collectors[user.UID].LoveGiven(myUnique.Count);
+         collectors[player.UID].GotLoved(myUnique.Count);
 
          ModuleJSONObject playerOutput = new ModuleJSONObject();
          playerOutput.recipients.Add(player.UID);
@@ -1196,14 +1335,7 @@ namespace WikiaChatLogger
 
          return outputs;
       }
-
-//		public override string PostProcess()
-//		{
-//			if (messageBacklog.Count > 0)
-//				return messageBacklog.Dequeue();
-//
-//			return "";
-//		}
+         
 
 //		public override List<string> ProcessInterModuleCommunication()
 //		{
@@ -1277,15 +1409,6 @@ namespace WikiaChatLogger
 //				StatusUpdate(ModuleName + " registered " + newRegistrations + " new users");
 //
 //			return output;
-//		}
-
-//		public override string DefaultConfig()
-//		{
-//			return base.DefaultConfig() + "helpFile = cgame\\help.txt\n" +
-//				"exchange = 500\n" +
-//				"rankup = 50\n" +
-//				"maxWithdraw = 100\n" + 
-//                "maxLovers = 10\n";
 //		}
 
       public override string Nickname
@@ -1612,6 +1735,26 @@ namespace WikiaChatLogger
 			return itemIndex;
 		}
 
+      public static double ItemRarity(SpecialPoint item, CollectionPlayer player)
+      {
+         if (!CollectionManager.ValidPoint(item))
+            return 0;
+         
+         int index = player.RareList.Select(x => CollectionManager.PointFrom1DIndex(x)).ToList().IndexOf(item);
+
+         if(index < 0)
+            return 0;
+
+         double totalRarity = CumulativeRarity(CollectionManager.TotalGridSpace);
+
+         return (CumulativeRarity(index + 1) - CumulativeRarity(index)) / totalRarity;
+      }
+
+      private static double CumulativeRarity(int x)
+      {
+         return 1 - Math.Pow(Math.E, -CollectionManager.LambdaCurve * x * CollectionManager.CurveScale / CollectionManager.TotalGridSpace);
+      }
+
 		/// <summary>
 		/// Based on the player and multiplier given, draw an item. This method does NOT add the item to the player; it just gives
 		/// a random item based on the player. Basically a wrapper around GenerateItemIndex
@@ -1703,11 +1846,13 @@ namespace WikiaChatLogger
 		public const int LotteryCost = 50;
 		public const int CollectionCoinIncrease = 40;
 		public const int IndividualSellPrice = 20;
+      public const int ExtraSellPrice = 130;
 		public const int RestockHours = 1;
 		public const int OfferTimeout = 60;
 		public const int MultiplyMultiplier = 4;
 		public const int MaxMultiplier = 15;
 		public const int MinMultiplier = 1;
+      public const double HugReduction = 1.0 / 3.0;
 
 		//Random number generation
 		public const int DrawChanceSimulations = 10000;
@@ -1754,6 +1899,26 @@ namespace WikiaChatLogger
 
 			return journal;
 		}
+
+      public static int SellPrice(SpecialPoint item, CollectionPlayer player)
+      {
+         return (int)(IndividualSellPrice + ExtraSellPrice * (player.RareList.Select(x => CollectionManager.PointFrom1DIndex(x)).ToList().IndexOf(item) / (double)CollectionManager.TotalGridSpace));
+//         double leastRare = CollectionGenerator.ItemRarity(CollectionManager.PointFrom1DIndex(player.RareList[0]), player);
+//
+//         return (int)(IndividualSellPrice + ExtraSellPrice * (1 - CollectionGenerator.ItemRarity(item, player) / leastRare));
+      }
+
+      public static bool PerformHug(Dictionary<int, CollectionPlayer> players, int hugger, int reciever, TimeSpan JealousyTime)
+      {
+         if (players[reciever].TryHug(hugger))
+         {
+            players[hugger].GaveHug();
+            //players[reciever].ReduceJealousy(new TimeSpan((long)((JealousyTime - (DateTime.Now - players[reciever].LastJealousy)).Ticks * HugReduction)));
+            return true;
+         }
+
+         return false;
+      }
 	}
 
 	/// <summary>
@@ -1770,6 +1935,19 @@ namespace WikiaChatLogger
 		private int totalCoinsCollected = CollectionManager.CoinRestockAmount;
 		private int stars = 0;
 		private DateTime lastRestock = DateTime.Now;
+      //private DateTime lastJealousy = new DateTime(0);
+      private DateTime jealousUntil = new DateTime(0);
+      private HashSet<int> huggers = new HashSet<int>();
+
+      //Extra stuff to keep track of
+      private int loveGiven = 0;
+      private int loveItemsGiven = 0;
+      private int loveRecieved = 0;
+      private int loveItemsReceived = 0;
+      private int jealousyCount = 0;
+      private int jealousyTaken = 0;
+      private int hugsGiven = 0;
+      private int hugsReceived = 0;
 
       [OptionalField]
       private List<int> loveList;
@@ -1825,6 +2003,64 @@ namespace WikiaChatLogger
 				rareList[i] = temp;
 			}
 		}
+
+      public void GotLoved(int itemCount)
+      {
+         loveRecieved++;
+         loveItemsReceived += itemCount;
+      }
+
+      public void LoveGiven(int itemCount)
+      {
+         loveGiven++;
+         loveItemsGiven += itemCount;
+      }
+
+      public void JealousyPerformed(int itemCount)
+      {
+         huggers = new HashSet<int>();
+         //lastJealousy = DateTime.Now;
+         jealousUntil = DateTime.Now.AddHours(itemCount / 10.0 + journal.CompletionCount() / 10.0);
+         jealousyTaken += itemCount;
+         jealousyCount++;
+      }
+
+//      public void ReduceJealousy(TimeSpan time)
+//      {
+//         lastJealousy = lastJealousy.Add(-time);
+//      }
+
+//      public DateTime LastJealousy
+//      {
+//         get { return lastJealousy; }
+//      }
+
+      public void GaveHug()
+      {
+         hugsGiven++;
+      }
+
+      public TimeSpan JealousTimeLeft
+      {
+         get { return (jealousUntil - DateTime.Now); }
+      }
+
+      public bool TryHug(int hugger)
+      {
+         if (jealousUntil > DateTime.Now && huggers.Add(hugger))
+         {
+            hugsReceived++;
+            jealousUntil = jealousUntil.Add(new TimeSpan((long)(JealousTimeLeft.Ticks * -CollectionManager.HugReduction)));
+            return true;
+         }
+
+         return false;
+      }
+
+      public int HugCount
+      {
+         get { return huggers.Count; }
+      }
 
 		/// <summary>
 		/// Get your daily coins! Returns false if you can't do it today
@@ -1969,31 +2205,42 @@ namespace WikiaChatLogger
       public string Statistics(bool simple = true, string style = "")
 		{
          return "<user-journal " + style + ">" + journal.AsString(simple) + "</user-journal>\n<user-info>" + (stars > 0 ? "Rank: " + StarString() + " (" + stars + ")\n" : "")
-				+ "Complete: " + journal.CompletionCount() + "%\nCoins: " + coins + "\n" + RestockString + "</user-info>";
+				+ "Complete: " + journal.CompletionCount() + "%\nCoins: " + coins + "\n" + RestockString + 
+            "</user-info>";
 		}
 
-        public bool AddLover(int lover)
-        {
-            if (loveList.Contains(lover))
-                return false;
+      public string ForeverStats()
+      {
+         return "Your permanent stats for the collection game: \n\n Total Coins Collected: " + TotalCoins +
+         "\n Total Items Collected: " + ForeverJournal.TotalObtained() + "\n" +
+         "Love given: " + loveGiven + " times (" + loveItemsGiven + " items)\n" +
+         "Love received: " + loveRecieved + " times (" + loveItemsReceived + " items)\n" +
+         "Jealousy used: " + jealousyCount + " times (" + jealousyTaken + " items taken)\n" +
+         "Hugs given: " + hugsGiven + "\nHugs received: " + hugsReceived;
+      }
 
-            loveList.Add(lover);
+      public bool AddLover(int lover)
+      {
+         if (loveList.Contains(lover))
+             return false;
 
-            return true;
-        }
-        public bool RemoveLover(int lover)
-        {
-            if (!loveList.Contains(lover))
-                return false;
+         loveList.Add(lover);
 
-            loveList.Remove(lover);
+         return true;
+      }
+      public bool RemoveLover(int lover)
+      {
+         if (!loveList.Contains(lover))
+             return false;
 
-            return true;
-        }
-        public List<int> GetLovers()
-        {
-            return new List<int>(loveList);
-        }
+         loveList.Remove(lover);
+
+         return true;
+      }
+      public List<int> GetLovers()
+      {
+         return new List<int>(loveList);
+      }
 
 		public int Coins
 		{
@@ -2248,6 +2495,11 @@ namespace WikiaChatLogger
 
 			return unique;
 		}
+
+      public List<SpecialPoint> Unobtained()
+      {
+         return CollectionManager.CompleteJournal().Compare(this);
+      }
 
 		public override string ToString()
 		{

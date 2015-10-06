@@ -13,7 +13,8 @@ namespace MyExtensions
       private static JsonSerializerSettings defaultSettings = new JsonSerializerSettings() 
       { 
          ContractResolver = new MyContractResolver(),
-         Formatting = Formatting.Indented
+         Formatting = Formatting.Indented,
+         ObjectCreationHandling = ObjectCreationHandling.Replace
       };
 
       //A quick and easy way to save objects to a file
