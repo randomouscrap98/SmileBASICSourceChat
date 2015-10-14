@@ -67,7 +67,7 @@ namespace ChatServer
 
       protected List<BandwidthWindow> outgoingBytes = new List<BandwidthWindow>();
       protected List<BandwidthWindow> incomingBytes = new List<BandwidthWindow>();
-      public readonly Object byteLock = new object();
+      public readonly Object byteLock = new Object();
 
       public BandwidthContainer() { }
 

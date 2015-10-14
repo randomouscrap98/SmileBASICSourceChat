@@ -81,8 +81,12 @@ namespace ChatEssentials
       public readonly int GlobalSpamScore;
       public readonly int SecondsToUnblock;
       public readonly bool CanStaffChat;
+      public readonly bool CanGlobalChat;
+      public readonly bool ChatControl;
+      public readonly bool ChatControlExtended;
       public readonly TimeSpan TotalChatTime;
       public readonly TimeSpan AverageSessionTime;
+      public readonly TimeSpan CurrentSessionTime;
 
       public UserInfo(User user, bool loggedIn)
       {
@@ -104,9 +108,13 @@ namespace ChatEssentials
          GlobalSpamScore = user.GlobalSpamScore;
          SecondsToUnblock = user.SecondsToUnblock;
          CanStaffChat = user.CanStaffChat;
+         CanGlobalChat = user.CanGlobalChat;
          TotalChatTime = user.TotalChatTime;
          AverageSessionTime = user.AverageSessionTime;
          Blocked = user.Blocked;
+         CurrentSessionTime = user.CurrentSessionTime;
+         ChatControl = user.ChatControl;
+         ChatControlExtended = user.ChatControlExtended;
       }
    }
 
@@ -115,6 +123,7 @@ namespace ChatEssentials
    {
       public const double JoinSpamMinutes = 2.0;
 
+      private static bool AutomaticBlocking = true;
       private static int SpamBlockSeconds = 1;
       private static int InactiveMinutes = 1;
       private static string Website = "";
@@ -130,6 +139,9 @@ namespace ChatEssentials
       private int globalSpamScore = 0;
 
       private bool staffChat = false;
+      private bool globalChat = false;
+      private bool chatControl = false;
+      private bool chatControlExtended = false;
       private DateTime bannedUntil = new DateTime(0);
 
       private bool lastActive = true;
@@ -137,6 +149,7 @@ namespace ChatEssentials
       private DateTime lastPost = DateTime.Now;
       private DateTime lastDecay = DateTime.Now;
       private DateTime lastBlock = new DateTime(0);
+      private DateTime lastGlobalReduce = new DateTime(0);
       //private DateTime lastJoin = DateTime.Now;
       private DateTime blockedUntil = new DateTime(0);
       private List<UserSession> sessions = new List<UserSession>();
@@ -185,11 +198,12 @@ namespace ChatEssentials
       }
 
       //Set static user parameters (constants, probably from an options file)
-      public static void SetUserParameters(int spamBlockSeconds, int inactiveMinutes, string website)
+      public static void SetUserParameters(int spamBlockSeconds, int inactiveMinutes, string website, bool automaticBlocking)
       {
          SpamBlockSeconds = spamBlockSeconds;
          InactiveMinutes = inactiveMinutes;
          Website = website;
+         AutomaticBlocking = automaticBlocking;
       }
 
       public DateTime LastPost
@@ -240,6 +254,26 @@ namespace ChatEssentials
          get { return staffChat; }
       }
 
+      public bool CanGlobalChat
+      {
+         get { return globalChat; }
+      }
+
+      public bool ChatControl
+      {
+         get { return chatControl; }
+      }
+
+      public bool ChatControlExtended
+      {
+         get { return chatControlExtended; }
+      }
+
+      public bool ShowMessages
+      {
+         get { return !Banned && !Blocked; }
+      }
+
       public int GlobalSpamScore
       {
          get { return globalSpamScore; }
@@ -264,15 +298,24 @@ namespace ChatEssentials
             {
                if (value < 0)
                   spamScore = 0;
+               else if (value > 1000)
+                  spamScore = 1000;
                else
                   spamScore = value;
+
+               if (spamScore == double.NaN)
+                  spamScore = 0;
             }
          }
       }
 
       public int SpamScore
       {
-         get { return (int)RealSpamScore; }
+         get 
+         { 
+            
+            return (int)RealSpamScore; 
+         }
       }
 
       public TimeSpan TotalChatTime
@@ -296,6 +339,24 @@ namespace ChatEssentials
                   return new TimeSpan(0);
                
                return new TimeSpan(TotalChatTime.Ticks / sessions.Count);
+            }
+         }
+      }
+
+      public TimeSpan CurrentSessionTime
+      {
+         get
+         {
+            lock (Lock)
+            {
+               try
+               {
+                  return sessions.Last(x => x.Left == false).Time;
+               }
+               catch
+               {
+                  return new TimeSpan(0);
+               }
             }
          }
       }
@@ -365,6 +426,9 @@ namespace ChatEssentials
 
          lock (Lock)
          {
+            //This is to set the "inactive" state on logout
+            lastPing = new DateTime(0);
+
             //You shouldn't be leaving in this case. Come on now
             if (sessions.Count == 0 || sessions.All(x => x.Left))
             {
@@ -413,6 +477,9 @@ namespace ChatEssentials
                   avatar = json.result.avatar;
                   stars = json.result.starlevel;
                   staffChat = json.result.permissions.staffchat;
+                  globalChat = json.result.permissions.chatany;
+                  chatControl = json.result.permissions.chatcontrol;
+                  chatControlExtended = json.result.permissions.chatcontrolextended;
                   bannedUntil = DateExtensions.FromUnixTime((double)json.result.banneduntil);
                   joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
                   language = json.result.language;
@@ -450,7 +517,7 @@ namespace ChatEssentials
       {
          //Get all messages from the last 10 minutes (hopefully we still have them)
          List<UserMessageJSONObject> myMessages = messages.Where(x => (DateTime.Now - x.PostTime()).TotalMinutes < 10 && 
-            x.uid == uid && x.Display).ToList();
+            x.uid == uid && x.Spammable).ToList();
 
          double lastPostTimePenalty = (5 - (DateTime.Now - LastPost).TotalSeconds) / 5.0;
 
@@ -460,7 +527,7 @@ namespace ChatEssentials
 
          foreach(UserMessageJSONObject message in myMessages)
          {
-            double messageDifference = 1 - StringExtensions.StringDifference(message.message.Truncate(300), current.Truncate(300));
+            double messageDifference = 1 - StringExtensions.StringDifference(message.message, current, 0.5);
             double timeDifference = 1 - (DateTime.Now - message.PostTime()).TotalMinutes / 10.0;
 
             //First is the "time-ignoring" long spamathon penalty, then the "level headed" fast spamming
@@ -468,7 +535,6 @@ namespace ChatEssentials
             tempSpamScore += 2.0 * (Math.Pow(messageDifference, 1.0) * Math.Pow(timeDifference, 8.0)); 
          }
 
-         //Console.WriteLine(current + " -likeness- " + (int)(2 * myMessages.Sum(x => 1 - StringExtensions.StringDifference(x.text, current))));
          return UpdateSpam(tempSpamScore);
       }
 
@@ -483,33 +549,39 @@ namespace ChatEssentials
       private ChatTags UpdateSpam(double points)
       {
          //Only update spamscore if they're not already blocked. Otherwise, leave them alone!
-         if (!Blocked)
+         if (!Blocked && points != double.NaN)
          {
             RequestDecayUpdate();      //Always decay before updating
             RealSpamScore += points;
 
-            //Update global spam score if they've been good
-            if ((DateTime.Now - lastBlock).TotalHours > 24)
+            //Update global spam score if they've been good (and we haven't updated for a day)
+            if ((DateTime.Now - lastBlock).TotalHours > 24 && (DateTime.Now - lastGlobalReduce).TotalHours > 24)
+            {
                GlobalSpamScore -= 2;
-
-            //Block if spam score is too high
-            if (SpamScore >= 100)
-            {
-               GlobalSpamScore++;
-               int seconds = GlobalSpamScore * SpamBlockSeconds;
-
-               lock (Lock)
-               {
-                  blockedUntil = DateTime.Now.AddSeconds(seconds);
-                  lastBlock = DateTime.Now;
-               }
-
-               return ChatTags.Blocked;
+               lastGlobalReduce = DateTime.Now;
             }
-            //Send warning if getting close
-            else if (SpamScore > 60)
+
+            if (AutomaticBlocking)
             {
-               return ChatTags.Warning;
+               //Block if spam score is too high
+               if (RealSpamScore >= 100)
+               {
+                  GlobalSpamScore++;
+                  int seconds = GlobalSpamScore * SpamBlockSeconds;
+
+                  lock (Lock)
+                  {
+                     blockedUntil = DateTime.Now.AddSeconds(seconds);
+                     lastBlock = DateTime.Now;
+                  }
+
+                  return ChatTags.Blocked;
+               }
+               //Send warning if getting close
+               else if (RealSpamScore > 60)
+               {
+                  return ChatTags.Warning;
+               }
             }
          }
 

@@ -35,5 +35,12 @@ cp $folder/$build $serverFolder/$build
 mkdir -p $serverFolder/plugins
 cp $dlls $serverFolder/plugins
 cd $serverFolder 
+
 ./chat.exe
+while [ $? -eq 99 ]
+do
+   echo "The server killed itself. Let's try to restart it in 3 seconds..."
+   sleep 3
+   ./chat.exe
+done
 

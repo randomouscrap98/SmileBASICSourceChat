@@ -30,6 +30,7 @@ namespace ModulePackage1
                moduleOutput = new ModuleJSONObject();
                moduleOutput.broadcast = true;
                moduleOutput.message = user.Username + " " + command.Arguments[0];
+               moduleOutput.tag = command.tag;
                outputs.Add(moduleOutput);
                break;
 

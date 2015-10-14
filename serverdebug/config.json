@@ -23,6 +23,9 @@
     "fakeAuthentication": false,
     "consoleLogLevel": "Debug",
     "fileLogLevel": "SuperDebug",
-    "languageURL": "/languages/chatserver.json"
+    "languageURL": "/languages/chatserver.json",
+    "automaticBlocking": true,
+    "crashDetectionTimeout": 10,
+    "sslCertificate": "chatcert.p12"
   }
 }

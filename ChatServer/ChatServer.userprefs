@@ -1,14 +1,15 @@
 ﻿<Properties StartupItem="ChatServer/ChatServer.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../modules/CollectGameModule.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../main.cs">
     <Files>
-      <File FileName="../chat.cs" Line="437" Column="52" />
-      <File FileName="../user.cs" Line="461" Column="17" />
-      <File FileName="../main.cs" Line="23" Column="5" />
-      <File FileName="../chatManager.cs" Line="517" Column="30" />
+      <File FileName="../user.cs" Line="1" Column="1" />
+      <File FileName="../chat.cs" Line="1" Column="1" />
+      <File FileName="../chatManager.cs" Line="1" Column="1" />
+      <File FileName="../main.cs" Line="76" Column="166" />
+      <File FileName="../modules/debugModule.cs" Line="1" Column="1" />
+      <File FileName="../messages.cs" Line="1" Column="1" />
       <File FileName="../modules/module.cs" Line="1" Column="1" />
-      <File FileName="../pm.cs" Line="29" Column="1" />
-      <File FileName="../modules/CollectGameModule.cs" Line="114" Column="22" />
+      <File FileName="../LanguageTags.cs" Line="65" Column="8" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

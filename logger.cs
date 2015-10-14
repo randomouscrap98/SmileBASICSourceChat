@@ -95,10 +95,10 @@ namespace MyExtensions.Logging
          {
             foreach (LogMessage message in messages)
             {
-               if (!message.WasLoggedBy ("console") && message.Level >= minConsoleLevel)
+               if (!message.WasLoggedBy (LoggerType.Console) && message.Level >= minConsoleLevel)
                {
                   Console.WriteLine (message.ToString ());
-                  message.SetLoggedBy ("console");
+                  message.SetLoggedBy (LoggerType.Console);
                }
             }
 
@@ -117,10 +117,10 @@ namespace MyExtensions.Logging
          {
             foreach (LogMessage message in messages)
             {
-               if (!message.WasLoggedBy ("file") && message.Level >= minFileLevel)
+               if (!message.WasLoggedBy (LoggerType.File) && message.Level >= minFileLevel)
                {
                   File.AppendAllText (logFile, message.ToString () + Environment.NewLine);
-                  message.SetLoggedBy ("file");
+                  message.SetLoggedBy (LoggerType.File);
                }
             }
 
@@ -158,7 +158,14 @@ namespace MyExtensions.Logging
 
             //Remove messages if we have too many
             while (messages.Count > MaxMessages)
-               messages.Dequeue ();
+            {
+               //If we're about to dequeue a message that has not been logged by the file logger,
+               //this is a problem. Log all messages to the file, then dequeue.
+               if (!messages.Peek().WasLoggedBy(LoggerType.File))
+                  DumpToFile();
+               
+               messages.Dequeue();
+            }
          }
 
          if (instantConsole)
@@ -185,7 +192,7 @@ namespace MyExtensions.Logging
       private string tag = "";
       private DateTime timestamp = DateTime.Now;
       private LogLevel level = LogLevel.Normal;
-      private HashSet<string> loggedBy = new HashSet<string>();
+      private HashSet<LoggerType> loggedBy = new HashSet<LoggerType>();
 
       public LogMessage(string message, LogLevel level = LogLevel.Normal, string tag = "")
       {
@@ -220,12 +227,12 @@ namespace MyExtensions.Logging
          get { return !string.IsNullOrWhiteSpace (tag); }
       }
 
-      public bool WasLoggedBy(string loggerType)
+      public bool WasLoggedBy(LoggerType loggerType)
       {
          return loggedBy.Contains (loggerType);
       }
 
-      public void SetLoggedBy(string loggerType)
+      public void SetLoggedBy(LoggerType loggerType)
       {
          loggedBy.Add (loggerType);
       }
@@ -236,5 +243,11 @@ namespace MyExtensions.Logging
          return string.Format ("[{0}]{1}{2}: {3}", TimeStamp.ToString("MM/dd/yy hh:mm:ss"),
             (level == LogLevel.Normal ? "" : "{" + level.ToString() + "}"), (HasTag ? "(" + Tag + ")" : ""), Message);
       }
+   }
+
+   public enum LoggerType
+   {
+      Console,
+      File
    }
 }

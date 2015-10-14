@@ -46,14 +46,14 @@
     <Compile Include="..\..\modules\funModule.cs">
       <Link>funModule.cs</Link>
     </Compile>
-    <Compile Include="..\..\modules\debugModule.cs">
-      <Link>debugModule.cs</Link>
-    </Compile>
     <Compile Include="..\..\modules\adminModule.cs">
       <Link>adminModule.cs</Link>
     </Compile>
     <Compile Include="..\..\modules\statisticsModule.cs">
       <Link>statisticsModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\modules\VoteModule.cs">
+      <Link>VoteModule.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

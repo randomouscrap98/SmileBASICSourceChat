@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 using ModuleSystem;
 using ChatEssentials;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.ComponentModel;
 
 [assembly: AssemblyVersion("1.0")]
 [assembly: AssemblyFileVersion("1.0")]
@@ -21,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "0.8.0.0";
+      public const string Version = "1.0.0";
 
       private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -29,6 +31,9 @@ namespace ChatServer
       private static ModuleLoader loader;
       private static ChatManager manager = null;
       private static MyExtensions.Options options = new MyExtensions.Options();
+
+      private static bool ShouldDie = false;
+      private static readonly Object Lock = new Object();
 
       public const string ConfigFile = "config.json";
       public const string ModuleConfigFile = "moduleConfig.json";
@@ -38,6 +43,11 @@ namespace ChatServer
       public static List<ModuleSystem.Module> ActiveModules
       {
          get { return loader.ActiveModules; }
+      }
+
+      public static ChatManager Manager
+      {
+         get { return manager; }
       }
 
       public static BandwidthContainer Bandwidth
@@ -51,6 +61,109 @@ namespace ChatServer
          }
       }
 
+      //This will reinitialize (hopefully) the websocket server.
+      private static void SetupWebsocket()
+      {
+         //Now, set up websocket server
+         webSocketServer = new WebSocketServer(GetOption<int>("chatServerPort"), true);
+         webSocketServer.AddWebSocketService<Chat>("/chat", () => new Chat(GetOption<int>("userUpdateInterval"), manager) {
+            Protocol = "chat",
+            IgnoreExtensions = true,
+         });
+
+         webSocketServer.SslConfiguration.ClientCertificateRequired = false;
+         webSocketServer.SslConfiguration.CheckCertificateRevocation = false;
+         webSocketServer.SslConfiguration.ServerCertificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(GetOption<string>("sslCertificate"));//"/etc/nginx/ssl/bundle.crt");
+
+         webSocketServer.WaitTime = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
+         webSocketServer.Start();
+
+         //If chat server is running, show services
+         if (webSocketServer.IsListening)
+         {
+            logger.Log("Chat Server listening on port " + webSocketServer.Port + " with services:", LogTag);
+
+            foreach (var path in webSocketServer.WebSocketServices.Paths)
+               logger.Log("- " + path, LogTag);
+         }
+      }
+
+      private static void SetupChatManager()
+      {
+         //Set up languages
+         LanguageTags languageTags = new LanguageTags(logger);
+
+         if(!languageTags.InitFromURL(GetOption<string>("website") + GetOption<string>("languageURL")))
+            logger.Warning("Couldn't load language tags! Hopefully the default will suffice");
+
+         //Set up the chat manager (the program that provides data to each chat instance)
+         manager = new ChatManager(loader, authServer, languageTags,
+            GetOption<int>("messageBacklog"), GetOption<int>("messageSend"),
+            GetOption<int>("saveInterval"), GetOption<int>("moduleWaitSeconds"),
+            GetOption<string>("acceptedTags"), GetOption<string>("globalTag"),
+            GetOption<string>("saveFolder"), logger);
+
+         //manager.Request += PerformRequest;
+      }
+
+      //Delay a request so the control can return to the caller. Eventually we'll get back to this and do the real request.
+      private static void DelayedRequest(SystemRequest request)
+      {
+         if (request.Request == SystemRequests.Reset)
+         {
+            logger.Log("Attempting to uncleanly quit the server");
+            ShouldDie = true;
+         }
+         else if (request.Request == SystemRequests.LockDeath)
+         {
+            logger.Log("Attempting to simulate lock death");
+            manager.Lockup();
+         }
+         else
+         {
+            logger.Warning("Got an unknown system request: " + request.Request.ToString());
+         }
+      }
+
+      //So when the chat manager gets some request, it'll call this thing. We know what to do with it (probably)
+      public static void PerformRequest(SystemRequest request)
+      {
+         BackgroundWorker worker = new BackgroundWorker();
+         worker.DoWork += (object sender, DoWorkEventArgs e) => { Thread.Sleep((int)request.Timeout.TotalMilliseconds); };
+         worker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => { DelayedRequest(request); };
+         worker.RunWorkerAsync();
+      }
+
+//      private static void ResetEssentials()
+//      {
+//         //First
+//         webSocketServer = null;
+//         manager = null;
+//
+//         System.GC.Collect();
+//
+//         bool success = false;
+//
+//         while (!success)
+//         {
+//            try
+//            {
+//               SetupWebsocket();
+//               success = true;
+//            }
+//            catch
+//            {
+//               success = false;
+//               logger.Warning("Couldn't restart chat server. This indicate a problem!");
+//               System.Threading.Thread.Sleep(3000);
+//               System.GC.Collect();
+//            }
+//         }
+//         SetupChatManager();
+//
+//         logger.Log("The websocket server and chat manager have been reset.");
+//      }
+
       public static void Main()
       {
          bool restart = false;
@@ -58,7 +171,7 @@ namespace ChatServer
          do
          {
             Dictionary<string, object> defaultOptions = new Dictionary<string, object> {
-               { "loggerBacklog", 100 },
+               { "loggerBacklog", 1000 },
                { "loggerFileDumpInterval", 10 },
                { "loggerFile", "log.txt" },
                { "authServerPort", 45696 },
@@ -80,7 +193,10 @@ namespace ChatServer
                { "fakeAuthentication", false },
                { "consoleLogLevel", "Normal" },
                { "fileLogLevel", "Debug" },
-               { "languageURL", "/languages/chatserver.json" }
+               { "languageURL", "/languages/chatserver.json" },
+               { "automaticBlocking", true },
+               { "crashDetectionTimeout", 10 },
+               { "sslCertificate", "chatcert.p12" }
             };
 
             //Set up and read options. We need to do this first so that the values can be used for init
@@ -121,7 +237,7 @@ namespace ChatServer
 
             //Set up the module system
             loader = new ModuleLoader(logger);
-            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule) };
+            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule), typeof(DebugModule) };
 
             //Oops, couldn't load the modules. What the heck?
             if (!loader.Setup(ModuleConfigFile, extraModules))
@@ -149,42 +265,13 @@ namespace ChatServer
                logger.Log("Authorization server running on port " + authServer.Port, LogTag);
             }
 
-            //Set up languages
-            LanguageTags languageTags = new LanguageTags(logger);
-
-            if(!languageTags.InitFromURL(GetOption<string>("website") + GetOption<string>("languageURL")))
-               logger.Warning("Couldn't load language tags! Hopefully the default will suffice");
-
-            //Set up the chat manager (the program that provides data to each chat instance)
-            manager = new ChatManager(loader, authServer, languageTags,
-               GetOption<int>("messageBacklog"), GetOption<int>("messageSend"),
-               GetOption<int>("saveInterval"), GetOption<int>("moduleWaitSeconds"),
-               GetOption<string>("acceptedTags"), GetOption<string>("globalTag"),
-               GetOption<string>("saveFolder"), logger);
+            SetupChatManager();
 
             //Also set user parameters
-            User.SetUserParameters(GetOption<int>("spamBlockSeconds"),
-               GetOption<int>("inactiveMinutes"),
-               GetOption<string>("website"));
+            User.SetUserParameters(GetOption<int>("spamBlockSeconds"), GetOption<int>("inactiveMinutes"),
+               GetOption<string>("website"), GetOption<bool>("automaticBlocking"));
          
-            //Now, set up websocket server
-            webSocketServer = new WebSocketServer(GetOption<int>("chatServerPort"));
-            webSocketServer.AddWebSocketService<Chat>("/chat", () => new Chat(GetOption<int>("userUpdateInterval"), manager) {
-               Protocol = "chat",
-               IgnoreExtensions = true,
-            });
-
-            webSocketServer.WaitTime = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
-            webSocketServer.Start();
-
-            //If chat server is running, show services
-            if (webSocketServer.IsListening)
-            {
-               logger.Log("Chat Server listening on port " + webSocketServer.Port + " with services:", LogTag);
-
-               foreach (var path in webSocketServer.WebSocketServices.Paths)
-                  logger.Log("- " + path, LogTag);
-            }
+            SetupWebsocket();
 
             int ShutdownSeconds = GetOption<int>("shutdownSeconds");
             Console.WriteLine(">> Press Q to nicely quit the server...");
@@ -192,6 +279,13 @@ namespace ChatServer
             Console.WriteLine(">> Press X to forcibly stop the server...");
 
             restart = false;
+
+            //CrashTimeoutSeconds = GetOption<int>("crashDetectionTimeout");
+
+            //Just before we start, we should ummmm set up the "please try again" timer for the stupid library
+            System.Timers.Timer timer = new System.Timers.Timer(10000);
+            timer.Elapsed += CheckServer;
+            timer.Start();
 
             //Now enter the "server loop" and run forever?
             while (true)
@@ -219,6 +313,17 @@ namespace ChatServer
                      break;
                   }
                }
+
+               //hmm, someone wants us to die. OK then
+               if(ShouldDie)
+               {
+                  manager.SaveData();
+                  logger.Log("Dying...");
+                  logger.DumpToFile();
+                  System.Environment.Exit(99);
+                  return;
+               }
+
                Thread.Sleep(AuthServer.ThreadSleepMilliseconds);
             }
                
@@ -228,6 +333,38 @@ namespace ChatServer
             }
 
          } while(restart);
+
+         System.Environment.Exit(0);
+      }
+
+      private static void CheckServer(object sender, System.Timers.ElapsedEventArgs e)
+      {
+         if (Monitor.TryEnter(Lock))
+         {
+            try
+            {
+               if(Monitor.TryEnter(manager.managerLock, GetOption<int>("crashDetectionTimeout") * 1000))
+               {
+                  logger.LogGeneral("Chat server seems OK", MyExtensions.Logging.LogLevel.SuperDebug);
+                  Monitor.Exit(manager.managerLock);
+               }
+               else
+               {
+                  //OK here we need to wreck some stuff
+                  logger.Warning("The chat server appears unresponsive. Attempting reset now.");
+                  ShouldDie = true;
+                  //ResetEssentials();
+               }
+            }
+            finally
+            {
+               Monitor.Exit(Lock);
+            }
+         }
+         else
+         {
+            logger.Warning("Couldn't check the status of the server. Maybe it's broken?");
+         }
       }
 
       private static T GetOption<T>(string optionTag)

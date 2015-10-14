@@ -17,7 +17,6 @@ namespace WikiaChatLogger
 {
 	public class CollectGameModule : Module
 	{
-
 		//This manages all the various transactions and trades that can occur
 		private CollectionOffer offer = new CollectionOffer(CollectionManager.OfferTimeout);
 
@@ -40,7 +39,7 @@ namespace WikiaChatLogger
             { "jealousyHours", 24 },
             { "jealousyCoins", 1000 },
             { "hugSayings", "How nice!, You smile a bit!, You wonder why., How eccentric!, How lovely!, " +
-               "You're pretty happy about it! Your HP was restored by 10 points!, You became confused!, " +
+               "You're pretty happy about it!, Your HP was restored by 10 points!, You became confused!, " +
                "Your defense fell!, Your spirits rose!, Maybe the world isn't so bad after all., " +
                "You cry a little., You cry a little inside., You burst into tears on their shoulder!, " +
                "You're a little uncomfortable., You want to return the favor., Your stress ebbs away., " +
@@ -57,9 +56,9 @@ namespace WikiaChatLogger
 
          CommandArgument price = new CommandArgument("price", ArgumentType.Integer);
          CommandArgument count = new CommandArgument("count", ArgumentType.Integer);
-         CommandArgument multiplier = new CommandArgument("multiplier", ArgumentType.Custom, @"[xX]?[0-9]+");
-         CommandArgument item = new CommandArgument("item", ArgumentType.Custom, @"[a-zA-Z][0-9]");
-         CommandArgument itemList = new CommandArgument("itemList", ArgumentType.Custom, @"(?:[a-zA-Z][0-9]\s*)+");
+         CommandArgument multiplier = new CommandArgument("multiplier", ArgumentType.Custom, RepeatType.One, @"[xX]?[0-9]+");
+         CommandArgument item = new CommandArgument("item", ArgumentType.Custom, RepeatType.One, @"[a-zA-Z][0-9]");
+         CommandArgument itemList = new CommandArgument("itemList", ArgumentType.Custom, RepeatType.One, @"(?:[a-zA-Z][0-9]\s*)+");
          CommandArgument player = new CommandArgument("player", ArgumentType.User);
 
          commands.AddRange(new List<ModuleCommand> {
@@ -1156,7 +1155,8 @@ namespace WikiaChatLogger
                   usersToInform.Add(steal.Value);
                }
 
-               collectors[myUID].JealousyPerformed(gonnaSteal.Count);
+               double multiplier = 0.5 + 1.5 * collectors.ToList().OrderBy(x => x.Value.Score()).Select(x => x.Key).ToList().IndexOf(myUID) / (double)collectors.Count;
+               collectors[myUID].JealousyPerformed(gonnaSteal.Count, multiplier);
 
                foreach(int userID in usersToInform)
                {
@@ -1176,10 +1176,6 @@ namespace WikiaChatLogger
                   " from unsuspecting users. 8(>_<)8";
                mainOutput.broadcast = true;
                outputs.Add(mainOutput);
-
-//               ModuleJSONObject coinMessage = new ModuleJSONObject();
-//               coinMessage.message = "You also got " + getCoins + " coins.";
-//               outputs.Add(coinMessage);
 
                return outputs;
             }
@@ -1942,7 +1938,7 @@ namespace WikiaChatLogger
       //Extra stuff to keep track of
       private int loveGiven = 0;
       private int loveItemsGiven = 0;
-      private int loveRecieved = 0;
+      private int loveReceived = 0;
       private int loveItemsReceived = 0;
       private int jealousyCount = 0;
       private int jealousyTaken = 0;
@@ -2006,7 +2002,7 @@ namespace WikiaChatLogger
 
       public void GotLoved(int itemCount)
       {
-         loveRecieved++;
+         loveReceived++;
          loveItemsReceived += itemCount;
       }
 
@@ -2016,24 +2012,14 @@ namespace WikiaChatLogger
          loveItemsGiven += itemCount;
       }
 
-      public void JealousyPerformed(int itemCount)
+      public void JealousyPerformed(int itemCount, double multiplier)
       {
          huggers = new HashSet<int>();
          //lastJealousy = DateTime.Now;
-         jealousUntil = DateTime.Now.AddHours(itemCount / 10.0 + journal.CompletionCount() / 10.0);
+         jealousUntil = DateTime.Now.AddHours(multiplier * (itemCount / 10.0 + journal.CompletionCount() / 10.0));
          jealousyTaken += itemCount;
          jealousyCount++;
       }
-
-//      public void ReduceJealousy(TimeSpan time)
-//      {
-//         lastJealousy = lastJealousy.Add(-time);
-//      }
-
-//      public DateTime LastJealousy
-//      {
-//         get { return lastJealousy; }
-//      }
 
       public void GaveHug()
       {
@@ -2213,9 +2199,9 @@ namespace WikiaChatLogger
       {
          return "Your permanent stats for the collection game: \n\n Total Coins Collected: " + TotalCoins +
          "\n Total Items Collected: " + ForeverJournal.TotalObtained() + "\n" +
-         "Love given: " + loveGiven + " times (" + loveItemsGiven + " items)\n" +
-         "Love received: " + loveRecieved + " times (" + loveItemsReceived + " items)\n" +
-         "Jealousy used: " + jealousyCount + " times (" + jealousyTaken + " items taken)\n" +
+            "Love given: " + loveGiven + " time".Pluralify(loveGiven) + " (" + loveItemsGiven + " items)\n" +
+            "Love received: " + loveReceived + " time".Pluralify(loveReceived) + " (" + loveItemsReceived + " items)\n" +
+            "Jealousy used: " + jealousyCount + " time".Pluralify(jealousyCount) + " (" + jealousyTaken + " items taken)\n" +
          "Hugs given: " + hugsGiven + "\nHugs received: " + hugsReceived;
       }
 

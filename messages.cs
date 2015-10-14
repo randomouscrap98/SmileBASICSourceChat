@@ -95,12 +95,28 @@ namespace ChatEssentials
    public class RoomJSONObject
    {
       public readonly string name = "";
-      public readonly List<int> users = new List<int>();
+      public readonly List<RoomUserJSONObject> users = new List<RoomUserJSONObject>();
 
-      public RoomJSONObject(PMRoom room)
+      public RoomJSONObject(PMRoom room, Dictionary<int, User> users)
       {
          name = room.Name;
-         users = room.Users.ToList();
+         this.users = room.Users.ToList().Select(x => new RoomUserJSONObject(users[x])).ToList();
+      }
+   }
+
+   public class RoomUserJSONObject
+   {
+      public readonly string username = "";
+      public readonly string avatar = "";
+      public readonly int uid = 0;
+      public readonly bool active = false;
+
+      public RoomUserJSONObject(User user)
+      {
+         username = user.Username;
+         avatar = user.Avatar;
+         uid = user.UID;
+         active = user.Active;
       }
    }
 
@@ -112,6 +128,31 @@ namespace ChatEssentials
       public bool broadcast = false;
       public string tag = "";
       public List<int> recipients = new List<int>();
+   }
+
+   public class SystemRequest
+   {
+      public readonly SystemRequests Request;
+      public readonly TimeSpan Timeout;
+
+      public SystemRequest(SystemRequests request) : this(request, TimeSpan.FromTicks(0)) {}
+
+      public SystemRequest(SystemRequests request, TimeSpan timeout)
+      {
+         this.Request = request;
+         this.Timeout = timeout;
+      }
+
+      public static implicit operator SystemRequest(SystemRequests request)
+      {
+         return new SystemRequest(request);
+      }
+   }
+
+   public enum SystemRequests
+   {
+      Reset,
+      LockDeath
    }
 
 

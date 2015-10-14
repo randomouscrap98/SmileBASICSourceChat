@@ -55,6 +55,9 @@
     <Compile Include="..\..\chatManager.cs">
       <Link>chatManager.cs</Link>
     </Compile>
+    <Compile Include="..\..\modules\debugModule.cs">
+      <Link>debugModule.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />

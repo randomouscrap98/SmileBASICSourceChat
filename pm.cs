@@ -67,7 +67,7 @@ namespace ChatEssentials
                Match match = Regex.Match(name, NamePrepend + @"(\d+)");
                long newID;
 
-               if (match.Success && long.TryParse(match.Groups[1].Value, out newID) && newID > nextID)
+               if (match.Success && long.TryParse(match.Groups[1].Value, out newID) && newID >= nextID)
                   nextID = newID + 1;
             }
          }

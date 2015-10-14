@@ -14,10 +14,17 @@ using ModuleSystem;
 
 namespace ChatServer
 {
+   //This is what other functions should look like when subscribing to our event
+   //public delegate void ChatEvent(SystemRequest request);
+
    //This is the manager for the chat. It includes information which all individual chat sessions
    //will probably need, and manages the saving/loading of resources.
    public class ChatManager
    {
+      //Other things can dump their crap into this event, and when I call it in here,
+      //it'll call all of them. Nifty.
+      //public event ChatEvent Request;
+
       public const int FileWaitSeconds = 10;
       public const int HeaderSize = 64;
       public const string LogTag = "ChatManager";
@@ -130,6 +137,16 @@ namespace ChatServer
          SaveData();
       }
 
+      //Force the manager to lock itself up. Warning: this really does lock the server up!
+      public void Lockup()
+      {
+         lock (managerLock)
+         {
+            //Now sit here for a while and think about what you've done!
+            Thread.Sleep(100000);   //Just 100 seconds; not too bad.
+         }
+      }
+
       private void Log(string message, MyExtensions.Logging.LogLevel level = MyExtensions.Logging.LogLevel.Normal)
       {
          Logger.LogGeneral(message, level, LogTag);
@@ -143,7 +160,7 @@ namespace ChatServer
       }
 
       //Forces file save for all pertinent manager data
-      private void SaveData()
+      public void SaveData()
       {
          if (Monitor.TryEnter(fileLock, TimeSpan.FromSeconds(FileWaitSeconds)))
          {
@@ -169,14 +186,25 @@ namespace ChatServer
                   Log("Exit user lock", MyExtensions.Logging.LogLevel.Locks);
                }
 
-               lock (managerLock)
+               if(Monitor.TryEnter(managerLock, MaxModuleWaitSeconds))
                {
-                  Log("Enter manager save lock", MyExtensions.Logging.LogLevel.Locks);
-                  if (MySerialize.SaveObject<List<UserMessageJSONObject>>(SavePath(MessageFile), messages))
-                     Log("Saved messages to file", MyExtensions.Logging.LogLevel.Debug);
-                  else
-                     Log("Couldn't save messages to file!", MyExtensions.Logging.LogLevel.Error);
-                  Log("Exit manager save lock", MyExtensions.Logging.LogLevel.Locks);
+                  try
+                  {
+                     Log("Enter manager save lock", MyExtensions.Logging.LogLevel.Locks);
+                     if (MySerialize.SaveObject<List<UserMessageJSONObject>>(SavePath(MessageFile), messages))
+                        Log("Saved messages to file", MyExtensions.Logging.LogLevel.Debug);
+                     else
+                        Log("Couldn't save messages to file!", MyExtensions.Logging.LogLevel.Error);
+                     Log("Exit manager save lock", MyExtensions.Logging.LogLevel.Locks);
+                  }
+                  finally
+                  {
+                     Monitor.Exit(managerLock);
+                  }
+               }
+               else
+               {
+                  Log("Couldn't save messages because the manager is locked up!", MyExtensions.Logging.LogLevel.Error);
                }
 
                //Save all module data
@@ -270,10 +298,14 @@ namespace ChatServer
 
       public List<string> AllAcceptedTagsForUser(int user)
       {
+         List<string> allTags = new List<string>();
          lock (managerLock)
          {
-            return AllAcceptedTags.Union(rooms.Where(x => x.Value.Users.Contains(user)).Select(x => x.Key)).ToList();
+            Log("Enter allacceptedtagsforuser lock", MyExtensions.Logging.LogLevel.Locks);
+            allTags = AllAcceptedTags.Union(rooms.Where(x => x.Value.Users.Contains(user)).Select(x => x.Key)).ToList();
+            Log("Exit allacceptedtagsforuser lock", MyExtensions.Logging.LogLevel.Locks);
          }
+         return allTags;
       }
 
       public bool ValidTagForUser(int user, string tag)
@@ -281,29 +313,32 @@ namespace ChatServer
          return AllAcceptedTagsForUser(user).Contains(tag);
       }
 
-      public bool CreatePMRoom(HashSet<int> users, int creator, out string error)
+      public bool CreatePMRoom(HashSet<int> newUsers, int creator, out string error)
       {
          error = "";
-         bool result = true;
+         bool result = false;
 
          lock(managerLock)
          {
             Log("Enter createpmroom lock", MyExtensions.Logging.LogLevel.Locks);
 
-            if (users.Count < 2)
+            if (newUsers.Count < 2)
             {
                error = "There's not enough people to make the room";
-               result = false;
             }
-            else if (rooms.Any(x => x.Value.Users.SetEquals(users)))
+            else if (rooms.Any(x => x.Value.Users.SetEquals(newUsers)))
             {
                error = "There's already a room with this exact set of people!";
-               result = false;
+            }
+            else if (!newUsers.All(x => users.ContainsKey(x)))
+            {
+               error = "One or more of the given users doesn't exist!";
             }
             else
             {
-               PMRoom newRoom = new PMRoom(users, creator, TimeSpan.FromHours(1));
+               PMRoom newRoom = new PMRoom(newUsers, creator, TimeSpan.FromMinutes(10));
                rooms.Add(newRoom.Name, newRoom);
+               result = true;
             }
 
             Log("Exit createpmroom lock", MyExtensions.Logging.LogLevel.Locks);
@@ -383,17 +418,35 @@ namespace ChatServer
       /// <param name="chatSession">Current Chat Session</param>
       public void LeaveChat(Chat chatSession)
       {
-         //string userList = ChatUserList();
-         lock (managerLock)
+         if (Monitor.TryEnter(managerLock, MaxModuleWaitSeconds))
          {
-            Log("Enter leavechat lock", MyExtensions.Logging.LogLevel.Locks);
-            activeChatters.Remove(chatSession);
-            authServer.UpdateUserList(activeChatters.Select(x => x.UID).ToList());
-            //Broadcast(userList);
-            Log("Exit leavechat lock", MyExtensions.Logging.LogLevel.Locks);
-         }
+            try
+            {
+               Log("Enter leavechat lock", MyExtensions.Logging.LogLevel.Locks);
+               activeChatters.Remove(chatSession);
+               authServer.UpdateUserList(activeChatters.Select(x => x.UID).ToList());
 
-         BroadcastUserList();
+               //Only perform special leaving messages and processing if the user was real
+               if (users.ContainsKey(chatSession.UID))
+               {
+                  if (!users[chatSession.UID].PerformOnChatLeave())
+                     Logger.Warning("User session timer was in an invalid state!");
+
+                  if (users[chatSession.UID].ShowMessages)
+                     Broadcast(new LanguageTagParameters(ChatTags.Leave, users[chatSession.UID]), new SystemMessageJSONObject());
+               }
+               BroadcastUserList();
+               Log("Exit leavechat lock", MyExtensions.Logging.LogLevel.Locks);
+            }
+            finally
+            {
+               Monitor.Exit(managerLock);
+            }
+         }
+         else
+         {
+            Log("Session " + chatSession.UID + " could not leave properly! Data may be inconsistent!", MyExtensions.Logging.LogLevel.Error);
+         }
       }
 
       public ChatTags AddMessage(UserMessageJSONObject message)
@@ -435,18 +488,22 @@ namespace ChatServer
 
       public void SendMessage(ModuleJSONObject message)
       {
+         List<Chat> recipients = new List<Chat>();
          lock (managerLock)
          {
             Log("Enter sendmessage lock", MyExtensions.Logging.LogLevel.Locks);
             foreach (int user in message.recipients.Distinct())
             {
                if (activeChatters.Any(x => x.UID == user))
-                  activeChatters.First(x => x.UID == user).MySend(message.ToString());
+                  recipients.Add(activeChatters.First(x => x.UID == user));
                else
                   Logger.LogGeneral("Recipient " + user + " in module message was not found", MyExtensions.Logging.LogLevel.Warning);
             }
             Log("Leave sendmessage lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         foreach(Chat recipient in recipients)
+            recipient.MySend(message.ToString());
       }
          
       /// <summary>
@@ -491,6 +548,16 @@ namespace ChatServer
          return returns;
       }
 
+      //When you get some kind of request, it goes through here. Then we call all the events that subscribed to us
+//      public void OnRequest(SystemRequest request)
+//      {
+//         if (Request != null)
+//         {
+//            //This calls all our subscribed events. They'll probably know what to do with this request.
+//            Request(request);
+//         }
+//      }
+
       //Get a JSON string representing a list of users currently in chat. Do NOT call this while locking on userLock
       public string ChatUserList(int caller)
       {
@@ -503,7 +570,7 @@ namespace ChatServer
 
             //Now we can finally do the user thing
             userList.users = LoggedInUsers().Select(x => new UserJSONObject(x.Value)).ToList();
-            userList.rooms = rooms.Where(x => x.Value.Users.Contains(caller)).Select(x => new RoomJSONObject(x.Value)).ToList();
+            userList.rooms = rooms.Where(x => x.Value.Users.Contains(caller)).Select(x => new RoomJSONObject(x.Value, users)).ToList();
          }
          return userList.ToString();
       }
@@ -518,11 +585,11 @@ namespace ChatServer
          {
             Log("Enter chatmessagelist lock", MyExtensions.Logging.LogLevel.Locks);
             //Messages are all readonly, so it's OK to have just references
-            visibleMessages = messages.Where(x => x.Display).ToList();
+            visibleMessages = messages.Where(x => x.Display && (DateTime.Now - x.PostTime()).TotalDays < 1.0).ToList();
             Log("Exit chatmessagelist lock", MyExtensions.Logging.LogLevel.Locks);
          }
 
-         foreach (string tag in AllAcceptedTagsForUser(user).Where(x => x != GlobalTag))
+         foreach (string tag in AllAcceptedTagsForUser(user))
          {
             List<UserMessageJSONObject> tagMessages = visibleMessages.Where(x => x.tag == tag).ToList();
             for (int i = 0; i < Math.Min(MaxMessageSend, tagMessages.Count); i++)
@@ -543,13 +610,41 @@ namespace ChatServer
          if (exclude == null)
             exclude = new List<Chat>();
 
+         List<Chat> receivers = new List<Chat>();
          lock (managerLock)
          {
             Log("Enter broadcast lock", MyExtensions.Logging.LogLevel.Locks);
-            foreach (Chat chatter in activeChatters.Except(exclude))
-               chatter.MySend(message);
+            receivers = activeChatters.Except(exclude).ToList();
             Log("Exit broadcast lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         Log("Just before broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+         foreach (Chat chatter in receivers)
+            chatter.MySend(message);
+         Log("Just after broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
+      }
+
+      public void SelectiveBroadcast(string message, string tag, List<Chat> exclude = null)
+      {
+         if (string.IsNullOrEmpty(message))
+            return;
+
+         if (exclude == null)
+            exclude = new List<Chat>();
+
+         List<Chat> receivers = new List<Chat>();
+         lock (managerLock)
+         {
+            Log("Enter selective broadcast lock", MyExtensions.Logging.LogLevel.Locks);
+            receivers = activeChatters.Except(exclude).ToList();
+            receivers = receivers.Where(x => AllAcceptedTagsForUser(x.UID).Contains(tag)).ToList();
+            Log("Exit selective broadcast lock", MyExtensions.Logging.LogLevel.Locks);
+         }
+
+         Log("Just before broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+         foreach (Chat chatter in receivers)
+            chatter.MySend(message);
+         Log("Just after broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
       }
 
       public void Broadcast(LanguageTagParameters parameters, JSONObject container, List<Chat> exclude = null)
@@ -557,16 +652,21 @@ namespace ChatServer
          if (exclude == null)
             exclude = new List<Chat>();
 
+         List<Chat> receivers = new List<Chat>();
          lock (managerLock)
          {
             Log("Enter broadcast tag lock", MyExtensions.Logging.LogLevel.Locks);
-            foreach (Chat chatter in activeChatters.Except(exclude))
-            {
-               parameters.UpdateUser(chatter.ThisUser);  //Update the message to reflect user preferences
-               chatter.MySend(parameters, container);    //Send a tag message by filling the container with the tag parameters
-            }
+            receivers = activeChatters.Except(exclude).ToList();
             Log("Exit broadcast tag lock", MyExtensions.Logging.LogLevel.Locks);
          }
+
+         Log("Just before tag broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+         foreach (Chat chatter in receivers)
+         {
+            parameters.UpdateUser(chatter.ThisUser);  //Update the message to reflect user preferences
+            chatter.MySend(parameters, container);    //Send a tag message by filling the container with the tag parameters
+         }
+         Log("Just after tag broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
       }
 
       public string ConvertTag(LanguageTagParameters parameters)
@@ -576,22 +676,34 @@ namespace ChatServer
 
       public void BroadcastUserList()
       {
+         List<Chat> receivers = new List<Chat>();
          lock (managerLock)
          {
-            foreach (Chat chatter in activeChatters)
-               chatter.MySend(ChatUserList(chatter.UID));
+            Log("Enter broadcast userlist lock", MyExtensions.Logging.LogLevel.Locks);
+            receivers = activeChatters.ToList();
+            Log("Exit broadcast userlist lock", MyExtensions.Logging.LogLevel.Locks);
          }
-         //Broadcast(ChatUserList());
+            
+         Log("Just before userlist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+         foreach (Chat chatter in receivers)
+            chatter.MySend(ChatUserList(chatter.UID));
+         Log("Just after userlist broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
       }
 
       public void BroadcastMessageList()
       {
+         List<Chat> receivers = new List<Chat>();
          lock (managerLock)
          {
-            foreach (Chat chatter in activeChatters)
-               chatter.MySend(ChatMessageList(chatter.UID));
+            Log("Enter broadcast messagelist lock", MyExtensions.Logging.LogLevel.Locks);
+            receivers = activeChatters.ToList();
+            Log("Exit broadcast messagelist lock", MyExtensions.Logging.LogLevel.Locks);
          }
-         //Broadcast(ChatMessageList());
+            
+         Log("Just before messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+         foreach (Chat chatter in receivers)
+            chatter.MySend(ChatMessageList(chatter.UID));
+         Log("Just after messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
       }
 
       public bool CheckKey(int uid, string key)

@@ -232,6 +232,7 @@ namespace ModulePackage1
          message += "Total users you've seen: " + myStats.UniqueUsersSeen + "\n";
          message += "Total chat time: " + StringExtensions.LargestTime(user.TotalChatTime) + "\n";
          message += "Average session time: " + StringExtensions.LargestTime(user.AverageSessionTime) + "\n";
+         message += "Current session time: " + StringExtensions.LargestTime(user.CurrentSessionTime) + "\n";
 
          return message;
       }

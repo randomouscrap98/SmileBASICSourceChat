@@ -79,11 +79,6 @@ namespace ChatServer
          }
       }
 
-      public bool ShowMessages
-      {
-         get { return !ThisUser.Banned && !ThisUser.Blocked; }
-      }
-
       public string UserLogString
       {
          get
@@ -101,7 +96,9 @@ namespace ChatServer
 
          try
          {
+            Logger.LogGeneral("Sending message: " + message.Truncate(100), MyExtensions.Logging.LogLevel.SuperDebug);
             Send(message);
+            Logger.LogGeneral("Send success!", MyExtensions.Logging.LogLevel.SuperDebug);
          }
          catch (Exception e)
          {
@@ -161,19 +158,7 @@ namespace ChatServer
       {
          Logger.Log ("Session disconnect: " + uid);
 
-         bool authenticated = (uid > 0);
-         string username = ThisUser.Username;
-
          manager.LeaveChat(this);
-
-         if (authenticated)
-         {
-            if (!ThisUser.PerformOnChatLeave())
-               Logger.Warning("User session timer was in an invalid state!");
-
-            if(ShowMessages)
-               manager.Broadcast(QuickParams(ChatTags.Leave), new SystemMessageJSONObject());
-         }
       }
 
       protected override void OnError(ErrorEventArgs e)
@@ -258,7 +243,7 @@ namespace ChatServer
                         uid = newUser;
 
                         //BEFORE adding, broadcast the "whatever has entered the chat" message
-                        if (ShowMessages)
+                        if (ThisUser.ShowMessages)
                         {
                            manager.Broadcast(QuickParams(ChatTags.Join), new SystemMessageJSONObject(),
                               new List<Chat> { this });
@@ -348,7 +333,8 @@ namespace ChatServer
                   response.errors.Add("You are banned from chat for " +
                   StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now));
                }
-               else if (tag == "admin" && !ThisUser.CanStaffChat)
+               else if (tag == "admin" && !ThisUser.CanStaffChat ||
+                        tag == manager.GlobalTag && !ThisUser.CanGlobalChat)
                {
                   response.errors.Add("You can't post messages here. I'm sorry.");
                }
@@ -421,7 +407,7 @@ namespace ChatServer
 
                   //Since we added a new message, we need to broadcast.
                   if (response.result && userMessage.Display)
-                     manager.BroadcastMessageList();
+                     manager.BroadcastMessageList();        //CRASH ALMOST CERTAINLY HAPPENS HERE!!!!!!!###$$$$$!!!!!!!!!!*$*$*$*
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
                   foreach (Module module in manager.GetModuleListCopy())
@@ -526,7 +512,7 @@ namespace ChatServer
          foreach(JSONObject jsonMessage in outputs)
          {
             //System messages are easy: just send to user.
-            if(jsonMessage is SystemMessageJSONObject)
+            if (jsonMessage is SystemMessageJSONObject)
             {
                MySend(jsonMessage.ToString());
             }
@@ -534,17 +520,23 @@ namespace ChatServer
             {
                MySend(jsonMessage.ToString());
             }
+//            else if (jsonMessage is SystemRequest)
+//            {
+//               //System requests made by modules are passed to the manager. I don't handle that crap.
+//               manager.OnRequest((SystemRequest)jsonMessage);
+//            }
             else if (jsonMessage is ModuleJSONObject)
             {
                ModuleJSONObject tempJSON = jsonMessage as ModuleJSONObject;
                tempJSON.uid = uid;
 
-               //if(string.IsNullOrWhiteSpace(tempJSON.tag))
-               tempJSON.tag = manager.GlobalTag;
+               if(string.IsNullOrWhiteSpace(tempJSON.tag))
+                  tempJSON.tag = manager.GlobalTag;
 
                if(tempJSON.broadcast)
-               { 
-                  manager.Broadcast(tempJSON.ToString());
+               {
+                  manager.SelectiveBroadcast(tempJSON.ToString(), tempJSON.tag);
+                  //manager.Broadcast(tempJSON.ToString());
                   Logger.LogGeneral("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
                }
                else
@@ -580,6 +572,8 @@ namespace ChatServer
          UserCommand tempUserCommand = null;
          List<Module> modules = manager.GetModuleListCopy();
 
+         string realMessage = System.Net.WebUtility.HtmlDecode(message.message);
+
          //Check through all modules for possible command match
          foreach(Module module in modules)
          {
@@ -590,7 +584,7 @@ namespace ChatServer
             //Check through this module's command for possible match
             foreach(ModuleCommand command in module.Commands)
             {
-               Match match = Regex.Match(message.message, command.FullRegex, RegexOptions.Singleline);
+               Match match = Regex.Match(realMessage, command.FullRegex, RegexOptions.Singleline);
                //Match partialMatch = Regex.Match(message.message, command.CommandRegex, RegexOptions.Singleline);
 
                //This command matched, so preparse the command and get out of here.
@@ -648,7 +642,7 @@ namespace ChatServer
          if (commandModule == null && ModuleCommand.IsACommand(message.message))
          {
             //OOPS! A command was parsed but it wasn't parsed correctly. Doop
-            error = "Command not recognized. Maybe something was misspelled, or you were missing arguments";
+            error = "\"" + message.message + "\" was not recognized. Maybe something was misspelled, or you were missing arguments";
             return false;
          }
 
@@ -659,7 +653,6 @@ namespace ChatServer
       
    public class GlobalModule : Module
    {
-
       public GlobalModule()
       {
          commands.AddRange(new List<ModuleCommand> {
@@ -670,7 +663,10 @@ namespace ChatServer
             new ModuleCommand("help", new List<CommandArgument>(), "See all modules which you can get help with"),
             new ModuleCommand("help", new List<CommandArgument>() {
                new CommandArgument("module", ArgumentType.Module)
-            }, "Get help about a particular module")
+            }, "Get help about a particular module"),
+            new ModuleCommand("helpregex", new List<CommandArgument>() {
+               new CommandArgument("module", ArgumentType.Module)
+            }, "Get help about a particular module + regex")
          });
       }
 
@@ -709,24 +705,13 @@ namespace ChatServer
                }
                else
                {
-                  output.message = "Help for the " + command.Arguments[0] + " module:\n";
-
-                  Module module = ChatRunner.ActiveModules.First(x => x.Nickname == command.Arguments[0]);
-
-                  if (!string.IsNullOrWhiteSpace(module.GeneralHelp))
-                     output.message += "\n" + module.GeneralHelp + "\n";
-
-                  foreach(ModuleCommand moduleCommand in module.Commands)
-                     output.message += "\n" + moduleCommand.DisplayString;
-
-                  if(module.ArgumentHelp.Count > 0)
-                     output.message += "\n\nSome argument regex (uses standard regex syntax):";
-
-                  foreach (KeyValuePair<string, string> argHelp in module.ArgumentHelp)
-                     output.message += "\n" + argHelp.Key + " - " + argHelp.Value;
-
+                  output.message = GetModuleHelp(command.Arguments[0]);
                   outputs.Add(output);
                }
+               break;
+            case "helpregex":
+               output.message = GetModuleHelp(command.Arguments[0], true);
+               outputs.Add(output);
                break;
             case "uactest":
                output = new ModuleJSONObject();
@@ -736,6 +721,30 @@ namespace ChatServer
          }
 
          return outputs;
+      }
+
+      public string GetModuleHelp(string moduleString, bool showRegex = false)
+      {
+         string message = "Help for the " + moduleString + " module:\n";
+
+         Module module = ChatRunner.ActiveModules.First(x => x.Nickname == moduleString);
+
+         if (!string.IsNullOrWhiteSpace(module.GeneralHelp))
+            message += "\n" + module.GeneralHelp + "\n";
+
+         foreach(ModuleCommand moduleCommand in module.Commands)
+            message += "\n" + moduleCommand.DisplayString + (showRegex ? " : " + moduleCommand.FullRegex : "");
+
+         if (showRegex)
+         {
+            if (module.ArgumentHelp.Count > 0)
+               message += "\n\nSome argument regex (uses standard regex syntax):";
+
+            foreach (KeyValuePair<string, string> argHelp in module.ArgumentHelp)
+               message += "\n" + argHelp.Key + " - " + argHelp.Value;
+         }
+
+         return message;
       }
    }
 }

@@ -124,6 +124,22 @@ namespace ModuleSystem
          }
       }
 
+      public List<JSONObject> FastMessage(string message, bool warning = false)
+      {
+         if (warning)
+         {
+            WarningJSONObject output = new WarningJSONObject();
+            output.message = message;
+            return new List<JSONObject> { output };
+         }
+         else
+         {
+            ModuleJSONObject output = new ModuleJSONObject();
+            output.message = message;
+            return new List<JSONObject> { output };
+         }
+      }
+
       /// <summary>
       /// Modules can use this to add a generic error to their return from ProccessCommand.
       /// </summary>
@@ -440,38 +456,89 @@ namespace ModuleSystem
       private readonly string customRegex;
       public readonly ArgumentType Type;
       public readonly string Name;
+      public readonly RepeatType Repeat;
 
-      public CommandArgument(string name, ArgumentType type, string customRegex = "")
+      public CommandArgument(string name, ArgumentType type, RepeatType repeat = RepeatType.One, string customRegex = "")
       {
          Type = type;
          Name = name;
+         Repeat = repeat;
          this.customRegex = customRegex;
+      }
+
+      private string BaseRegex
+      {
+         get
+         {
+            string regex = "";
+
+            switch (Type)
+            {
+               case ArgumentType.User:
+                  regex = @"\??\??[0-9a-zA-Z_]+";
+                  break;
+               case ArgumentType.FullString:
+                  regex = ".*";
+                  break;
+               case ArgumentType.Word:
+                  regex = @"[^\s]+";
+                  break;
+               case ArgumentType.Integer:
+                  regex = @"[0-9]+";
+                  break;
+               case ArgumentType.Module:
+                  regex = @"[^\s]+";
+                  break;
+               case ArgumentType.Keyword:
+                  regex = Name;
+                  break;
+               case ArgumentType.Custom:
+                  regex = customRegex;
+                  break;
+               default:
+                  return "";
+            }
+
+            return regex;
+         }
       }
 
       public string Regex
       {
          get
          {
-            switch (Type)
-            {
-               case ArgumentType.User:
-                  return @"\??\??[0-9a-zA-Z_]+";
-               case ArgumentType.FullString:
-                  return ".*";
-               case ArgumentType.Word:
-                  return @"[^\s]+";
-               case ArgumentType.Integer:
-                  return @"[0-9]+";
-               case ArgumentType.Module:
-                  return @"[^\s]+";
-               case ArgumentType.Keyword:
-                  return Name;
-               case ArgumentType.Custom:
-                  return customRegex;
-               default:
-                  return "";
-            }
+            string repeatCharacter = RepeatCharacter(Repeat);
+
+            if (!string.IsNullOrWhiteSpace(repeatCharacter))
+               return @"(?:" + BaseRegex + @"\s*)" + repeatCharacter;
+            else
+               return BaseRegex;
          }
+      }
+
+      public string GroupCaptureRegex
+      {
+         get
+         {
+            string repeatCharacter = RepeatCharacter(Repeat);
+
+            if (!string.IsNullOrWhiteSpace(repeatCharacter))
+               return @"(" + BaseRegex + @"\s*)" + repeatCharacter;
+            else
+               return BaseRegex;
+         }
+      }
+
+      public static string RepeatCharacter(RepeatType repeat)
+      {
+         if (repeat == RepeatType.OneOrMore)
+            return "+";
+         else if (repeat == RepeatType.ZeroOrMore)
+            return "*";
+         else if (repeat == RepeatType.ZeroOrOne)
+            return "?";
+         else
+            return "";
       }
    }
 
@@ -484,6 +551,14 @@ namespace ModuleSystem
       Module,
       Keyword,
       Custom
+   }
+
+   public enum RepeatType
+   {
+      ZeroOrOne,
+      One,
+      OneOrMore,
+      ZeroOrMore
    }
 
    public class ModuleCommand
@@ -516,6 +591,13 @@ namespace ModuleSystem
                   display += " " + argument.Name;
                else
                   display += " [" + (argument.Type == ArgumentType.User ? "?" : "") + argument.Name + "]";
+
+               if (argument.Repeat == RepeatType.ZeroOrOne)
+                  display += "(optional)";
+               else if (argument.Repeat == RepeatType.OneOrMore)
+                  display += "(repeat)";
+               else if (argument.Repeat == RepeatType.ZeroOrMore)
+                  display += "(optional,repeat)";
             }
 
             display += " => " + Description;
@@ -529,21 +611,14 @@ namespace ModuleSystem
          return Regex.IsMatch(message, @"^\s*" + CommandStart + @"\S");
       }
 
-//      public string CommandRegex
-//      {
-//         get
-//         {
-//            return @"^\s*" + CommandStart + "(" + Command + @")";
-//         }
-//      }
-
       //Return the regex that will be able to parse this command
       public string FullRegex
       {
          get
          {
             return @"^\s*" + CommandStart + "(" + Command + @")" + 
-               string.Join("", Arguments.Select(x => @"\s+(" + x.Regex + ")")) + @"\s*$";
+               string.Join("", Arguments.Select(x => 
+                  ((x.Repeat == RepeatType.ZeroOrOne && Arguments.Last() == x) ? @"\s*(" : @"\s+(") + x.Regex + ")")) + @"\s*$";
          }
       }
    }
@@ -552,6 +627,7 @@ namespace ModuleSystem
    {
       public readonly string Command;
       public readonly List<string> Arguments;
+      public readonly List<List<string>> ArgumentParts;
       public readonly List<string> OriginalArguments;
       public readonly ModuleCommand MatchedCommand;
 
@@ -561,6 +637,18 @@ namespace ModuleSystem
          Arguments = parts;
          OriginalArguments = new List<string>(parts);
          MatchedCommand = matched;
+
+         ArgumentParts = new List<List<string>>();
+
+         for (int i = 0; i < matched.Arguments.Count; i++)
+         {
+            List<string> argParts = new List<string>();
+
+            foreach(Capture capture in Regex.Match(parts[i], matched.Arguments[i].GroupCaptureRegex).Groups[1].Captures)
+               argParts.Add(capture.Value.Trim());
+
+            ArgumentParts.Add(argParts);
+         }
       }
 
       public UserCommand(UserCommand copy) : base(copy)
@@ -570,6 +658,11 @@ namespace ModuleSystem
             Command = copy.Command;
             Arguments = new List<string>(copy.Arguments);
             OriginalArguments = new List<string>(copy.OriginalArguments);
+            ArgumentParts = new List<List<string>>();
+
+            foreach (List<string> parts in copy.ArgumentParts)
+               ArgumentParts.Add(new List<string>(parts));
+            
             MatchedCommand = copy.MatchedCommand;
          }
       }

@@ -9,6 +9,9 @@ namespace MyExtensions
 {
 	public static class StringExtensions
 	{
+      public const int SafeStringSize = 300;
+      public const double DefaultSubstringWeight = 0.8;
+
 		// Taken from: http://stackoverflow.com/questions/13793560/find-closest-match-to-input-string-in-a-list-of-strings
 		// This code is an implementation of the pseudocode from the Wikipedia,
 		// showing a naive implementation.
@@ -51,8 +54,20 @@ namespace MyExtensions
 		}
 
       //Returns a normalized number between 0 and 1 representing the difference. 0 means strings are the same
-      public static double StringDifference(string s1, string s2)
+      public static double StringDifference(string s1, string s2, double substringWeight = DefaultSubstringWeight)
       {
+         return StringDifference_Unsafe(s1.Truncate(SafeStringSize), s2.Truncate(SafeStringSize), substringWeight);
+      }
+
+      //Returns a normalized number between 0 and 1 representing the difference. 0 means strings are the same.
+      //WARNING: DO NOT CALL WITH OVERLY LARGE STRINGS!
+      public static double StringDifference_Unsafe(string s1, string s2, double substringWeight = DefaultSubstringWeight)
+      {
+         if (substringWeight > 1)
+            substringWeight = 1;
+         else if (substringWeight < 0)
+            substringWeight = 0;
+         
          //Go through all the subsets matching the shorter string to the longer string and get the min distance.
          string longer = s1;
          string shorter = s2;
@@ -63,7 +78,7 @@ namespace MyExtensions
             shorter = s1;
          }
 
-         int minLength = int.MaxValue;
+         int minLength = shorter.Length;
 
          for (int i = 0; i <= longer.Length - shorter.Length; i++)
          {
@@ -73,7 +88,7 @@ namespace MyExtensions
                minLength = subLength;
          }
 
-         return 0.95 * ((double)minLength / shorter.Length) + 0.05 * ((double)LevenshteinDistance(s1, s2) / longer.Length);
+         return substringWeight * ((double)minLength / (shorter.Length < 1 ? 1 : shorter.Length)) + (1 - substringWeight) * ((double)LevenshteinDistance(s1, s2) / (longer.Length < 1 ? 1 : longer.Length));
 
          //return (double)LevenshteinDistance(s1, s2) / Math.Max(s1.Length, s2.Length);
       }
@@ -192,6 +207,11 @@ namespace MyExtensions
 			if (string.IsNullOrEmpty(value)) return value;
 			return value.Length <= maxLength ? value : value.Substring(0, maxLength);
 		}
+
+      public static string ShortDecimal(double data, int decimalPlaces = 2)
+      {
+         return string.Format("{0:0." + new string('0', decimalPlaces) + "}", data);
+      }
 
 		public static string ReplaceBadWords(string data, string[] badWords, out int badWordCount)
 		{
@@ -348,7 +368,12 @@ namespace MyExtensions
 			return Regex.Replace(baseString, @"<\s*a\s+href\s*\=s*""([^""]*)""\s*>[^<]*<\s*/a\s*>", "$1");
 		}
 
-		public static string AutoCorrectionMatch(string substring, List<string> possibilities)
+      public static string AutoCorrectionMatch(string substring, List<string> possibilities)
+      {
+         return AutoCorrectionMatch_Unsafe(substring.Truncate(SafeStringSize), possibilities.Select(x => x.Truncate(SafeStringSize)).ToList());
+      }
+
+		public static string AutoCorrectionMatch_Unsafe(string substring, List<string> possibilities)
 		{
 			if (possibilities.Count == 0)
 				return "";
@@ -357,7 +382,8 @@ namespace MyExtensions
 			if (subStringMatch != null && subStringMatch.Count == 1)
 				return subStringMatch[0];	//There is only one string which starts with our substring. This is the best match in human terms
 			else
-				return possibilities.OrderBy(x => (double)StringExtensions.DamerauLevenshteinDistance(substring.ToLower(), x.ToLower()) / x.Length).First();
+				return possibilities.OrderBy(x => StringExtensions.StringDifference_Unsafe(substring.ToLower(), x.ToLower())).First();
+            //return possibilities.OrderBy(x => (double)StringExtensions.DamerauLevenshteinDistance(substring.ToLower(), x.ToLower()) / x.Length).First();
 		}
 
       public static string PathFixer(string path) //A helper function which fixes paths if they don't include the ending slashes
