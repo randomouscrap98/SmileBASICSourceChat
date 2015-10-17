@@ -1,8 +1,8 @@
 {
   "2": {
-    "messageCount": 12318,
-    "totalCharacters": 458372,
-    "totalUsers": 92666,
+    "messageCount": 12470,
+    "totalCharacters": 463927,
+    "totalUsers": 92978,
     "allSeenUsers": [
       2,
       18,
@@ -77,9 +77,9 @@
     ]
   },
   "12": {
-    "messageCount": 12637,
-    "totalCharacters": 322787,
-    "totalUsers": 85775,
+    "messageCount": 12694,
+    "totalCharacters": 332666,
+    "totalUsers": 85915,
     "allSeenUsers": [
       2,
       18,
@@ -155,9 +155,9 @@
     ]
   },
   "20": {
-    "messageCount": 180,
-    "totalCharacters": 5238,
-    "totalUsers": 1314,
+    "messageCount": 186,
+    "totalCharacters": 5303,
+    "totalUsers": 1326,
     "allSeenUsers": [
       12,
       23,
@@ -295,9 +295,9 @@
     ]
   },
   "3": {
-    "messageCount": 13287,
-    "totalCharacters": 327331,
-    "totalUsers": 104256,
+    "messageCount": 13317,
+    "totalCharacters": 327680,
+    "totalUsers": 104316,
     "allSeenUsers": [
       12,
       3,
@@ -340,9 +340,9 @@
     ]
   },
   "25": {
-    "messageCount": 128,
-    "totalCharacters": 2541,
-    "totalUsers": 1125,
+    "messageCount": 130,
+    "totalCharacters": 2576,
+    "totalUsers": 1127,
     "allSeenUsers": [
       12,
       3,
@@ -468,9 +468,9 @@
     ]
   },
   "11": {
-    "messageCount": 4077,
-    "totalCharacters": 324395,
-    "totalUsers": 33666,
+    "messageCount": 4078,
+    "totalCharacters": 324397,
+    "totalUsers": 33667,
     "allSeenUsers": [
       2,
       12,
@@ -509,9 +509,9 @@
     ]
   },
   "19": {
-    "messageCount": 5366,
-    "totalCharacters": 192310,
-    "totalUsers": 45121,
+    "messageCount": 5367,
+    "totalCharacters": 192362,
+    "totalUsers": 45122,
     "allSeenUsers": [
       2,
       12,
@@ -624,9 +624,9 @@
     ]
   },
   "15": {
-    "messageCount": 1255,
-    "totalCharacters": 66864,
-    "totalUsers": 10989,
+    "messageCount": 1288,
+    "totalCharacters": 68365,
+    "totalUsers": 11064,
     "allSeenUsers": [
       2,
       18,
@@ -733,9 +733,9 @@
     ]
   },
   "34": {
-    "messageCount": 3953,
-    "totalCharacters": 195093,
-    "totalUsers": 30022,
+    "messageCount": 3955,
+    "totalCharacters": 195102,
+    "totalUsers": 30024,
     "allSeenUsers": [
       2,
       12,
@@ -837,9 +837,9 @@
     ]
   },
   "40": {
-    "messageCount": 18,
-    "totalCharacters": 404,
-    "totalUsers": 115,
+    "messageCount": 19,
+    "totalCharacters": 407,
+    "totalUsers": 116,
     "allSeenUsers": [
       2,
       12,
@@ -855,9 +855,9 @@
     ]
   },
   "41": {
-    "messageCount": 12,
-    "totalCharacters": 310,
-    "totalUsers": 77,
+    "messageCount": 13,
+    "totalCharacters": 312,
+    "totalUsers": 78,
     "allSeenUsers": [
       2,
       12,
@@ -1092,6 +1092,14 @@
     "totalUsers": 3,
     "allSeenUsers": [
       66
+    ]
+  },
+  "68": {
+    "messageCount": 5,
+    "totalCharacters": 222,
+    "totalUsers": 5,
+    "allSeenUsers": [
+      68
     ]
   }
 }

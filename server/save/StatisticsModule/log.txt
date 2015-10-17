@@ -1,0 +1,8 @@
+[10/16/15 07:11:19]{Locks}(ChatManager): Enter getuser lock
+[10/16/15 07:11:19]{Locks}(ChatManager): Exit getuser lock
+[10/16/15 07:11:19]{Locks}(ChatManager): Enter getuser lock
+[10/16/15 07:11:19]{Locks}(ChatManager): Exit getuser lock
+[10/16/15 09:02:44]{SuperDebug}: Trying to use module GlobalModule to process command /helpregex cgame from bluesun
+[10/16/15 10:13:44]{SuperDebug}: Sending message: {"messages":[{"uid":2,"username":"randomouscrap","avatar":"/user_uploads/avatars/t1444822282.jpg","s
+[10/17/15 02:52:44]{Debug}(ChatManager): Saved FunModule data
+[10/17/15 04:33:44]{Debug}(ChatManager): Saved FunModule data

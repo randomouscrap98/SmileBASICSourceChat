@@ -9,7 +9,7 @@
   },
   "FunModule": {
     "enabled": true,
-    "emoteLink": "https://smilebasicsource.com/emotes.json"
+    "emoteLink": "http://127.0.0.1/emotes.json"
   },
   "DebugModule": {
     "enabled": true

@@ -35,3 +35,7 @@
 [10/12/15 08:57:23]{Locks}(ChatManager): Enter chatmessagelist lock
 [10/12/15 08:57:23]{Locks}(ChatManager): Exit chatmessagelist lock
 [10/12/15 08:57:23]{Locks}(ChatManager): Enter allacceptedtagsforuser lock
+[10/15/15 10:17:08]{SuperDebug}: Chat server seems OK
+[10/16/15 03:02:57]{Debug}(ChatManager): Saved FunModule data
+[10/16/15 03:02:57]{SuperDebug}: Chat server seems OK
+[10/16/15 03:02:57]{SuperDebug}: Chat server seems OK

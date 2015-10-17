@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "1.0.0";
+      public const string Version = "1.1.1";
 
       private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -65,15 +65,22 @@ namespace ChatServer
       private static void SetupWebsocket()
       {
          //Now, set up websocket server
-         webSocketServer = new WebSocketServer(GetOption<int>("chatServerPort"), true);
+         webSocketServer = new WebSocketServer(GetOption<int>("chatServerPort"));
          webSocketServer.AddWebSocketService<Chat>("/chat", () => new Chat(GetOption<int>("userUpdateInterval"), manager) {
             Protocol = "chat",
             IgnoreExtensions = true,
          });
 
+         /*System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
+         webSocketServer.SslConfiguration.ClientCertificateValidationCallback += (sender, ICertificatePolicy, chain, sslPolicyErrors) => true;
          webSocketServer.SslConfiguration.ClientCertificateRequired = false;
          webSocketServer.SslConfiguration.CheckCertificateRevocation = false;
+         webSocketServer.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Default |
+         System.Security.Authentication.SslProtocols.Ssl2 | System.Security.Authentication.SslProtocols.Tls11 |
+         System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Ssl3 |
+         System.Security.Authentication.SslProtocols.Tls;
          webSocketServer.SslConfiguration.ServerCertificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(GetOption<string>("sslCertificate"));//"/etc/nginx/ssl/bundle.crt");
+         */
 
          webSocketServer.WaitTime = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
          webSocketServer.Start();
@@ -234,6 +241,7 @@ namespace ChatServer
             logger.StartInstantConsole();
 
             logger.Log("ChatServer v" + Version + ", built on " + MyBuildDate().ToString(), LogTag);
+            logger.Log("WebSocket Library v" + MySocketVariables.Version, LogTag);
 
             //Set up the module system
             loader = new ModuleLoader(logger);
@@ -283,7 +291,7 @@ namespace ChatServer
             //CrashTimeoutSeconds = GetOption<int>("crashDetectionTimeout");
 
             //Just before we start, we should ummmm set up the "please try again" timer for the stupid library
-            System.Timers.Timer timer = new System.Timers.Timer(10000);
+            System.Timers.Timer timer = new System.Timers.Timer(GetOption<int>("chatTimeout") * 1000);
             timer.Elapsed += CheckServer;
             timer.Start();
 
@@ -343,18 +351,10 @@ namespace ChatServer
          {
             try
             {
-               if(Monitor.TryEnter(manager.managerLock, GetOption<int>("crashDetectionTimeout") * 1000))
-               {
-                  logger.LogGeneral("Chat server seems OK", MyExtensions.Logging.LogLevel.SuperDebug);
-                  Monitor.Exit(manager.managerLock);
-               }
-               else
-               {
-                  //OK here we need to wreck some stuff
-                  logger.Warning("The chat server appears unresponsive. Attempting reset now.");
-                  ShouldDie = true;
-                  //ResetEssentials();
-               }
+               if(!AttemptLock(manager.managerLock))
+                  logger.LogGeneral("Manager is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
+               else if(!AttemptLock(MySocketVariables.CrashLock))
+                  logger.LogGeneral("Websocket is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
             }
             finally
             {
@@ -365,6 +365,32 @@ namespace ChatServer
          {
             logger.Warning("Couldn't check the status of the server. Maybe it's broken?");
          }
+      }
+
+      private static bool AttemptLock(object lockthing)
+      {
+         bool result = false;
+
+         if(Monitor.TryEnter(lockthing, GetOption<int>("crashDetectionTimeout") * 1000))
+         {
+            try
+            {
+               logger.LogGeneral("Chat server seems OK", MyExtensions.Logging.LogLevel.SuperDebug);
+               result = true;
+            }
+            finally
+            {
+               Monitor.Exit(lockthing);
+            }
+         }
+         else
+         {
+            //OK here we need to wreck some stuff
+            logger.Warning("The chat server appears unresponsive. Attempting reset now.");
+            ShouldDie = true;
+         }
+
+         return result;
       }
 
       private static T GetOption<T>(string optionTag)
@@ -450,6 +476,21 @@ namespace ChatServer
             DateTime buildDate = MyExtensions.DateExtensions.FromUnixTime((double)int.Parse(date));
             //buildDate = buildDate.AddHours(GetOption<int>("buildHourModifier"));
             return buildDate;
+         }
+         catch
+         {
+            return new DateTime(0);
+         }
+      }
+
+      public static DateTime LastCrash()
+      {
+         try
+         {
+            string date = File.ReadAllText("crash.txt");
+            DateTime crashDate = MyExtensions.DateExtensions.FromUnixTime((double)int.Parse(date));
+            //buildDate = buildDate.AddHours(GetOption<int>("buildHourModifier"));
+            return crashDate;
          }
          catch
          {

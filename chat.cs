@@ -25,6 +25,9 @@ namespace ChatServer
       private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
       private readonly ChatManager manager;
 
+      private readonly Queue<string> backlog = new Queue<string>();
+      private readonly Object backlock = new Object();
+      private readonly Object sendlock = new Object();
       //public event ChatEventHandler OnUserListChange;
 
       //Set up the logger when building the chat provider. Logging will go out to a file and the console
@@ -94,15 +97,57 @@ namespace ChatServer
          
          manager.Bandwidth.AddOutgoing(message.Length + HeaderSize);
 
-         try
+         //All sends just enqueue their message no matter what
+         lock (backlock)
          {
-            Logger.LogGeneral("Sending message: " + message.Truncate(100), MyExtensions.Logging.LogLevel.SuperDebug);
-            Send(message);
-            Logger.LogGeneral("Send success!", MyExtensions.Logging.LogLevel.SuperDebug);
+            if (backlog.Count >= 30)
+               Logger.Warning(ThisUser.Username + "'s backlog is too big (30). Message thrown away.");
+            else
+               backlog.Enqueue(message);
          }
-         catch (Exception e)
+
+         //Only try to send if we're not currently sending
+         if (Monitor.TryEnter(sendlock))
          {
-            Logger.Warning("Cannot send message: " + message + " to user: " + UserLogString + " because: " + e);
+            try
+            {
+               //Loop forever because I refuse to lock on the loop
+               while (true)
+               {
+                  string nextMessage = null;
+
+                  //NOW we lock so we can pull the next message to send.
+                  lock (backlock)
+                  {
+                     if (backlog.Count > 0)
+                        nextMessage = backlog.Dequeue();
+                  }
+
+                  //oops, no more messages. gtfo
+                  if (nextMessage == null)
+                     break;
+
+                  //OK, now we can send it off
+                  try
+                  {
+                     Logger.LogGeneral("Sending message: " + nextMessage.Truncate(100), MyExtensions.Logging.LogLevel.SuperDebug);
+                     Send(nextMessage);
+                     Logger.LogGeneral("Send success!", MyExtensions.Logging.LogLevel.SuperDebug);
+                  }
+                  catch (Exception e)
+                  {
+                     Logger.Warning("Cannot send message: " + nextMessage + " to user: " + UserLogString + " because: " + e);
+                  }
+               }
+            }
+            finally
+            {
+               Monitor.Exit(sendlock);
+            }
+         }
+         else
+         {
+            Logger.LogGeneral("Queueing message for " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
          }
       }
 
@@ -159,6 +204,9 @@ namespace ChatServer
          Logger.Log ("Session disconnect: " + uid);
 
          manager.LeaveChat(this);
+
+         foreach (Module module in manager.GetModuleListCopy())
+            module.OnExtraCommandOutput -= DefaultOutputMessages;
       }
 
       protected override void OnError(ErrorEventArgs e)
@@ -176,6 +224,8 @@ namespace ChatServer
       //I guess this is WHENEVER it receives a message?
       protected override void OnMessage(MessageEventArgs e)
       {
+         Logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
+
          ResponseJSONObject response = new ResponseJSONObject();
          response.result = false;
          dynamic json = new Object();
@@ -354,6 +404,9 @@ namespace ChatServer
                   //Step 1: parse a possible command. If no command is parsed, no module will be written.
                   if (TryCommandParse(userMessage, out commandModule, out userCommand, out commandError))
                   {
+                     Logger.LogGeneral("Trying to use module " + commandModule.ModuleName + " to process command " + 
+                        userCommand.message + " from " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
+
                      //We found a command. Send it off to the proper module and get the output
                      if (Monitor.TryEnter(commandModule.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
                      {
@@ -496,8 +549,6 @@ namespace ChatServer
 
          //Send the "OK" message back.
          MySend(response.ToString());
-
-         Logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
       }
          
       private void OutputMessages(List<JSONObject> outputs, int receiverUID, string defaultTag = "")
@@ -682,15 +733,25 @@ namespace ChatServer
                output = new ModuleJSONObject();
                BandwidthContainer bandwidth = ChatRunner.Bandwidth; //Chat.GetBandwidth();
                DateTime built = ChatRunner.MyBuildDate();
+               DateTime crashed = ChatRunner.LastCrash();
+               string crashedString = "never";
+
+               if (crashed.Ticks > 0)
+                  crashedString = StringExtensions.LargestTime(DateTime.Now - crashed) + " ago";
+                  
                output.message = 
                   "---Build info---\n" +
                   "Version: " + ChatRunner.AssemblyVersion() + "\n" +
                   "Built " + StringExtensions.LargestTime(DateTime.Now - built) + " ago (" + built.ToString("R") + ")\n" +
                   "---Data usage---\n" +
                   "Outgoing: " + bandwidth.GetTotalBandwidthOutgoing() + " (1h: " + bandwidth.GetHourBandwidthOutgoing() + ")\n" +
-                  "Incoming: " + bandwidth.GetTotalBandwidthIncoming() + " (1h: " + bandwidth.GetHourBandwidthIncoming() + ")\n";
+                  "Incoming: " + bandwidth.GetTotalBandwidthIncoming() + " (1h: " + bandwidth.GetHourBandwidthIncoming() + ")\n" +
+                  "---Websocket---\n" +
+                  "Library Version: " + MySocketVariables.Version + "\n" +
+                  "Last full crash: " + crashedString;
                outputs.Add(output);
                break;
+
             case "help":
                output = new ModuleJSONObject();
                if (command.Arguments.Count == 0)

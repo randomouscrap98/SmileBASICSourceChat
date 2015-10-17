@@ -39,6 +39,7 @@ cd $serverFolder
 ./chat.exe
 while [ $? -eq 99 ]
 do
+   date +%s > crash.txt
    echo "The server killed itself. Let's try to restart it in 3 seconds..."
    sleep 3
    ./chat.exe

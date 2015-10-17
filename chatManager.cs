@@ -334,6 +334,18 @@ namespace ChatServer
             {
                error = "One or more of the given users doesn't exist!";
             }
+            else if (!users.ContainsKey(creator))
+            {
+               error = "You don't seem to exist... I'm not sure how to create the room";
+            }
+            else if (users[creator].Banned || users[creator].Blocked)
+            {
+               error = "You are banned or blocked and cannot create a room";
+            }
+//            else if (rooms.Count(x => x.Value.Creator == creator) >= 3)
+//            {
+//               error = "You've already have 3 PM rooms
+//            }
             else
             {
                PMRoom newRoom = new PMRoom(newUsers, creator, TimeSpan.FromMinutes(10));
@@ -426,16 +438,6 @@ namespace ChatServer
                activeChatters.Remove(chatSession);
                authServer.UpdateUserList(activeChatters.Select(x => x.UID).ToList());
 
-               //Only perform special leaving messages and processing if the user was real
-               if (users.ContainsKey(chatSession.UID))
-               {
-                  if (!users[chatSession.UID].PerformOnChatLeave())
-                     Logger.Warning("User session timer was in an invalid state!");
-
-                  if (users[chatSession.UID].ShowMessages)
-                     Broadcast(new LanguageTagParameters(ChatTags.Leave, users[chatSession.UID]), new SystemMessageJSONObject());
-               }
-               BroadcastUserList();
                Log("Exit leavechat lock", MyExtensions.Logging.LogLevel.Locks);
             }
             finally
@@ -446,6 +448,18 @@ namespace ChatServer
          else
          {
             Log("Session " + chatSession.UID + " could not leave properly! Data may be inconsistent!", MyExtensions.Logging.LogLevel.Error);
+         }
+
+         BroadcastUserList();
+
+         //Only perform special leaving messages and processing if the user was real
+         if (users.ContainsKey(chatSession.UID))
+         {
+            if (!users[chatSession.UID].PerformOnChatLeave())
+               Logger.Warning("User session timer was in an invalid state!");
+
+            if (users[chatSession.UID].ShowMessages)
+               Broadcast(new LanguageTagParameters(ChatTags.Leave, users[chatSession.UID]), new SystemMessageJSONObject());
          }
       }
 

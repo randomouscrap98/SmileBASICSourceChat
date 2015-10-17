@@ -71,6 +71,18 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
+    <Reference Include="System.Threading.Tasks.Dataflow">
+      <HintPath>..\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
+    </Reference>
+    <Reference Include="vtortola.WebSockets.Deflate">
+      <HintPath>..\packages\vtortola.WebSocketListener.2.1.9.0\lib\net45\vtortola.WebSockets.Deflate.dll</HintPath>
+    </Reference>
+    <Reference Include="vtortola.WebSockets">
+      <HintPath>..\packages\vtortola.WebSocketListener.2.1.9.0\lib\net45\vtortola.WebSockets.dll</HintPath>
+    </Reference>
+    <Reference Include="vtortola.WebSockets.Rfc6455">
+      <HintPath>..\packages\vtortola.WebSocketListener.2.1.9.0\lib\net45\vtortola.WebSockets.Rfc6455.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Module\Module.csproj">
@@ -85,5 +97,8 @@
       <Project>{11915F24-34FB-4C4D-8CE7-3F509F8D5A42}</Project>
       <Name>ChatEssentials</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

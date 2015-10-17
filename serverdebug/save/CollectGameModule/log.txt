@@ -133,3 +133,8 @@
 [10/12/15 08:52:23]{Locks}(ChatManager): Enter loggedinuserget lock
 [10/12/15 08:52:23]{Locks}(ChatManager): exit loggedinuserget lock
 [10/12/15 08:52:23]{Locks}(ChatManager): Enter usersformodules lock
+[10/14/15 09:25:57]{SuperDebug}: Chat server seems OK
+[10/15/15 10:37:08]{SuperDebug}: Chat server seems OK
+[10/15/15 10:42:08]{SuperDebug}: Chat server seems OK
+[10/15/15 11:07:08]{SuperDebug}: Chat server seems OK
+[10/15/15 11:32:08]{SuperDebug}: Chat server seems OK
