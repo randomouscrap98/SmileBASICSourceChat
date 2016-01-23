@@ -83,9 +83,9 @@ namespace ModulePackage1
          //user. It will also perform the ? and ?? completion for you, so you do not need to worry about any of that. Assume
          //that if an argument is of type ArgumentType.User, you will be getting a real user. If you need a special format
          //for your argument, you can specify ArgumentType.Custom and include your custom regex.
-         commands.Add(new ModuleCommand("mystatistics", new List<CommandArgument> (), "view personal chat statistics", false));
-         commands.Add(new ModuleCommand("statistics", new List<CommandArgument> (), "view global chat statistics", false));
-         commands.Add(new ModuleCommand("statistics", new List<CommandArgument> { 
+         Commands.Add(new ModuleCommand("mystatistics", new List<CommandArgument> (), "view personal chat statistics", false));
+         Commands.Add(new ModuleCommand("statistics", new List<CommandArgument> (), "view global chat statistics", false));
+         Commands.Add(new ModuleCommand("statistics", new List<CommandArgument> { 
             new CommandArgument("user", ArgumentType.User) }, "view user chat statistics", false));
       }
 

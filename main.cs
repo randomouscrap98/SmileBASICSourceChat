@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "1.1.1";
+      public const string Version = "1.4.4";
 
       private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -34,6 +34,8 @@ namespace ChatServer
 
       private static bool ShouldDie = false;
       private static readonly Object Lock = new Object();
+
+      public static readonly DateTime Startup = DateTime.Now;
 
       public const string ConfigFile = "config.json";
       public const string ModuleConfigFile = "moduleConfig.json";
@@ -66,7 +68,7 @@ namespace ChatServer
       {
          //Now, set up websocket server
          webSocketServer = new WebSocketServer(GetOption<int>("chatServerPort"));
-         webSocketServer.AddWebSocketService<Chat>("/chat", () => new Chat(GetOption<int>("userUpdateInterval"), manager) {
+         webSocketServer.AddWebSocketService<Chat>("/chatserver", () => new Chat(GetOption<int>("userUpdateInterval"), manager) {
             Protocol = "chat",
             IgnoreExtensions = true,
          });
@@ -82,6 +84,7 @@ namespace ChatServer
          webSocketServer.SslConfiguration.ServerCertificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(GetOption<string>("sslCertificate"));//"/etc/nginx/ssl/bundle.crt");
          */
 
+         //Console.WriteLine("Keep clean: " + webSocketServer.KeepClean);
          webSocketServer.WaitTime = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
          webSocketServer.Start();
 
@@ -105,10 +108,12 @@ namespace ChatServer
 
          //Set up the chat manager (the program that provides data to each chat instance)
          manager = new ChatManager(loader, authServer, languageTags,
-            GetOption<int>("messageBacklog"), GetOption<int>("messageSend"),
+               new MyExtensions.Options(options.GetOptionsForKey(OptionTag)), logger);
+            /*GetOption<int>("messageBacklog"), GetOption<int>("messageSend"),
             GetOption<int>("saveInterval"), GetOption<int>("moduleWaitSeconds"),
             GetOption<string>("acceptedTags"), GetOption<string>("globalTag"),
-            GetOption<string>("saveFolder"), logger);
+            GetOption<string>("saveFolder"), GetOption<string>("ircServer"), 
+            GetOption<string>("ircChannel"), GetOption<string>("ircTag"), logger);*/
 
          //manager.Request += PerformRequest;
       }
@@ -125,6 +130,10 @@ namespace ChatServer
          {
             logger.Log("Attempting to simulate lock death");
             manager.Lockup();
+         }
+         else if (request.Request == SystemRequests.SaveModules)
+         {
+            manager.SaveData();
          }
          else
          {
@@ -196,6 +205,7 @@ namespace ChatServer
                { "shutdownSeconds", 5 },
                { "saveFolder", "save" },
                { "saveInterval", 300 },
+               { "cleanInterval", 5 },
                { "moduleWaitSeconds", 5 },
                { "fakeAuthentication", false },
                { "consoleLogLevel", "Normal" },
@@ -203,7 +213,11 @@ namespace ChatServer
                { "languageURL", "/languages/chatserver.json" },
                { "automaticBlocking", true },
                { "crashDetectionTimeout", 10 },
-               { "sslCertificate", "chatcert.p12" }
+               { "sslCertificate", "chatcert.p12" },
+               { "policyReminderHours", 24 },
+               { "ircServer", "irc.freenode.net" },
+               { "ircChannel", "#smilebasic" },
+               { "ircTag", "general" }
             };
 
             //Set up and read options. We need to do this first so that the values can be used for init
@@ -245,7 +259,7 @@ namespace ChatServer
 
             //Set up the module system
             loader = new ModuleLoader(logger);
-            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule), typeof(DebugModule) };
+            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule), typeof(DebugModule), typeof(PmModule) };
 
             //Oops, couldn't load the modules. What the heck?
             if (!loader.Setup(ModuleConfigFile, extraModules))
@@ -277,7 +291,8 @@ namespace ChatServer
 
             //Also set user parameters
             User.SetUserParameters(GetOption<int>("spamBlockSeconds"), GetOption<int>("inactiveMinutes"),
-               GetOption<string>("website"), GetOption<bool>("automaticBlocking"));
+               GetOption<string>("website"), GetOption<bool>("automaticBlocking"), 
+               GetOption<int>("policyReminderHours"));
          
             SetupWebsocket();
 
@@ -325,6 +340,7 @@ namespace ChatServer
                //hmm, someone wants us to die. OK then
                if(ShouldDie)
                {
+                  logger.Log("Trying to die...");
                   manager.SaveData();
                   logger.Log("Dying...");
                   logger.DumpToFile();
@@ -355,6 +371,8 @@ namespace ChatServer
                   logger.LogGeneral("Manager is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
                else if(!AttemptLock(MySocketVariables.CrashLock))
                   logger.LogGeneral("Websocket is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
+               else
+                  logger.LogGeneral("Chat server seems OK", MyExtensions.Logging.LogLevel.SuperDebug);
             }
             finally
             {
@@ -371,11 +389,10 @@ namespace ChatServer
       {
          bool result = false;
 
-         if(Monitor.TryEnter(lockthing, GetOption<int>("crashDetectionTimeout") * 1000))
+         if(Monitor.TryEnter(lockthing, TimeSpan.FromSeconds(GetOption<int>("crashDetectionTimeout"))))
          {
             try
             {
-               logger.LogGeneral("Chat server seems OK", MyExtensions.Logging.LogLevel.SuperDebug);
                result = true;
             }
             finally

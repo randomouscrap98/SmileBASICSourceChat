@@ -14,8 +14,8 @@ namespace ModuleSystem
 
    public abstract class Module
    {
-      protected string generalHelp = "";
-      protected List<ModuleCommand> commands = new List<ModuleCommand>();
+      private string generalHelp = "";
+      private List<ModuleCommand> commands = new List<ModuleCommand>();
 
       private Options options = new Options();
       private List<Logger> loggers = new List<Logger>(); 
@@ -31,6 +31,7 @@ namespace ModuleSystem
       public List<ModuleCommand> Commands
       {
          get { return commands; }
+         protected set { commands = value; }
       }
 
       public Dictionary<string, string> ArgumentHelp
@@ -45,6 +46,7 @@ namespace ModuleSystem
       public string GeneralHelp
       {
          get { return generalHelp; }
+         protected set { generalHelp = value; }
       }
 
       public Options ModuleOptions
@@ -156,6 +158,11 @@ namespace ModuleSystem
          OnExtraCommandOutput(outputs, callerUID);
       }
 
+      protected int ExtraCommandHandlerCount
+      {
+         get { return OnExtraCommandOutput.GetInvocationList().Length; }
+      }
+
       /// <summary>
       /// This is performed when the modules are loaded. You should load any necessary files here,
       /// such as save data/etc. This is only called when the module is loaded, but could be called 
@@ -227,6 +234,16 @@ namespace ModuleSystem
       public virtual string Nickname
       {
          get { return ModuleName.ToLower().Replace("module", ""); }
+      }
+
+      /// <summary>
+      /// Whether or not the module should be hidden from the given user. A hidden module is unusable
+      /// and does not show up in the help menu. Use with caution.
+      /// </summary>
+      /// <param name="user">User to hide from (can ignore)</param>
+      public virtual bool Hidden(UserInfo user)
+      {
+         return false;
       }
    }
 
@@ -475,7 +492,7 @@ namespace ModuleSystem
             switch (Type)
             {
                case ArgumentType.User:
-                  regex = @"\??\??[0-9a-zA-Z_]+";
+                  regex = @"(?:\??\??|#)[0-9a-zA-Z_]+";
                   break;
                case ArgumentType.FullString:
                   regex = ".*";

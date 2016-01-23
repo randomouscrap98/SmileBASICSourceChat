@@ -87,6 +87,7 @@ namespace ChatEssentials
       public readonly TimeSpan TotalChatTime;
       public readonly TimeSpan AverageSessionTime;
       public readonly TimeSpan CurrentSessionTime;
+      public readonly int SessionCount;
 
       public UserInfo(User user, bool loggedIn)
       {
@@ -115,6 +116,7 @@ namespace ChatEssentials
          CurrentSessionTime = user.CurrentSessionTime;
          ChatControl = user.ChatControl;
          ChatControlExtended = user.ChatControlExtended;
+         SessionCount = user.SessionCount;
       }
    }
 
@@ -122,7 +124,9 @@ namespace ChatEssentials
    public class User
    {
       public const double JoinSpamMinutes = 2.0;
+      //public const string IrcAppendTag = "-irc";
 
+      private static TimeSpan PolicyReminderTime = TimeSpan.FromDays(1);
       private static bool AutomaticBlocking = true;
       private static int SpamBlockSeconds = 1;
       private static int InactiveMinutes = 1;
@@ -130,6 +134,7 @@ namespace ChatEssentials
 
       private readonly int uid = 0;
       private string username = "default";
+      //private string ircUsername = "";
       private string avatar = "";
       private string stars = "";
       private string language = "";
@@ -145,6 +150,10 @@ namespace ChatEssentials
       private DateTime bannedUntil = new DateTime(0);
 
       private bool lastActive = true;
+      private bool acceptedPolicy = false;
+      /*private bool isIrcUser = false;
+      private bool ircActive = false;*/
+      private DateTime lastPolicyReminder = new DateTime(0);
       private DateTime lastPing = DateTime.Now;
       private DateTime lastPost = DateTime.Now;
       private DateTime lastDecay = DateTime.Now;
@@ -172,6 +181,11 @@ namespace ChatEssentials
          get { return username; }
       }
 
+//      public string IrcUsername
+//      {
+//         get { return ircUsername; }
+//      }
+
       public string Avatar
       {
          get { return avatar; }
@@ -198,12 +212,14 @@ namespace ChatEssentials
       }
 
       //Set static user parameters (constants, probably from an options file)
-      public static void SetUserParameters(int spamBlockSeconds, int inactiveMinutes, string website, bool automaticBlocking)
+      public static void SetUserParameters(int spamBlockSeconds, int inactiveMinutes, string website, bool automaticBlocking,
+         double reminderHours)
       {
          SpamBlockSeconds = spamBlockSeconds;
          InactiveMinutes = inactiveMinutes;
          Website = website;
          AutomaticBlocking = automaticBlocking;
+         PolicyReminderTime = TimeSpan.FromHours(reminderHours);
       }
 
       public DateTime LastPost
@@ -218,12 +234,23 @@ namespace ChatEssentials
 
       public bool Active
       {
-         get { return lastPing > DateTime.Now.AddMinutes(-InactiveMinutes); }
+         get 
+         { 
+            /*if (isIrcUser)
+               return ircActive;*/
+            
+            return lastPing > DateTime.Now.AddMinutes(-InactiveMinutes); 
+         }
       }
 
       public bool StatusChanged
       {
          get { return lastActive != Active; }
+      }
+
+      public bool AcceptedPolicy
+      {
+         get { return acceptedPolicy; }
       }
 
       public DateTime BlockedUntil 
@@ -291,7 +318,10 @@ namespace ChatEssentials
 
       public double RealSpamScore
       {
-         get { return spamScore; }
+         get 
+         {
+            return spamScore; 
+         }
          private set 
          {
             lock (Lock)
@@ -303,7 +333,7 @@ namespace ChatEssentials
                else
                   spamScore = value;
 
-               if (spamScore == double.NaN)
+               if (double.IsNaN(spamScore) || double.IsInfinity(spamScore))
                   spamScore = 0;
             }
          }
@@ -361,6 +391,52 @@ namespace ChatEssentials
          }
       }
 
+      public int SessionCount
+      {
+         get
+         {
+            lock (Lock)
+            {
+               return sessions.Count;
+            }
+         }
+      }
+
+      public bool ShouldPolicyRemind
+      {
+         get { return (DateTime.Now - lastPolicyReminder) > PolicyReminderTime; }
+      }
+
+      /*public bool IrcUser
+      {
+         get { return isIrcUser; }
+      }
+
+      public void SetIRC(string username, bool active)
+      {
+         isIrcUser = true;
+         //this.ircUsername = username;
+         this.username = username; //+ IrcAppendTag;
+         this.avatar = "/user_uploads/avatars/tdefault.png";
+         ircActive = active;
+      }*/
+
+      public void AcceptPolicy()
+      {
+         lock (Lock)
+         {
+            acceptedPolicy = true;
+         }
+      }
+
+      public void PerformOnReminder()
+      {
+         lock (Lock)
+         {
+            lastPolicyReminder = DateTime.Now;
+         }
+      }
+
       //This function should be called when posts are made.
       public void PerformOnPost()
       {
@@ -369,14 +445,17 @@ namespace ChatEssentials
             lastPost = DateTime.Now;
          }
 
-         PerformOnPing();
+         PerformOnPing(true);
       }
 
-      public void PerformOnPing()
+      public void PerformOnPing(bool active)
       {
          lock (Lock)
          {
-            lastPing = DateTime.Now;
+            //For now, this is all we do. Maybe in the future, we can do something special with the 
+            //"active" state.
+            if(active)
+               lastPing = DateTime.Now;
          }
       }
 
@@ -390,7 +469,11 @@ namespace ChatEssentials
 
       public bool PerformOnChatEnter()
       {
-         PerformOnPing();
+         //No, don't do anything for these guys.
+         /*if (isIrcUser)
+            return true;*/
+         
+         PerformOnPing(true);
          bool result = false;
 
          lock (Lock)
@@ -417,12 +500,17 @@ namespace ChatEssentials
             }
          }
 
+         //We're only good if we succeeded AND there's only one session open
          return result && (sessions.Count(x => !x.Left) == 1);
       }
 
       public bool PerformOnChatLeave()
       {
          bool result = true;
+
+         //No, don't do anything for these guys.
+         /*if (isIrcUser)
+            return true;*/
 
          lock (Lock)
          {
@@ -566,6 +654,7 @@ namespace ChatEssentials
                //Block if spam score is too high
                if (RealSpamScore >= 100)
                {
+                  RealSpamScore = 0;   //Just reset spamscore; they're blocked anyway.
                   GlobalSpamScore++;
                   int seconds = GlobalSpamScore * SpamBlockSeconds;
 

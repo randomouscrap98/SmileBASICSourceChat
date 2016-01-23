@@ -50,7 +50,7 @@ namespace WikiaChatLogger
                "You feel a bit better!" }
          });
 
-         generalHelp = "In cgame, you collect items by using your hourly coins to draw random items. " +
+         GeneralHelp = "In cgame, you collect items by using your hourly coins to draw random items. " +
          "Your goal is to collect all 100 items, which allows you to rank up and move through the leaderboards. " +
          "You can also trade items with other people, or simply be a nice person and give out free items.";
 
@@ -61,7 +61,7 @@ namespace WikiaChatLogger
          CommandArgument itemList = new CommandArgument("itemList", ArgumentType.Custom, RepeatType.One, @"(?:[a-zA-Z][0-9]\s*)+");
          CommandArgument player = new CommandArgument("player", ArgumentType.User);
 
-         commands.AddRange(new List<ModuleCommand> {
+         Commands.AddRange(new List<ModuleCommand> {
             new ModuleCommand("cgamedraw", new List<CommandArgument> {
                count
             }, "Get item(s) (Max: " + MaxWithdraw + ")"),
@@ -103,7 +103,7 @@ namespace WikiaChatLogger
             new ModuleCommand("cgamegive", new List<CommandArgument> {
                itemList,
                player
-            }, "Give item(s) to player (how nice!)."),
+            }, "Give item(s) to player (how nice!).", true),
             new ModuleCommand("cgametrade", new List<CommandArgument> {
                itemList,
                player,
@@ -246,7 +246,7 @@ namespace WikiaChatLogger
 			return false;
 		}
 
-      public List<JSONObject> QuickQuit(string message, bool warning = false)
+      public List<JSONObject> QuickQuit(string message, bool warning = false, bool safe = true)
       {
          if (warning)
          {
@@ -258,6 +258,7 @@ namespace WikiaChatLogger
          {
             ModuleJSONObject output = new ModuleJSONObject();
             output.message = message;
+            output.safe = safe;
             return new List<JSONObject> { output };
          }
       }
@@ -365,11 +366,11 @@ namespace WikiaChatLogger
    			#region mycollection
             else if (cmd == "cgamestock")
    			{
-               return QuickQuit("-=Your collection=-\n" + collectors[myUID].Statistics(false, JournalStyle));
+               return QuickQuit("-=Your collection=-\n" + collectors[myUID].Statistics(false, JournalStyle), false, false);
    			}
             else if (cmd == "cgamestockm")
             {
-               return QuickQuit("-=Your collection=-\n" + collectors[myUID].Statistics(true, JournalStyle));
+               return QuickQuit("-=Your collection=-\n" + collectors[myUID].Statistics(true, JournalStyle), false, false);
             }
    			#endregion
 
@@ -1848,7 +1849,7 @@ namespace WikiaChatLogger
 		public const int MultiplyMultiplier = 4;
 		public const int MaxMultiplier = 15;
 		public const int MinMultiplier = 1;
-      public const double HugReduction = 1.0 / 3.0;
+      public const double HugReduction = 1.0 / 4.0;
 
 		//Random number generation
 		public const int DrawChanceSimulations = 10000;

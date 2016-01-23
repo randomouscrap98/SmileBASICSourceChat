@@ -37,9 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\modules\pmModule.cs">
-      <Link>pmModule.cs</Link>
-    </Compile>
     <Compile Include="..\..\modules\smallModules.cs">
       <Link>smallModules.cs</Link>
     </Compile>
@@ -54,6 +51,9 @@
     </Compile>
     <Compile Include="..\..\modules\VoteModule.cs">
       <Link>VoteModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\modules\LoggerModule.cs">
+      <Link>LoggerModule.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

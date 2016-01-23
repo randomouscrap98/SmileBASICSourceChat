@@ -118,23 +118,23 @@ namespace ModulePackage1
          //CommandArgument pageNumber = new CommandArgument("page", ArgumentType.Integer, RepeatType.ZeroOrOne);
          CommandArgument search = new CommandArgument("search", ArgumentType.FullString);
 
-         commands.Add(new ModuleCommand("polls", new List<CommandArgument>(), "See the top open polls"));
-         commands.Add(new ModuleCommand("poll", new List<CommandArgument> {
+         Commands.Add(new ModuleCommand("polls", new List<CommandArgument>(), "See the top open polls"));
+         Commands.Add(new ModuleCommand("poll", new List<CommandArgument> {
             poll
          }, "See data for poll#"));
-         commands.Add(new ModuleCommand("pollcreate", new List<CommandArgument>{
+         Commands.Add(new ModuleCommand("pollcreate", new List<CommandArgument>{
             title, choiceList
          }, "Create a poll with given options.", true));
-         commands.Add(new ModuleCommand("vote", new List<CommandArgument> {
+         Commands.Add(new ModuleCommand("vote", new List<CommandArgument> {
             choice, poll
          }, "Vote on poll#."));
-         commands.Add(new ModuleCommand("pollclose", new List<CommandArgument> {
+         Commands.Add(new ModuleCommand("pollclose", new List<CommandArgument> {
             poll
          }, "Close the given poll", true));
-         commands.Add(new ModuleCommand("pollsearch", new List<CommandArgument> {
+         Commands.Add(new ModuleCommand("pollsearch", new List<CommandArgument> {
             search
          }, "Search for poll with given title"));
-         commands.Add(new ModuleCommand("pollsopen", new List<CommandArgument>(), "See your open polls"));
+         Commands.Add(new ModuleCommand("pollsopen", new List<CommandArgument>(), "See your open polls"));
 
          AddOptions(new Dictionary<string, object> {
             { "maxUserPolls", 1 },
@@ -143,7 +143,7 @@ namespace ModulePackage1
             { "searchResults", 5 }
          });
 
-         generalHelp = "Quickstart: Do /polls to see the list of polls you can vote on. " +
+         GeneralHelp = "Quickstart: Do /polls to see the list of polls you can vote on. " +
             "Do /poll 1 to see the voting options for poll #1." +
             "Do /vote yes 1 to vote \"yes\" on poll #1. " +
             "Do /pollsearch Blah blah blah to search for a poll by title. " +

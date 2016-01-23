@@ -13,14 +13,21 @@ namespace MyExtensions
 		//public const string SubsectionIdentifier = "*";
 		//public const string CommentIdentifier = "#";
 		//public const string ConfigurationFile = "config.ini";
+      public const string DefaultSection = "default";
 
       private readonly Dictionary<string, Dictionary<string, object>> optionData = 
          new Dictionary<string, Dictionary<string, object>>();
 
 		public Options()
 		{
-         AddOptions ("default", new Dictionary<string, object> ());
+         AddOptions (DefaultSection, new Dictionary<string, object> ());
 		}
+
+      //Quick initialize options with default section
+      public Options(Dictionary<string, object> options)
+      {
+         AddOptions(DefaultSection, options);
+      }
 
       public Options(Options copy)
       {
@@ -177,7 +184,7 @@ namespace MyExtensions
 
          return optionList;
       }
-
+         
 		//Retrieve a dictionary value as a particular type. Should be safe for the
 		//basic types used in the option file (bool, double, int, string)
 		public T GetAsType<T>(string key, string subkey)
@@ -202,6 +209,12 @@ namespace MyExtensions
 
 			//return (T)returnValue;
 		}
+
+      //Get an option from the default area
+      public T GetAsType<T>(string subkey)
+      {
+         return GetAsType<T>(DefaultSection, subkey);
+      }
 
 		public static object GetDefaultTypeValue(Type T)
 		{

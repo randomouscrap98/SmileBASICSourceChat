@@ -3,6 +3,9 @@ using ModuleSystem;
 using System.Collections.Generic;
 using ChatEssentials;
 using MyExtensions;
+using System.Linq;
+using MyExtensions.Logging;
+using System.Diagnostics;
 
 namespace ChatServer
 {
@@ -15,11 +18,13 @@ namespace ChatServer
    {
       public DebugModule()
       {
-         commands.Add(new ModuleCommand("spamscore", new List<CommandArgument> (), "check personal spam score"));
-         commands.Add(new ModuleCommand("resetserver", new List<CommandArgument> {
+         Commands.Add(new ModuleCommand("spamscore", new List<CommandArgument> (), "check personal spam score"));
+         Commands.Add(new ModuleCommand("resetserver", new List<CommandArgument> {
             new CommandArgument("seconds", ArgumentType.Integer, RepeatType.ZeroOrOne)
          }, "reset the server in the specified amount of time (default 5 seconds)"));
-         commands.Add(new ModuleCommand("simulatelock", new List<CommandArgument>(), "simulate a server deadlock"));
+         Commands.Add(new ModuleCommand("simulatelock", new List<CommandArgument>(), "simulate a server deadlock"));
+         Commands.Add(new ModuleCommand("savemodules", new List<CommandArgument>(), "save all module data now"));
+         Commands.Add(new ModuleCommand("checkserver", new List<CommandArgument>(), "See important stats for server"));
          //commands.Add(new ModuleCommand("myrooms", new List<CommandArgument>(), "show pm rooms you're currently in"));
       }
 
@@ -70,6 +75,55 @@ namespace ChatServer
 
                   moduleOutput.message = user.Username + " is simulating a server crash. The server WILL be unresponsive if successful";
                   moduleOutput.broadcast = true;
+                  outputs.Add(moduleOutput);
+
+                  break;
+
+               case "savemodules":
+
+                  //Make sure the user can even run such a high command
+                  if(!user.ChatControlExtended)
+                     return FastMessage("You don't have access to this command!", true); 
+
+                  ChatRunner.PerformRequest(new SystemRequest(SystemRequests.SaveModules));
+
+                  moduleOutput.message = user.Username + " is saving all module data. This may cause a small hiccup";
+                  moduleOutput.broadcast = true;
+                  outputs.Add(moduleOutput);
+
+                  break;
+
+               case "checkserver":
+                  
+                  //Make sure the user can even run such a high command
+                  if(!user.ChatControl)
+                     return FastMessage("You don't have access to this command!", true); 
+
+                  string message = "Information about the chat server:\n\n";
+
+                  Dictionary<string, List<UserMessageJSONObject>> history = ChatRunner.Manager.GetHistory();
+                  List<UserMessageJSONObject> messages = ChatRunner.Manager.GetMessages();
+                  List<LogMessage> logMessages = ChatRunner.Manager.Logger.GetMessages();
+                  List<LogMessage> logFileBuffer = ChatRunner.Manager.Logger.GetFileBuffer();
+                  List<Module> modules = ChatRunner.Manager.GetModuleListCopy();
+
+                  message += "Rooms: " + history.Keys.Count + "\n";
+                  message += "History messages: " + history.Sum(x => x.Value.Count) + "\n";
+                  message += "Registered users: " + users.Count + "\n";
+                  message += "Total user sessions: " + users.Sum(x => (long)x.Value.SessionCount) + "\n";
+                  message += "Stored messages: " + messages.Count + "\n";
+                  message += "Stored log: " + logMessages.Count + "\n";
+                  message += "Log file buffer: " + logFileBuffer.Count + "\n";
+                  message += "Modules loaded: " + string.Join(", ", modules.Select(x => x.GetType().Name)) + " (" + modules.Count + ")\n";
+                  message += "Subscribed handlers for extra output: " + this.ExtraCommandHandlerCount + "\n";
+
+                  using(Process process = Process.GetCurrentProcess())
+                  {
+                     message += "Virtual Memory: " + (process.PrivateMemorySize64 / 1048576) + "MiB\n";
+                     message += "Heap Allocated: " + (GC.GetTotalMemory(true) / 1048576) + "MiB"; 
+                  }
+
+                  moduleOutput.message = message;
                   outputs.Add(moduleOutput);
 
                   break;

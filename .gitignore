@@ -1,0 +1,6 @@
+*
+!.gitignore
+!/*.cs
+!/modules/*.cs
+!/ChatServer/
+

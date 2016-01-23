@@ -208,6 +208,8 @@ namespace ChatServer
 
                      Log("Sent authorization token " + auth + " for user " + json.uid);
                   }
+
+                  client.Close();
                }
                catch (Exception e)
                {

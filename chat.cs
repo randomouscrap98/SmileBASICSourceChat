@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using MyExtensions;
 using ChatEssentials;
 using ModuleSystem;
+using IrcDotNet;
 
 namespace ChatServer
 {
@@ -20,14 +21,19 @@ namespace ChatServer
    public class Chat : WebSocketBehavior
    {
       public const int HeaderSize = 64;
+
       private int uid = -1;
 
+      public readonly DateTime Startup = DateTime.Now;
       private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
       private readonly ChatManager manager;
 
       private readonly Queue<string> backlog = new Queue<string>();
       private readonly Object backlock = new Object();
       private readonly Object sendlock = new Object();
+      private DateTime lastPing = DateTime.Now;
+
+      //private SimpleIRCRelay relay = SimpleIRCRelay.DefaultRelay;
       //public event ChatEventHandler OnUserListChange;
 
       //Set up the logger when building the chat provider. Logging will go out to a file and the console
@@ -43,6 +49,15 @@ namespace ChatServer
 
          foreach (Module module in manager.GetModuleListCopy())
             module.OnExtraCommandOutput += DefaultOutputMessages;
+      }
+
+      //Destruction with donuts
+      ~Chat()
+      {
+         userUpdateTimer.Elapsed -= UpdateActiveUserList;
+
+         foreach (Module module in manager.GetModuleListCopy())
+            module.OnExtraCommandOutput -= DefaultOutputMessages;
       }
 
       public MyExtensions.Logging.Logger Logger
@@ -73,6 +88,14 @@ namespace ChatServer
          get { return uid; }
       }
 
+      public TimeSpan TimeSincePing
+      {
+         get
+         {
+            return DateTime.Now - lastPing;
+         }
+      }
+
       //The user attached to this session
       public User ThisUser
       {
@@ -82,6 +105,11 @@ namespace ChatServer
          }
       }
 
+      /*public string IrcUsername
+      {
+         get { return relay.Username; }
+      }*/
+
       public string UserLogString
       {
          get
@@ -90,11 +118,19 @@ namespace ChatServer
          }
       }
 
-      public void MySend(string message)
+      public void MySend(string message, bool forceSend = false)
       {
          if (string.IsNullOrEmpty(message))
             return;
-         
+
+         //Do nothing until user has accepted policy
+         if (!ThisUser.AcceptedPolicy && !forceSend)
+         {
+            Logger.LogGeneral("Cannot send message because user has not accepted policy yet. ForceSend: " + forceSend,
+               MyExtensions.Logging.LogLevel.SuperDebug);
+            return;
+         }
+            
          manager.Bandwidth.AddOutgoing(message.Length + HeaderSize);
 
          //All sends just enqueue their message no matter what
@@ -207,6 +243,9 @@ namespace ChatServer
 
          foreach (Module module in manager.GetModuleListCopy())
             module.OnExtraCommandOutput -= DefaultOutputMessages;
+
+         //relay.Disconnect();
+         //relay.Dispose();
       }
 
       protected override void OnError(ErrorEventArgs e)
@@ -340,6 +379,31 @@ namespace ChatServer
                         }
 
                         OutputMessages(outputs, ThisUser.UID);
+
+                        //Finally, output the "Yo accept dis" thing if they haven't already.
+                        if(!ThisUser.AcceptedPolicy)
+                        {
+                           MessageListJSONObject emptyMessages = new MessageListJSONObject();
+                           UserListJSONObject emptyUsers = new UserListJSONObject();
+                           ModuleJSONObject policy = new ModuleJSONObject(ChatManager.Policy);
+                           ModuleJSONObject accept = new ModuleJSONObject("\nYou must accept this chat policy before " +
+                              "using the chat. Type /accept if you accept the chat policy\n");
+                           MySend(emptyMessages.ToString(), true);
+                           MySend(emptyUsers.ToString(), true);
+                           MySend(policy.ToString(), true);
+                           MySend(accept.ToString(), true);
+                        }
+                        else if(ThisUser.ShouldPolicyRemind)
+                        {
+                           ModuleJSONObject policy = new ModuleJSONObject(ChatManager.Policy);
+                           MySend(policy.ToString());
+                           ThisUser.PerformOnReminder();
+                        }
+
+                        //Now set up the IRC relay. Oh boy, let's hope this works!
+                        /*relay = new SimpleIRCRelay(manager.IrcServer, manager.IrcChannel, ThisUser.Username, Logger);
+                        relay.ConnectAsync();*/
+                        //relay.IRCRelayMessageEvent += OnIrcRelayMessage;
                      }
                   }
                }
@@ -351,7 +415,21 @@ namespace ChatServer
          }
          else if (type == "ping")
          {
-            ThisUser.PerformOnPing();
+            lastPing = DateTime.Now;
+
+            bool active = true;
+
+            try
+            {
+               active = (bool)json.active;
+               //relay.Ping();
+            }
+            catch (Exception messageError)
+            {
+               response.errors.Add("Internal server error: " + messageError/*.Message*/);
+            }
+
+            ThisUser.PerformOnPing(active);
             UpdateActiveUserList(null, null);
          }
          else if (type == "message")
@@ -373,6 +451,28 @@ namespace ChatServer
                {
                   Logger.LogGeneral("Got invalid key " + key + " from " + UserLogString);
                   response.errors.Add("Your key is invalid");
+               }
+               else if (!ThisUser.AcceptedPolicy)
+               {
+                  if(message != "/accept")
+                  {
+                     response.errors.Add("The only command available right now is /accept");
+                  }
+                  else
+                  {
+                     ModuleJSONObject acceptSuccess = new ModuleJSONObject("You have accepted the SmileBASIC Source " +
+                        "chat policy. Please use the appropriate chat tab for discussion about SmileBASIC or off-topic " +
+                        "subjects!");
+                     MySend(acceptSuccess.ToString(), true);
+
+                     Thread.Sleep(2000);
+                     ThisUser.AcceptPolicy();
+                     ThisUser.PerformOnReminder();
+                     response.result = true;
+
+                     MySend(manager.ChatUserList(UID));
+                     MySend(manager.ChatMessageList(UID));
+                  }
                }
                else if (ThisUser.Blocked)
                {
@@ -450,6 +550,15 @@ namespace ChatServer
 
                   ChatTags warning = manager.AddMessage(userMessage);
 
+                  //Send off on relay
+                  /*if(userMessage.Display && userMessage.tag == manager.IrcTag)
+                  {
+                     if(relay.SendMessage(userMessage.message))
+                        Logger.LogGeneral("Sent message on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
+                     else
+                        Logger.LogGeneral("Couldn't send on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
+                  }*/
+
                   if (warning != ChatTags.None)
                      outputs.Add(NewWarningFromTag(QuickParams(warning)));
 
@@ -463,23 +572,26 @@ namespace ChatServer
                      manager.BroadcastMessageList();        //CRASH ALMOST CERTAINLY HAPPENS HERE!!!!!!!###$$$$$!!!!!!!!!!*$*$*$*
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
-                  foreach (Module module in manager.GetModuleListCopy())
+                  if(manager.AllAcceptedTags.Contains(userMessage.tag))
                   {
-                     if (Monitor.TryEnter(module.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
+                     foreach (Module module in manager.GetModuleListCopy())
                      {
-                        try
+                        if (Monitor.TryEnter(module.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
                         {
-                           module.ProcessMessage(userMessage, currentUsers[ThisUser.UID], currentUsers);
+                           try
+                           {
+                              module.ProcessMessage(userMessage, currentUsers[ThisUser.UID], currentUsers);
+                           }
+                           finally
+                           {
+                              Monitor.Exit(module.Lock);
+                           }
                         }
-                        finally
+                        else
                         {
-                           Monitor.Exit(module.Lock);
+                           Logger.LogGeneral("Skipped " + module.ModuleName + " message processing", 
+                              MyExtensions.Logging.LogLevel.Warning);
                         }
-                     }
-                     else
-                     {
-                        Logger.LogGeneral("Skipped " + module.ModuleName + " message processing", 
-                           MyExtensions.Logging.LogLevel.Warning);
                      }
                   }
 
@@ -498,28 +610,28 @@ namespace ChatServer
                //response.errors.Add("Message was missing fields");
             }
          }
-         else if (type == "createroom")
-         {
-            try
-            {
-               List<int> users = json.users.ToObject<List<int>>();
-               string error;
-
-               if(!manager.CreatePMRoom(new HashSet<int>(users), ThisUser.UID, out error))
-               {
-                  response.errors.Add(error);
-               }
-               else
-               {
-                  MySend((new SystemMessageJSONObject("You created a chat room for " + string.Join(", ", users.Select(x => manager.GetUser(x).Username)))).ToString());
-                  manager.BroadcastUserList();
-               }
-            }
-            catch
-            {
-               response.errors.Add("Could not parse PM creation room message");
-            }
-         }
+//         else if (type == "createroom")
+//         {
+//            try
+//            {
+//               List<int> users = json.users.ToObject<List<int>>();
+//               string error;
+//
+//               if(!manager.CreatePMRoom(new HashSet<int>(users), ThisUser.UID, out error))
+//               {
+//                  response.errors.Add(error);
+//               }
+//               else
+//               {
+//                  MySend((new SystemMessageJSONObject("You created a chat room for " + string.Join(", ", users.Select(x => manager.GetUser(x).Username)))).ToString());
+//                  manager.BroadcastUserList();
+//               }
+//            }
+//            catch
+//            {
+//               response.errors.Add("Could not parse PM creation room message");
+//            }
+//         }
          else if (type == "request")
          {
             try
@@ -548,7 +660,7 @@ namespace ChatServer
          }
 
          //Send the "OK" message back.
-         MySend(response.ToString());
+         MySend(response.ToString(), true);
       }
          
       private void OutputMessages(List<JSONObject> outputs, int receiverUID, string defaultTag = "")
@@ -607,6 +719,36 @@ namespace ChatServer
          OutputMessages(outputs, receiverUID);
       }
 
+      private string ParseUser(string user)
+      {
+         if (user.StartsWith("??"))
+         {
+            return StringExtensions.AutoCorrectionMatch(user.Replace("??", ""), 
+               manager.UsersForModules().Select(x => x.Value.Username).ToList());
+         }
+         else if (user.StartsWith("?"))
+         {
+            return StringExtensions.AutoCorrectionMatch(user.Replace("?", ""), 
+               manager.UsersForModules().Where(x => x.Value.LoggedIn).Select(x => x.Value.Username).ToList());
+         }
+         else if (user.StartsWith("#"))
+         {
+            //Console.WriteLine("User: '" + user + "'");
+            int id = 0;
+            string username = "no";
+
+            if (int.TryParse(user.Replace("#", ""), out id) &&
+               manager.UsersForModules().ContainsKey(id))
+            {
+               username = manager.UsersForModules()[id].Username;
+            }
+
+            return username;
+         }
+
+         return user;
+      }
+
       /// <summary>
       /// Parse and build command if possible. Assign module which will handle command. 
       /// </summary>
@@ -621,7 +763,7 @@ namespace ChatServer
          error = "";
 
          UserCommand tempUserCommand = null;
-         List<Module> modules = manager.GetModuleListCopy();
+         List<Module> modules = manager.GetModuleListCopy(UID);
 
          string realMessage = System.Net.WebUtility.HtmlDecode(message.message);
 
@@ -655,20 +797,13 @@ namespace ChatServer
                      //Users need to exist. If not, throw error.
                      if (command.Arguments[i].Type == ArgumentType.User)
                      {
-                        if (tempUserCommand.Arguments[i].StartsWith("??"))
-                        {
-                           tempUserCommand.Arguments[i] = StringExtensions.AutoCorrectionMatch(
-                              tempUserCommand.Arguments[i].Replace("??", ""), 
-                              manager.UsersForModules().Select(x => x.Value.Username).ToList());
-                        }
-                        else if (tempUserCommand.Arguments[i].StartsWith("?"))
-                        {
-                           tempUserCommand.Arguments[i] = StringExtensions.AutoCorrectionMatch(
-                              tempUserCommand.Arguments[i].Replace("?", ""), 
-                              manager.UsersForModules().Where(x => x.Value.LoggedIn).Select(x => x.Value.Username).ToList());
-                        }
+                        tempUserCommand.Arguments[i] = ParseUser(tempUserCommand.Arguments[i]);
 
-                        if (manager.UserLookup(tempUserCommand.Arguments[i]) < 0)
+                        for (int j = 0; j < tempUserCommand.ArgumentParts[i].Count; j++)
+                           tempUserCommand.ArgumentParts[i][j] = ParseUser(tempUserCommand.ArgumentParts[i][j]);
+
+                        if (tempUserCommand.ArgumentParts[i].Count == 0 && manager.UserLookup(tempUserCommand.Arguments[i]) < 0 ||
+                           tempUserCommand.ArgumentParts[i].Any(x => manager.UserLookup(x) < 0))
                         {
                            error = "User does not exist";
                            return false;
@@ -706,8 +841,9 @@ namespace ChatServer
    {
       public GlobalModule()
       {
-         commands.AddRange(new List<ModuleCommand> {
+         Commands.AddRange(new List<ModuleCommand> {
             new ModuleCommand("about", new List<CommandArgument>(), "See information about the chat server"),
+            new ModuleCommand("policy", new List<CommandArgument>(), "View the SmileBASIC Source chat policy"),
             new ModuleCommand("uactest", new List<CommandArgument> {
                new CommandArgument("shortuser", ArgumentType.User)
             }, "Test user autocorrection (use ? on username to enable shorthand)"),
@@ -742,6 +878,7 @@ namespace ChatServer
                output.message = 
                   "---Build info---\n" +
                   "Version: " + ChatRunner.AssemblyVersion() + "\n" +
+                  "Runtime: " + StringExtensions.LargestTime(DateTime.Now - ChatRunner.Startup) + "\n" +
                   "Built " + StringExtensions.LargestTime(DateTime.Now - built) + " ago (" + built.ToString("R") + ")\n" +
                   "---Data usage---\n" +
                   "Outgoing: " + bandwidth.GetTotalBandwidthOutgoing() + " (1h: " + bandwidth.GetHourBandwidthOutgoing() + ")\n" +
@@ -752,13 +889,18 @@ namespace ChatServer
                outputs.Add(output);
                break;
 
+            case "policy":
+               output = new ModuleJSONObject(ChatManager.Policy);
+               outputs.Add(output);
+               break;
+
             case "help":
                output = new ModuleJSONObject();
                if (command.Arguments.Count == 0)
                {
                   output.message = "Which module would you like help with?\n";
 
-                  foreach (Module module in ChatRunner.ActiveModules)
+                  foreach (Module module in ChatRunner.Manager.GetModuleListCopy(user.UID))
                      output.message += "\n" + module.Nickname;
 
                   output.message += "\n\nRerun help command with a module name to see commands for that module";
@@ -766,12 +908,12 @@ namespace ChatServer
                }
                else
                {
-                  output.message = GetModuleHelp(command.Arguments[0]);
+                  output.message = GetModuleHelp(command.Arguments[0], user);
                   outputs.Add(output);
                }
                break;
             case "helpregex":
-               output.message = GetModuleHelp(command.Arguments[0], true);
+               output.message = GetModuleHelp(command.Arguments[0], user, true);
                outputs.Add(output);
                break;
             case "uactest":
@@ -784,25 +926,34 @@ namespace ChatServer
          return outputs;
       }
 
-      public string GetModuleHelp(string moduleString, bool showRegex = false)
+      public string GetModuleHelp(string moduleString, UserInfo user, bool showRegex = false)
       {
          string message = "Help for the " + moduleString + " module:\n";
 
-         Module module = ChatRunner.ActiveModules.First(x => x.Nickname == moduleString);
+         Module module = null;
 
-         if (!string.IsNullOrWhiteSpace(module.GeneralHelp))
-            message += "\n" + module.GeneralHelp + "\n";
-
-         foreach(ModuleCommand moduleCommand in module.Commands)
-            message += "\n" + moduleCommand.DisplayString + (showRegex ? " : " + moduleCommand.FullRegex : "");
-
-         if (showRegex)
+         try
          {
-            if (module.ArgumentHelp.Count > 0)
-               message += "\n\nSome argument regex (uses standard regex syntax):";
+            module = ChatRunner.Manager.GetModuleListCopy(user.UID).First(x => x.Nickname == moduleString);
 
-            foreach (KeyValuePair<string, string> argHelp in module.ArgumentHelp)
-               message += "\n" + argHelp.Key + " - " + argHelp.Value;
+            if (!string.IsNullOrWhiteSpace(module.GeneralHelp))
+               message += "\n" + module.GeneralHelp + "\n";
+
+            foreach(ModuleCommand moduleCommand in module.Commands)
+               message += "\n" + moduleCommand.DisplayString + (showRegex ? " : " + moduleCommand.FullRegex : "");
+
+            if (showRegex)
+            {
+               if (module.ArgumentHelp.Count > 0)
+                  message += "\n\nSome argument regex (uses standard regex syntax):";
+
+               foreach (KeyValuePair<string, string> argHelp in module.ArgumentHelp)
+                  message += "\n" + argHelp.Key + " - " + argHelp.Value;
+            }
+         }
+         catch
+         {
+            message += "\nThis module is hidden or does not exist.";
          }
 
          return message;

@@ -123,11 +123,31 @@ namespace ChatEssentials
    public class ModuleJSONObject : JSONObject
    {
       public ModuleJSONObject() : base("module") {}
-      public string message = "";
+      public ModuleJSONObject(string message) : base("module") 
+      {
+         this.rawMessage = message;
+      }
+      private string rawMessage = "";
       public int uid = 0;
       public bool broadcast = false;
+      public bool safe = true;
       public string tag = "";
       public List<int> recipients = new List<int>();
+
+      public string message
+      {
+         get
+         {
+            if (safe)
+               return System.Security.SecurityElement.Escape(System.Net.WebUtility.HtmlDecode(rawMessage));
+            else
+               return rawMessage;
+         }
+         set
+         {
+            rawMessage = value;
+         }
+      }
    }
 
    public class SystemRequest
@@ -152,7 +172,8 @@ namespace ChatEssentials
    public enum SystemRequests
    {
       Reset,
-      LockDeath
+      LockDeath,
+      SaveModules
    }
 
 

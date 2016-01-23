@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Timers;
 using System.IO;
+using System.Linq;
 
 namespace MyExtensions.Logging
 {
@@ -10,15 +11,17 @@ namespace MyExtensions.Logging
    //which should be able to handle most use cases.
    public class Logger
    {
+      public const int MaxFileBuffer = 10000;
       public const LogLevel DefaultConsoleLogLevel = LogLevel.Normal;
       public const LogLevel DefaultFileLogLevel = LogLevel.Normal;
 
       private Queue<LogMessage> messages = new Queue<LogMessage>();
+      private Queue<LogMessage> fileBuffer = new Queue<LogMessage>();
       private readonly object messageLock = new object();
       private Timer autoDumpTimer = new Timer();
       private readonly string logFile = "";
       public readonly int MaxMessages = 1000;
-      private bool instantConsole = false;
+      private bool instantConsole = true;
       private LogLevel minConsoleLevel;
       private LogLevel minFileLevel;
 
@@ -31,22 +34,37 @@ namespace MyExtensions.Logging
          this.minConsoleLevel = minConsoleLevel;
          this.minFileLevel = minFileLevel;
 
-         //First, try to create the file if it doesn't exist
-         if (!File.Exists (logFile) && !string.IsNullOrWhiteSpace(logFile))
-            File.Create (logFile).Close();
+         //First, try to create the file if it doesn't exist (and a file was given)
+         if (!string.IsNullOrWhiteSpace(logFile))
+         {
+            if (!File.Exists(logFile))
+               File.Create(logFile).Close();
 
-         //If it still doesn't exist, that means it's not accessible
-         if (File.Exists (logFile))
-         {
-            this.logFile = logFile;
-         }
-         else
-         {
-            Error("Cannot open logfile: " + logFile, "System");
+            //If it still doesn't exist, that means it's not accessible
+            if (File.Exists(logFile))
+               this.logFile = logFile;
+            else
+               Error("Cannot open logfile: " + logFile, "System");
          }
 
          if (maxMessages > 0)
             MaxMessages = maxMessages;
+      }
+
+      public List<LogMessage> GetMessages()
+      {
+         lock (messageLock)
+         {
+            return messages.Select(x => new LogMessage(x)).ToList();
+         }
+      }
+
+      public List<LogMessage> GetFileBuffer()
+      {
+         lock (messageLock)
+         {
+            return fileBuffer.Select(x => new LogMessage(x)).ToList();
+         }
       }
 
       public bool CanLogToFile
@@ -110,25 +128,42 @@ namespace MyExtensions.Logging
       //Dump all log messages out to file
       public bool DumpToFile(bool tossMessages = false)
       {
-         if (!CanLogToFile)
-            return false;
-         
          lock (messageLock)
          {
-            foreach (LogMessage message in messages)
+            //Only mess with messages and files if we can actually write to a file
+            if (CanLogToFile)
             {
-               if (!message.WasLoggedBy (LoggerType.File) && message.Level >= minFileLevel)
+               foreach (LogMessage message in messages.Union(fileBuffer).OrderBy(x => x.TimeStamp))
                {
-                  File.AppendAllText (logFile, message.ToString () + Environment.NewLine);
-                  message.SetLoggedBy (LoggerType.File);
+                  if (!message.WasLoggedBy(LoggerType.File) && message.Level >= minFileLevel)
+                  {
+                     File.AppendAllText(logFile, message.ToString() + Environment.NewLine);
+                     message.SetLoggedBy(LoggerType.File);
+                  }
                }
+
+               if (tossMessages)
+                  messages.Clear ();
             }
 
-            if (tossMessages)
-               messages.Clear ();
+            //Unconditionally toss the files in the file buffer
+            fileBuffer.Clear();
          }
 
-         return true;
+         return CanLogToFile;
+      }
+
+      public void BufferFileMessage(LogMessage message)
+      {
+         lock (messageLock)
+         {
+            fileBuffer.Enqueue(messages.Peek());
+
+            //If our file buffer gets too large to even consider, it's probably
+            //because we can't log to the file. Just throw out everything
+            if (fileBuffer.Count > MaxFileBuffer)
+               fileBuffer.Clear();
+         }
       }
 
       //Add a message to the log
@@ -154,15 +189,17 @@ namespace MyExtensions.Logging
       {
          lock (messageLock)
          {
-            messages.Enqueue (new LogMessage(message, level, tag));
+            //Don't log unnecessary files
+            if((int)level >= Math.Min((int)minFileLevel, (int)minConsoleLevel))
+               messages.Enqueue (new LogMessage(message, level, tag));
 
             //Remove messages if we have too many
             while (messages.Count > MaxMessages)
             {
                //If we're about to dequeue a message that has not been logged by the file logger,
                //this is a problem. Log all messages to the file, then dequeue.
-               if (!messages.Peek().WasLoggedBy(LoggerType.File))
-                  DumpToFile();
+               if (!messages.Peek().WasLoggedBy(LoggerType.File) && CanLogToFile)
+                  BufferFileMessage(messages.Peek());
                
                messages.Dequeue();
             }
@@ -199,6 +236,15 @@ namespace MyExtensions.Logging
          this.message = message;
          this.tag = tag;
          this.level = level;
+      }
+
+      public LogMessage(LogMessage copyMessage)
+      {
+         this.message = copyMessage.message;
+         this.tag = copyMessage.tag;
+         this.level = copyMessage.level;
+         this.timestamp = copyMessage.timestamp;
+         this.loggedBy = new HashSet<LoggerType>(copyMessage.loggedBy);
       }
 
       //Accessors

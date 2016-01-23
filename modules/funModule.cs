@@ -11,10 +11,10 @@ namespace ModulePackage1
    {
       public FunModule()
       {
-         commands.Add(new ModuleCommand("me", new List<CommandArgument> { 
+         Commands.Add(new ModuleCommand("me", new List<CommandArgument> { 
             new CommandArgument("message", ArgumentType.FullString)
          }, "be silly", true));
-         commands.Add(new ModuleCommand("emotes", new List<CommandArgument>(), "See all available emotes"));
+         Commands.Add(new ModuleCommand("emotes", new List<CommandArgument>(), "See all available emotes"));
 
          AddOptions(new Dictionary<string, object>{{"emoteLink", "http://development.smilebasicsource.com/emotes.json"}});
       }
@@ -29,7 +29,7 @@ namespace ModulePackage1
             case "me":
                moduleOutput = new ModuleJSONObject();
                moduleOutput.broadcast = true;
-               moduleOutput.message = user.Username + " " + command.Arguments[0];
+               moduleOutput.message = user.Username + " " + command.Arguments[0]; //System.Security.SecurityElement.Escape(command.Arguments[0]);
                moduleOutput.tag = command.tag;
                outputs.Add(moduleOutput);
                break;

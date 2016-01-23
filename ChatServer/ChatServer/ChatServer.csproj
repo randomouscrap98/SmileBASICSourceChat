@@ -58,6 +58,12 @@
     <Compile Include="..\..\modules\debugModule.cs">
       <Link>debugModule.cs</Link>
     </Compile>
+    <Compile Include="..\..\simpleIRCRelay.cs">
+      <Link>simpleIRCRelay.cs</Link>
+    </Compile>
+    <Compile Include="..\..\modules\pmModule.cs">
+      <Link>pmModule.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />
@@ -71,17 +77,8 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.Threading.Tasks.Dataflow">
-      <HintPath>..\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
-    </Reference>
-    <Reference Include="vtortola.WebSockets.Deflate">
-      <HintPath>..\packages\vtortola.WebSocketListener.2.1.9.0\lib\net45\vtortola.WebSockets.Deflate.dll</HintPath>
-    </Reference>
-    <Reference Include="vtortola.WebSockets">
-      <HintPath>..\packages\vtortola.WebSocketListener.2.1.9.0\lib\net45\vtortola.WebSockets.dll</HintPath>
-    </Reference>
-    <Reference Include="vtortola.WebSockets.Rfc6455">
-      <HintPath>..\packages\vtortola.WebSocketListener.2.1.9.0\lib\net45\vtortola.WebSockets.Rfc6455.dll</HintPath>
+    <Reference Include="IrcDotNet">
+      <HintPath>..\packages\IrcDotNet.0.5.0\lib\net45\IrcDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
