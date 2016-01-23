@@ -71,14 +71,11 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="websocket-sharp">
-      <HintPath>..\..\websocket-sharp.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="IrcDotNet">
-      <HintPath>..\packages\IrcDotNet.0.5.0\lib\net45\IrcDotNet.dll</HintPath>
+    <Reference Include="MyWebSocket">
+      <HintPath>..\..\MyWebSocket.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
