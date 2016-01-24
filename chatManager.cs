@@ -63,7 +63,19 @@ namespace ChatServer
       public ChatServerSettings(int port, string service, Func<WebSocketUser> generator, Logger logger = null) 
          : base(port, service, generator, logger)
       {
+         Dictionary<string, string> settingValues = new Dictionary<string, string>();
 
+         settingValues.Add("fileWait", this.MaxFileWait.ToString());
+         settingValues.Add("moduleWait", this.MaxModuleWait.ToString());
+         settingValues.Add("maxReceiveSize", this.MaxReceiveSize.ToString());
+         settingValues.Add("pingInterval", this.PingInterval.ToString());
+         settingValues.Add("readWriteTimeout", this.ReadWriteTimeout.ToString());
+         settingValues.Add("receiveBuffer", this.ReceiveBufferSize.ToString());
+         settingValues.Add("sendBuffer", this.SendBufferSize.ToString());
+         settingValues.Add("shutdownTimeout", this.ShutdownTimeout.ToString());
+
+         logger.LogGeneral("Settings dump: " + 
+            string.Join(" ", settingValues.Select(x => "[" + x.Key + "] " + x.Value)), LogLevel.Debug, "ChatSettings");
       }
    }
 
@@ -1070,7 +1082,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          lock (managerLock)
          {
             Log("Enter loggedinuserget lock", MyExtensions.Logging.LogLevel.Locks);
-            returns = ConnectedUsers().Select(x => (Chat)x).Where(x => users.ContainsKey(x.UID)).ToDictionary(k => k.UID, v => users[v.UID]); //users.Where(x => activeUIDs.Contains(x.Key)).ToDictionary(k => k.Key, v => v.Value);
+            returns = ConnectedUsers().Select(x => (Chat)x).Where(x => users.ContainsKey(x.UID)).DistinctBy(x => x.UID).ToDictionary(k => k.UID, v => users[v.UID]); //users.Where(x => activeUIDs.Contains(x.Key)).ToDictionary(k => k.Key, v => v.Value);
             Log("exit loggedinuserget lock", MyExtensions.Logging.LogLevel.Locks);
          }
 

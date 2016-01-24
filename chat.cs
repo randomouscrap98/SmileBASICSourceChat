@@ -59,7 +59,7 @@ namespace ChatServer
          else
             tag += "X";
          
-         manager.ChatSettings.LogProvider.LogGeneral(message, level, "ChatUser" + UID);
+         manager.ChatSettings.LogProvider.LogGeneral(message, level, tag);
 
 //         if (manager != null)
 //            return manager.Logger;
@@ -234,9 +234,6 @@ namespace ChatServer
       public override void ClosedConnection()
       {
          Log ("Session disconnect: " + uid);
-         manager.UpdateAuthUserlist();
-
-         manager.BroadcastUserList();
 
          //Only perform special leaving messages and processing if the user was real
          if (UID > 0)
@@ -247,6 +244,15 @@ namespace ChatServer
             if (ThisUser.ShowMessages)
                manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
          }
+
+         //Now "technically" remove the user from lists
+         int tempID = uid;
+         uid = -1;
+         manager.UpdateAuthUserlist();
+         manager.BroadcastUserList();
+
+         //Uh now put it back?
+         uid = tempID;
 
          //Now get rid of events
          userUpdateTimer.Elapsed -= UpdateActiveUserList;
@@ -341,7 +347,7 @@ namespace ChatServer
                      else
                      {
                         //Before we do anything, remove other chatting sessions
-                        foreach (Chat removeChat in GetAllUsers().Select(x => (Chat)x).Where(x => x.UID == UID && x != this))
+                        foreach (Chat removeChat in GetAllUsers().Select(x => (Chat)x).Where(x => x.UID == newUser && x != this))
                            removeChat.CloseSelf();
                         
                            //Sessions.CloseSession(removeChat.ID);

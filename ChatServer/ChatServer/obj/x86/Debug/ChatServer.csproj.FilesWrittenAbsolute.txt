@@ -11,3 +11,16 @@
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe.mdb
+/home/csanchez/chatserver/ChatServer/ChatServer/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe.mdb
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe
+/home/csanchez/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe
+/home/csanchez/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe.mdb
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/Newtonsoft.Json.dll
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/MyWebSocket.dll
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/Module.dll
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/Module.dll.mdb
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/MyExtensions.dll
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/MyExtensions.dll.mdb
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/ChatEssentials.dll
+/home/csanchez/chatserver/ChatServer/ChatServer/bin/Debug/ChatEssentials.dll.mdb
