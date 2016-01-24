@@ -5,20 +5,19 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Text.RegularExpressions;
-using WebSocketSharp;
-using WebSocketSharp.Server;
 using Newtonsoft.Json;
 using MyExtensions;
 using ChatEssentials;
 using ModuleSystem;
-using IrcDotNet;
+using MyWebSocket;
+using MyExtensions.Logging;
 
 namespace ChatServer
 {
    public delegate void ChatEventHandler(object source, EventArgs e);
 
    //This is the thing that will get passed as the... controller to Websockets?
-   public class Chat : WebSocketBehavior
+   public class Chat : WebSocketUser
    {
       public const int HeaderSize = 64;
 
@@ -26,7 +25,7 @@ namespace ChatServer
 
       public readonly DateTime Startup = DateTime.Now;
       private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
-      private readonly ChatManager manager;
+      private readonly ChatServer manager;
 
       private readonly Queue<string> backlog = new Queue<string>();
       private readonly Object backlock = new Object();
@@ -38,7 +37,7 @@ namespace ChatServer
 
       //Set up the logger when building the chat provider. Logging will go out to a file and the console
       //if possible. Otherwise, log to the default logger (which is like throwing them away)
-      public Chat(int userUpdateInterval, ChatManager manager)
+      public Chat(int userUpdateInterval, ChatServer manager)
       {
          userUpdateTimer.Interval = userUpdateInterval * 1000;
          userUpdateTimer.Elapsed += UpdateActiveUserList;
@@ -60,15 +59,14 @@ namespace ChatServer
             module.OnExtraCommandOutput -= DefaultOutputMessages;
       }
 
-      public MyExtensions.Logging.Logger Logger
+      public void Log(string message, LogLevel level)
       {
-         get 
-         {
-            if (manager != null)
-               return manager.Logger;
-            else
-               return new MyExtensions.Logging.Logger(10);
-         }
+         manager.ChatSettings.LogProvider.LogGeneral(message, level, "ChatUser" + UID);
+
+//         if (manager != null)
+//            return manager.Logger;
+//         else
+//            return new MyExtensions.Logging.Logger(10);
       }
 
       //This should be the ONLY place where the active state changes
@@ -228,42 +226,54 @@ namespace ChatServer
 //
 //      }
 
-      protected override void OnOpen()
-      {
-         //I don't know what we're doing for OnOpen yet.
-      }
+//      protected override void OnOpen()
+//      {
+//         //I don't know what we're doing for OnOpen yet.
+//      }
 
       //On closure of the websocket, remove ourselves from the list of active
       //chatters.
-      protected override void OnClose(CloseEventArgs e)
+      protected override void ClosedConnection()
       {
          Logger.Log ("Session disconnect: " + uid);
+         manager.UpdateAuthUserlist();
 
-         manager.LeaveChat(this);
+         manager.BroadcastUserList();
 
-         foreach (Module module in manager.GetModuleListCopy())
-            module.OnExtraCommandOutput -= DefaultOutputMessages;
+         //Only perform special leaving messages and processing if the user was real
+         if (UID > 0)
+         {
+            if (!ThisUser.PerformOnChatLeave())
+               Log("User session timer was in an invalid state!", LogLevel.Warning);
+
+            if (ThisUser.ShowMessages)
+               Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
+         }
+//         manager.LeaveChat(this);
+//
+//         foreach (Module module in manager.GetModuleListCopy())
+//            module.OnExtraCommandOutput -= DefaultOutputMessages;
 
          //relay.Disconnect();
          //relay.Dispose();
       }
 
-      protected override void OnError(ErrorEventArgs e)
-      {
-         if(e.Message != null)
-            Logger.Error("UID: " + uid + " - " + e.Message, "WebSocket");
-         if(e.Exception != null)
-            Logger.Error(e.Exception.ToString(), "WebSocket");
-
-         //OK let's see what happens here
-         //OnClose(null);
-         //base.OnError(e);
-      }
+//      protected override void OnError(ErrorEventArgs e)
+//      {
+//         if(e.Message != null)
+//            Logger.Error("UID: " + uid + " - " + e.Message, "WebSocket");
+//         if(e.Exception != null)
+//            Logger.Error(e.Exception.ToString(), "WebSocket");
+//
+//         //OK let's see what happens here
+//         //OnClose(null);
+//         //base.OnError(e);
+//      }
 
       //I guess this is WHENEVER it receives a message?
-      protected override void OnMessage(MessageEventArgs e)
+      protected override void ReceivedMessage(string rawMessage)
       {
-         Logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
+         //Logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
 
          ResponseJSONObject response = new ResponseJSONObject();
          response.result = false;
@@ -274,16 +284,16 @@ namespace ChatServer
          ThisUser.PullInfoFromQueryPage();
 
          //Before anything else, log the amount of incoming data
-         if (!string.IsNullOrEmpty(e.Data))
+         if (!string.IsNullOrEmpty(rawMessage))
          {
-            manager.Bandwidth.AddIncoming(e.Data.Length + HeaderSize);
+            manager.Bandwidth.AddIncoming(rawMessage.Length + HeaderSize);
          }
 
          //First, just try to parse the JSON they gave us. If it's absolute
          //garbage (or just not JSON), let them know and quit immediately.
          try
          {
-            json = JsonConvert.DeserializeObject(e.Data);
+            json = JsonConvert.DeserializeObject(rawMessage);
             type = json.type;
             response.from = type;
          }
@@ -319,15 +329,17 @@ namespace ChatServer
                      List<Chat> removals;
                      string error;
 
-                     if (!manager.Authenticate(this, newUser, key, out removals, out error))
+                     if (!manager.CheckAuthentication(newUser, key, out error))  //newUser, key, out removals, out error))
                      {
                         response.errors.Add(error);
                      }
                      else
                      {
                         //Before we do anything, remove other chatting sessions
-                        foreach (Chat removeChat in removals)
-                           Sessions.CloseSession(removeChat.ID);
+                        foreach (Chat removeChat in GetAllUsers().Select(x => (Chat)x).Where(x => x.UID == UID))
+                           removeChat.CloseSelf();
+                        
+                           //Sessions.CloseSession(removeChat.ID);
                      
                         uid = newUser;
 
@@ -360,7 +372,7 @@ namespace ChatServer
                         //Also do some other crap
                         foreach (Module module in manager.GetModuleListCopy())
                         {
-                           if (Monitor.TryEnter(module.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
+                           if (Monitor.TryEnter(module.Lock, manager.ChatSettings.MaxModuleWait))
                            {
                               try
                               {
@@ -385,7 +397,7 @@ namespace ChatServer
                         {
                            MessageListJSONObject emptyMessages = new MessageListJSONObject();
                            UserListJSONObject emptyUsers = new UserListJSONObject();
-                           ModuleJSONObject policy = new ModuleJSONObject(ChatManager.Policy);
+                           ModuleJSONObject policy = new ModuleJSONObject(ChatServer.Policy);
                            ModuleJSONObject accept = new ModuleJSONObject("\nYou must accept this chat policy before " +
                               "using the chat. Type /accept if you accept the chat policy\n");
                            MySend(emptyMessages.ToString(), true);
@@ -395,7 +407,7 @@ namespace ChatServer
                         }
                         else if(ThisUser.ShouldPolicyRemind)
                         {
-                           ModuleJSONObject policy = new ModuleJSONObject(ChatManager.Policy);
+                           ModuleJSONObject policy = new ModuleJSONObject(ChatServer.Policy);
                            MySend(policy.ToString());
                            ThisUser.PerformOnReminder();
                         }
@@ -484,7 +496,7 @@ namespace ChatServer
                   StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now));
                }
                else if (tag == "admin" && !ThisUser.CanStaffChat ||
-                        tag == manager.GlobalTag && !ThisUser.CanGlobalChat)
+                        tag == manager.ChatSettings.GlobalTag && !ThisUser.CanGlobalChat)
                {
                   response.errors.Add("You can't post messages here. I'm sorry.");
                }
@@ -508,7 +520,7 @@ namespace ChatServer
                         userCommand.message + " from " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
 
                      //We found a command. Send it off to the proper module and get the output
-                     if (Monitor.TryEnter(commandModule.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
+                     if (Monitor.TryEnter(commandModule.Lock, manager.ChatSettings.MaxModuleWait))
                      {
                         try
                         {
@@ -572,11 +584,11 @@ namespace ChatServer
                      manager.BroadcastMessageList();        //CRASH ALMOST CERTAINLY HAPPENS HERE!!!!!!!###$$$$$!!!!!!!!!!*$*$*$*
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
-                  if(manager.AllAcceptedTags.Contains(userMessage.tag))
+                  if(manager.ChatSettings.AcceptedTags.Contains(userMessage.tag))
                   {
                      foreach (Module module in manager.GetModuleListCopy())
                      {
-                        if (Monitor.TryEnter(module.Lock, TimeSpan.FromSeconds(manager.MaxModuleWaitSeconds)))
+                        if (Monitor.TryEnter(module.Lock, manager.ChatSettings.MaxModuleWait))
                         {
                            try
                            {
@@ -669,8 +681,8 @@ namespace ChatServer
          if (ThisUser.UID != receiverUID)
             return;
          
-         if (!manager.AllAcceptedTags.Contains(defaultTag))
-            defaultTag = manager.GlobalTag;
+         if (!manager.ChatSettings.AcceptedTags.Contains(defaultTag))
+            defaultTag = manager.ChatSettings.GlobalTag;
          
          foreach(JSONObject jsonMessage in outputs)
          {
@@ -694,11 +706,11 @@ namespace ChatServer
                tempJSON.uid = uid;
 
                if(string.IsNullOrWhiteSpace(tempJSON.tag))
-                  tempJSON.tag = manager.GlobalTag;
+                  tempJSON.tag = manager.ChatSettings.GlobalTag;
 
                if(tempJSON.broadcast)
                {
-                  manager.SelectiveBroadcast(tempJSON.ToString(), tempJSON.tag);
+                  manager.BroadcastExclude(tempJSON.ToString(), tempJSON.tag);
                   //manager.Broadcast(tempJSON.ToString());
                   Logger.LogGeneral("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
                }
@@ -884,13 +896,13 @@ namespace ChatServer
                   "Outgoing: " + bandwidth.GetTotalBandwidthOutgoing() + " (1h: " + bandwidth.GetHourBandwidthOutgoing() + ")\n" +
                   "Incoming: " + bandwidth.GetTotalBandwidthIncoming() + " (1h: " + bandwidth.GetHourBandwidthIncoming() + ")\n" +
                   "---Websocket---\n" +
-                  "Library Version: " + MySocketVariables.Version + "\n" +
+                  "Library Version: " + WebSocketServer.Version + "\n" +
                   "Last full crash: " + crashedString;
                outputs.Add(output);
                break;
 
             case "policy":
-               output = new ModuleJSONObject(ChatManager.Policy);
+               output = new ModuleJSONObject(ChatServer.Policy);
                outputs.Add(output);
                break;
 

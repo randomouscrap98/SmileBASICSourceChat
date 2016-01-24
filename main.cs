@@ -1,7 +1,5 @@
 using MyHelper;
 using System;
-using WebSocketSharp;
-using WebSocketSharp.Server;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
@@ -15,6 +13,8 @@ using ChatEssentials;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Linq;
+using MyWebSocket;
 
 [assembly: AssemblyVersion("1.0")]
 [assembly: AssemblyFileVersion("1.0")]
@@ -25,11 +25,11 @@ namespace ChatServer
    {
       public const string Version = "1.4.4";
 
-      private static WebSocketServer webSocketServer;
+      //private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
       private static MyExtensions.Logging.Logger logger;
       private static ModuleLoader loader;
-      private static ChatManager manager = null;
+      private static ChatServer manager = null;
       private static MyExtensions.Options options = new MyExtensions.Options();
 
       private static bool ShouldDie = false;
@@ -47,7 +47,7 @@ namespace ChatServer
          get { return loader.ActiveModules; }
       }
 
-      public static ChatManager Manager
+      public static ChatServer Manager
       {
          get { return manager; }
       }
@@ -63,52 +63,76 @@ namespace ChatServer
          }
       }
 
-      //This will reinitialize (hopefully) the websocket server.
-      private static void SetupWebsocket()
+//      //This will reinitialize (hopefully) the websocket server.
+//      private static void SetupWebsocket()
+//      {
+//         //Now, set up websocket server
+//         webSocketServer = new WebSocketServer(GetOption<int>("chatServerPort"));
+//         webSocketServer.AddWebSocketService<Chat>("/chatserver", () => new Chat(GetOption<int>("userUpdateInterval"), manager) {
+//            Protocol = "chat",
+//            IgnoreExtensions = true,
+//         });
+//
+//         /*System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
+//         webSocketServer.SslConfiguration.ClientCertificateValidationCallback += (sender, ICertificatePolicy, chain, sslPolicyErrors) => true;
+//         webSocketServer.SslConfiguration.ClientCertificateRequired = false;
+//         webSocketServer.SslConfiguration.CheckCertificateRevocation = false;
+//         webSocketServer.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Default |
+//         System.Security.Authentication.SslProtocols.Ssl2 | System.Security.Authentication.SslProtocols.Tls11 |
+//         System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Ssl3 |
+//         System.Security.Authentication.SslProtocols.Tls;
+//         webSocketServer.SslConfiguration.ServerCertificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(GetOption<string>("sslCertificate"));//"/etc/nginx/ssl/bundle.crt");
+//         */
+//
+//         //Console.WriteLine("Keep clean: " + webSocketServer.KeepClean);
+//         webSocketServer.WaitTime = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
+//         webSocketServer.Start();
+//
+//         //If chat server is running, show services
+//         if (webSocketServer.IsListening)
+//         {
+//            logger.Log("Chat Server listening on port " + webSocketServer.Port + " with services:", LogTag);
+//
+//            foreach (var path in webSocketServer.WebSocketServices.Paths)
+//               logger.Log("- " + path, LogTag);
+//         }
+//      }
+
+      private static bool SetupChatManager()
       {
-         //Now, set up websocket server
-         webSocketServer = new WebSocketServer(GetOption<int>("chatServerPort"));
-         webSocketServer.AddWebSocketService<Chat>("/chatserver", () => new Chat(GetOption<int>("userUpdateInterval"), manager) {
-            Protocol = "chat",
-            IgnoreExtensions = true,
-         });
-
-         /*System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
-         webSocketServer.SslConfiguration.ClientCertificateValidationCallback += (sender, ICertificatePolicy, chain, sslPolicyErrors) => true;
-         webSocketServer.SslConfiguration.ClientCertificateRequired = false;
-         webSocketServer.SslConfiguration.CheckCertificateRevocation = false;
-         webSocketServer.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Default |
-         System.Security.Authentication.SslProtocols.Ssl2 | System.Security.Authentication.SslProtocols.Tls11 |
-         System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Ssl3 |
-         System.Security.Authentication.SslProtocols.Tls;
-         webSocketServer.SslConfiguration.ServerCertificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(GetOption<string>("sslCertificate"));//"/etc/nginx/ssl/bundle.crt");
-         */
-
-         //Console.WriteLine("Keep clean: " + webSocketServer.KeepClean);
-         webSocketServer.WaitTime = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
-         webSocketServer.Start();
-
-         //If chat server is running, show services
-         if (webSocketServer.IsListening)
-         {
-            logger.Log("Chat Server listening on port " + webSocketServer.Port + " with services:", LogTag);
-
-            foreach (var path in webSocketServer.WebSocketServices.Paths)
-               logger.Log("- " + path, LogTag);
-         }
-      }
-
-      private static void SetupChatManager()
-      {
+         ChatServerSettings settings = new ChatServerSettings(GetOption<int>("chatServerPort"), "chatserver",
+            () => { return new Chat(GetOption<int>("userUpdateInterval"), Manager); }, logger);
+         
          //Set up languages
          LanguageTags languageTags = new LanguageTags(logger);
 
          if(!languageTags.InitFromURL(GetOption<string>("website") + GetOption<string>("languageURL")))
             logger.Warning("Couldn't load language tags! Hopefully the default will suffice");
 
+         settings.MaxMessageKeep = GetOption<int>("messageBacklog");
+         settings.MaxMessageSend = GetOption<int>("messageSend");
+         settings.MaxModuleWait = TimeSpan.FromSeconds(GetOption<int>("moduleWaitSeconds"));
+         settings.SaveFolder = GetOption<string>("saveFolder");
+         settings.GlobalTag = GetOption<string>("globalTag");
+         settings.SaveInterval = TimeSpan.FromSeconds(GetOption<int>("saveInterval"));
+         settings.PingInterval = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
+         settings.AcceptedTags = GetOption<string>("acceptedTags").Split(",".ToCharArray(), 
+            StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+
+         manager = ChatServer(settings, loader, authServer, languageTags);
+
+         if (!manager.Start())
+         {
+            logger.LogGeneral("WebSocket server couldn't be started!", MyExtensions.Logging.LogLevel.FatalError);
+            return false;
+         }
+         else
+         {
+            return true;
+         }
          //Set up the chat manager (the program that provides data to each chat instance)
-         manager = new ChatManager(loader, authServer, languageTags,
-               new MyExtensions.Options(options.GetOptionsForKey(OptionTag)), logger);
+//         manager = new ChatManager(loader, authServer, languageTags,
+//               new MyExtensions.Options(options.GetOptionsForKey(OptionTag)), logger);
             /*GetOption<int>("messageBacklog"), GetOption<int>("messageSend"),
             GetOption<int>("saveInterval"), GetOption<int>("moduleWaitSeconds"),
             GetOption<string>("acceptedTags"), GetOption<string>("globalTag"),
@@ -192,7 +216,7 @@ namespace ChatServer
                { "loggerFile", "log.txt" },
                { "authServerPort", 45696 },
                { "chatServerPort", 45695 },
-               { "chatTimeout", 3 },
+               { "chatTimeout", 15 },
                { "messageBacklog", 1000 },
                { "messageSend", 10 },
                { "acceptedTags", "general, admin, offtopic" },
@@ -255,7 +279,7 @@ namespace ChatServer
             logger.StartInstantConsole();
 
             logger.Log("ChatServer v" + Version + ", built on " + MyBuildDate().ToString(), LogTag);
-            logger.Log("WebSocket Library v" + MySocketVariables.Version, LogTag);
+            logger.Log("WebSocket Library v" + WebSocketServer.Version, LogTag);
 
             //Set up the module system
             loader = new ModuleLoader(logger);
@@ -287,14 +311,14 @@ namespace ChatServer
                logger.Log("Authorization server running on port " + authServer.Port, LogTag);
             }
 
-            SetupChatManager();
-
             //Also set user parameters
             User.SetUserParameters(GetOption<int>("spamBlockSeconds"), GetOption<int>("inactiveMinutes"),
                GetOption<string>("website"), GetOption<bool>("automaticBlocking"), 
                GetOption<int>("policyReminderHours"));
-         
-            SetupWebsocket();
+
+            //This starts up the server!
+            SetupChatManager();
+            //SetupWebsocket();
 
             int ShutdownSeconds = GetOption<int>("shutdownSeconds");
             Console.WriteLine(">> Press Q to nicely quit the server...");
@@ -369,8 +393,8 @@ namespace ChatServer
             {
                if(!AttemptLock(manager.managerLock))
                   logger.LogGeneral("Manager is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
-               else if(!AttemptLock(MySocketVariables.CrashLock))
-                  logger.LogGeneral("Websocket is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
+//               else if(!AttemptLock(MySocketVariables.CrashLock))
+//                  logger.LogGeneral("Websocket is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
                else
                   logger.LogGeneral("Chat server seems OK", MyExtensions.Logging.LogLevel.SuperDebug);
             }
@@ -421,8 +445,8 @@ namespace ChatServer
          logger.Log("Stopping auth server...", LogTag);
          authServer.Stop();
          logger.Log("Stopping chat server...", LogTag);
-         webSocketServer.Stop();
-         logger.Log("Stopping chat manager...", LogTag);
+         //webSocketServer.Stop();
+         //logger.Log("Stopping chat manager...", LogTag);
          manager.Stop();
          logger.Log("Stopping logger...", LogTag);
          logger.Log(message);
@@ -430,7 +454,7 @@ namespace ChatServer
 
          DateTime start = DateTime.Now;
 
-         while (webSocketServer.IsListening || authServer.Running)
+         while (manager.Running || authServer.Running)
          {
             Thread.Sleep(100);
 

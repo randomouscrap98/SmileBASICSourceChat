@@ -10,15 +10,3 @@
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ModulePackage1/bin/Debug/ChatEssentials.dll.mdb
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ModulePackage1/bin/Debug/MyExtensions.dll
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ModulePackage1/bin/Debug/MyExtensions.dll.mdb
-/home/csanchez/chatserver/ChatServer/ModulePackage1/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/ModulePackage1.dll.mdb
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/ModulePackage1.dll
-/home/csanchez/chatserver/ChatServer/ModulePackage1/obj/Debug/ModulePackage1.dll
-/home/csanchez/chatserver/ChatServer/ModulePackage1/obj/Debug/ModulePackage1.dll.mdb
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/Newtonsoft.Json.dll
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/Module.dll
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/Module.dll.mdb
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/ChatEssentials.dll
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/ChatEssentials.dll.mdb
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/MyExtensions.dll
-/home/csanchez/chatserver/ChatServer/ModulePackage1/bin/Debug/MyExtensions.dll.mdb
