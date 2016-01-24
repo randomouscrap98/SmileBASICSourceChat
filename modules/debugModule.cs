@@ -101,11 +101,11 @@ namespace ChatServer
 
                   string message = "Information about the chat server:\n\n";
 
-                  Dictionary<string, List<UserMessageJSONObject>> history = ChatRunner.Manager.GetHistory();
-                  List<UserMessageJSONObject> messages = ChatRunner.Manager.GetMessages();
-                  List<LogMessage> logMessages = ChatRunner.Manager.Settings.LogProvider.GetMessages();
-                  List<LogMessage> logFileBuffer = ChatRunner.Manager.Settings.LogProvider.GetFileBuffer();
-                  List<Module> modules = ChatRunner.Manager.GetModuleListCopy();
+                  Dictionary<string, List<UserMessageJSONObject>> history = ChatRunner.Server.GetHistory();
+                  List<UserMessageJSONObject> messages = ChatRunner.Server.GetMessages();
+                  List<LogMessage> logMessages = ChatRunner.Server.Settings.LogProvider.GetMessages();
+                  List<LogMessage> logFileBuffer = ChatRunner.Server.Settings.LogProvider.GetFileBuffer();
+                  List<Module> modules = ChatRunner.Server.GetModuleListCopy();
 
                   message += "Rooms: " + history.Keys.Count + "\n";
                   message += "History messages: " + history.Sum(x => x.Value.Count) + "\n";
@@ -116,6 +116,7 @@ namespace ChatServer
                   message += "Log file buffer: " + logFileBuffer.Count + "\n";
                   message += "Modules loaded: " + string.Join(", ", modules.Select(x => x.GetType().Name)) + " (" + modules.Count + ")\n";
                   message += "Subscribed handlers for extra output: " + this.ExtraCommandHandlerCount + "\n";
+                  message += "Registered connections: " + ChatRunner.Server.ConnectedUsers().Count + "\n";
 
                   using(Process process = Process.GetCurrentProcess())
                   {

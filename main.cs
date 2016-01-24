@@ -23,13 +23,13 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.0.0";
+      public const string Version = "2.0.1";
 
       //private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
       private static MyExtensions.Logging.Logger logger;
       private static ModuleLoader loader;
-      private static ChatServer manager = null;
+      private static ChatServer chatServer = null;
       private static MyExtensions.Options options = new MyExtensions.Options();
 
       private static bool ShouldDie = false;
@@ -47,17 +47,17 @@ namespace ChatServer
          get { return loader.ActiveModules; }
       }
 
-      public static ChatServer Manager
+      public static ChatServer Server
       {
-         get { return manager; }
+         get { return chatServer; }
       }
 
       public static BandwidthContainer Bandwidth
       {
          get
          {
-            if (manager != null)
-               return (BandwidthContainer)manager.Bandwidth;
+            if (chatServer != null)
+               return (BandwidthContainer)chatServer.Bandwidth;
 
             return new BandwidthContainer();
          }
@@ -101,7 +101,7 @@ namespace ChatServer
       private static bool SetupChatManager()
       {
          ChatServerSettings settings = new ChatServerSettings(GetOption<int>("chatServerPort"), "chatserver",
-            () => { return new Chat(GetOption<int>("userUpdateInterval"), Manager); }, logger);
+            () => { return new Chat(GetOption<int>("userUpdateInterval"), Server); }, logger);
          
          //Set up languages
          LanguageTags languageTags = new LanguageTags(logger);
@@ -119,9 +119,9 @@ namespace ChatServer
          settings.AcceptedTags = GetOption<string>("acceptedTags").Split(",".ToCharArray(), 
             StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
 
-         manager = new ChatServer(settings, loader, authServer, languageTags);
+         chatServer = new ChatServer(settings, loader, authServer, languageTags);
 
-         if (!manager.Start())
+         if (!chatServer.Start())
          {
             logger.LogGeneral("WebSocket server couldn't be started!", MyExtensions.Logging.LogLevel.FatalError);
             return false;
@@ -153,11 +153,11 @@ namespace ChatServer
          else if (request.Request == SystemRequests.LockDeath)
          {
             logger.Log("Attempting to simulate lock death");
-            manager.Lockup();
+            chatServer.Lockup();
          }
          else if (request.Request == SystemRequests.SaveModules)
          {
-            manager.SaveData();
+            chatServer.SaveData();
          }
          else
          {
@@ -344,7 +344,7 @@ namespace ChatServer
                   {
                      Console.WriteLine();
                      Console.WriteLine("Stopping server in " + ShutdownSeconds + " seconds...");
-                     manager.GeneralBroadcast((new SystemMessageJSONObject() { 
+                     chatServer.GeneralBroadcast((new SystemMessageJSONObject() { 
                         message = "System is shutting down in " + ShutdownSeconds + " seconds for maintenance..."
                      }).ToString());
                      Thread.Sleep(ShutdownSeconds * 1000);
@@ -365,7 +365,7 @@ namespace ChatServer
                if(ShouldDie)
                {
                   logger.Log("Trying to die...");
-                  manager.SaveData();
+                  chatServer.SaveData();
                   logger.Log("Dying...");
                   logger.DumpToFile();
                   System.Environment.Exit(99);
@@ -391,7 +391,7 @@ namespace ChatServer
          {
             try
             {
-               if(!AttemptLock(manager.managerLock))
+               if(!AttemptLock(chatServer.managerLock))
                   logger.LogGeneral("Manager is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
 //               else if(!AttemptLock(MySocketVariables.CrashLock))
 //                  logger.LogGeneral("Websocket is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
@@ -447,14 +447,14 @@ namespace ChatServer
          logger.Log("Stopping chat server...", LogTag);
          //webSocketServer.Stop();
          //logger.Log("Stopping chat manager...", LogTag);
-         manager.Stop();
+         chatServer.SafeStop();
          logger.Log("Stopping logger...", LogTag);
          logger.Log(message);
          logger.DumpToFile();
 
          DateTime start = DateTime.Now;
 
-         while (manager.Running || authServer.Running)
+         while (chatServer.Running || authServer.Running)
          {
             Thread.Sleep(100);
 

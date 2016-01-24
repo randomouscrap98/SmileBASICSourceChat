@@ -71,7 +71,7 @@ namespace ChatServer
 
                roomUsers.Add(user.UID);
 
-               if (!string.IsNullOrWhiteSpace(error) || !ChatRunner.Manager.CreatePMRoom(roomUsers, user.UID, out error))
+               if (!string.IsNullOrWhiteSpace(error) || !ChatRunner.Server.CreatePMRoom(roomUsers, user.UID, out error))
                {
                   WarningJSONObject warning = new WarningJSONObject(error);
                   outputs.Add(warning);
@@ -85,7 +85,7 @@ namespace ChatServer
                break;
 
             case "pmleaveroom":
-               if (!ChatRunner.Manager.LeavePMRoom(user.UID, command.tag, out error))
+               if (!ChatRunner.Server.LeavePMRoom(user.UID, command.tag, out error))
                {
                   WarningJSONObject warning = new WarningJSONObject(error);
                   outputs.Add(warning);

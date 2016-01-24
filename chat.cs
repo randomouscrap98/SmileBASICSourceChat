@@ -50,17 +50,15 @@ namespace ChatServer
             module.OnExtraCommandOutput += DefaultOutputMessages;
       }
 
-      //Destruction with donuts
-      ~Chat()
-      {
-         userUpdateTimer.Elapsed -= UpdateActiveUserList;
-
-         foreach (Module module in manager.GetModuleListCopy())
-            module.OnExtraCommandOutput -= DefaultOutputMessages;
-      }
-
       public void Log(string message, LogLevel level = LogLevel.Normal)
       {
+         string tag = "Chatuser";
+
+         if (UID > 0)
+            tag += UID;
+         else
+            tag += "X";
+         
          manager.ChatSettings.LogProvider.LogGeneral(message, level, "ChatUser" + UID);
 
 //         if (manager != null)
@@ -249,6 +247,13 @@ namespace ChatServer
             if (ThisUser.ShowMessages)
                manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
          }
+
+         //Now get rid of events
+         userUpdateTimer.Elapsed -= UpdateActiveUserList;
+
+         foreach (Module module in manager.GetModuleListCopy())
+            module.OnExtraCommandOutput -= DefaultOutputMessages;
+         
 //         manager.LeaveChat(this);
 //
 //         foreach (Module module in manager.GetModuleListCopy())
@@ -912,7 +917,7 @@ namespace ChatServer
                {
                   output.message = "Which module would you like help with?\n";
 
-                  foreach (Module module in ChatRunner.Manager.GetModuleListCopy(user.UID))
+                  foreach (Module module in ChatRunner.Server.GetModuleListCopy(user.UID))
                      output.message += "\n" + module.Nickname;
 
                   output.message += "\n\nRerun help command with a module name to see commands for that module";
@@ -946,7 +951,7 @@ namespace ChatServer
 
          try
          {
-            module = ChatRunner.Manager.GetModuleListCopy(user.UID).First(x => x.Nickname == moduleString);
+            module = ChatRunner.Server.GetModuleListCopy(user.UID).First(x => x.Nickname == moduleString);
 
             if (!string.IsNullOrWhiteSpace(module.GeneralHelp))
                message += "\n" + module.GeneralHelp + "\n";

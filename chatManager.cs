@@ -856,7 +856,7 @@ the actions of any user within the chat.".Replace("\n", " ");
             {
                Log("Enter leavechat lock", MyExtensions.Logging.LogLevel.Locks);
                //didLeave = activeChatters.Remove(chatSession);
-               authServer.UpdateUserList(ConnectedUsers().Select(x => ((Chat)x).UID).ToList());//activeChatters.Select(x => x.UID).ToList());
+               authServer.UpdateUserList(ConnectedUsers().Select(x => ((Chat)x).UID).Where(x => x > 0).ToList());//activeChatters.Select(x => x.UID).ToList());
                Log("Exit leavechat lock", MyExtensions.Logging.LogLevel.Locks);
             }
             finally
