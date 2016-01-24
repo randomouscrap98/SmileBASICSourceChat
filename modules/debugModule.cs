@@ -103,8 +103,8 @@ namespace ChatServer
 
                   Dictionary<string, List<UserMessageJSONObject>> history = ChatRunner.Manager.GetHistory();
                   List<UserMessageJSONObject> messages = ChatRunner.Manager.GetMessages();
-                  List<LogMessage> logMessages = ChatRunner.Manager.Logger.GetMessages();
-                  List<LogMessage> logFileBuffer = ChatRunner.Manager.Logger.GetFileBuffer();
+                  List<LogMessage> logMessages = ChatRunner.Manager.Settings.LogProvider.GetMessages();
+                  List<LogMessage> logFileBuffer = ChatRunner.Manager.Settings.LogProvider.GetFileBuffer();
                   List<Module> modules = ChatRunner.Manager.GetModuleListCopy();
 
                   message += "Rooms: " + history.Keys.Count + "\n";

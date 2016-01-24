@@ -532,9 +532,9 @@ the actions of any user within the chat.".Replace("\n", " ");
                      try
                      {
                         if(loader.SaveWrapper(module))
-                           Logger.LogGeneral("Saved " + module.ModuleName + " data", MyExtensions.Logging.LogLevel.Debug, LogTag);
+                           Log("Saved " + module.ModuleName + " data", MyExtensions.Logging.LogLevel.Debug);
                         else
-                           Logger.Error("Couldn't save " + module.ModuleName + " data!", LogTag);
+                           Log("Couldn't save " + module.ModuleName + " data!", LogLevel.Error);
                      }
                      finally
                      {
@@ -543,7 +543,7 @@ the actions of any user within the chat.".Replace("\n", " ");
                   }
                   else
                   {
-                     Logger.Warning("Couldn't save " + module.ModuleName + " data; it appears to be busy", LogTag);
+                     Log("Couldn't save " + module.ModuleName + " data; it appears to be busy", LogLevel.Warning);
                   }
                }
             }
@@ -554,7 +554,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          }
          else
          {
-            Logger.Warning("Couldn't save files... another process may still be writing");
+            Log("Couldn't save files... another process may still be writing", LogLevel.Warning);
          }
       }
 
@@ -817,7 +817,7 @@ the actions of any user within the chat.".Replace("\n", " ");
                if (!GetUser(uid).PullInfoFromQueryPage())
                {
                   error = "Couldn't authenticate because your user information couldn't be found";
-                  Logger.Warning("Authentication failed: Couldn't get user information from website");
+                  Log("Authentication failed: Couldn't get user information from website", LogLevel.Warning);
                   return false;
                }
 //               lock (managerLock)
@@ -835,7 +835,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          }
          else
          {
-            Logger.Log("User " + uid + " tried to bind with bad auth code: " + key);
+            Log("User " + uid + " tried to bind with bad auth code: " + key);
             error = "Key was invalid";
          }
 
@@ -848,7 +848,7 @@ the actions of any user within the chat.".Replace("\n", " ");
       /// <param name="chatSession">Current Chat Session</param>
       public void UpdateAuthUserlist()//Chat chatSession)
       {
-         bool didLeave = false;
+         //bool didLeave = false;
 
          if (Monitor.TryEnter(managerLock, ChatSettings.MaxModuleWait))
          {
@@ -984,7 +984,7 @@ the actions of any user within the chat.".Replace("\n", " ");
 
                //Then, get rid of history we don't need anymore
                foreach(string key in history.Keys.ToList())
-                  history[key] = history[key].Where(x => (DateTime.Now - x.PostTime()).TotalDays <= 1).OrderByDescending(x => x.PostTime()).Take(MaxMessageSend).ToList();
+                  history[key] = history[key].Where(x => (DateTime.Now - x.PostTime()).TotalDays <= 1).OrderByDescending(x => x.PostTime()).Take(ChatSettings.MaxMessageSend).ToList();
                history = history.Where(x => ChatSettings.AcceptedTags.Contains(x.Key) || rooms.ContainsKey(x.Key)).ToDictionary(x => x.Key, y => y.Value);
 
                Log("Enter message add lock", MyExtensions.Logging.LogLevel.Locks);

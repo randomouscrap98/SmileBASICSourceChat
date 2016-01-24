@@ -7,3 +7,7 @@
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/MyExtensions.dll.mdb
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/ChatEssentials.dll
 /home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/ChatEssentials.dll.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe.mdb
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/bin/Debug/ChatServer.exe
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe
+/home/csanchez/Desktop/smilebasicsource/chatserver/ChatServer/ChatServer/obj/x86/Debug/ChatServer.exe.mdb

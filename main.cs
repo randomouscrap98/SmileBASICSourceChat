@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "1.4.4";
+      public const string Version = "2.0.0";
 
       //private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -119,7 +119,7 @@ namespace ChatServer
          settings.AcceptedTags = GetOption<string>("acceptedTags").Split(",".ToCharArray(), 
             StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
 
-         manager = ChatServer(settings, loader, authServer, languageTags);
+         manager = new ChatServer(settings, loader, authServer, languageTags);
 
          if (!manager.Start())
          {
@@ -344,7 +344,7 @@ namespace ChatServer
                   {
                      Console.WriteLine();
                      Console.WriteLine("Stopping server in " + ShutdownSeconds + " seconds...");
-                     manager.Broadcast((new SystemMessageJSONObject() { 
+                     manager.GeneralBroadcast((new SystemMessageJSONObject() { 
                         message = "System is shutting down in " + ShutdownSeconds + " seconds for maintenance..."
                      }).ToString());
                      Thread.Sleep(ShutdownSeconds * 1000);

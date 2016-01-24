@@ -59,7 +59,7 @@ namespace ChatServer
             module.OnExtraCommandOutput -= DefaultOutputMessages;
       }
 
-      public void Log(string message, LogLevel level)
+      public void Log(string message, LogLevel level = LogLevel.Normal)
       {
          manager.ChatSettings.LogProvider.LogGeneral(message, level, "ChatUser" + UID);
 
@@ -76,7 +76,7 @@ namespace ChatServer
          {
             ThisUser.SaveActiveState();
             manager.BroadcastUserList();
-            Logger.LogGeneral(UserLogString + " became " + (ThisUser.Active ? "active" : "inactive"), MyExtensions.Logging.LogLevel.Debug);
+            Log(UserLogString + " became " + (ThisUser.Active ? "active" : "inactive"), MyExtensions.Logging.LogLevel.Debug);
          }
       }
 
@@ -124,7 +124,7 @@ namespace ChatServer
          //Do nothing until user has accepted policy
          if (!ThisUser.AcceptedPolicy && !forceSend)
          {
-            Logger.LogGeneral("Cannot send message because user has not accepted policy yet. ForceSend: " + forceSend,
+            Log("Cannot send message because user has not accepted policy yet. ForceSend: " + forceSend,
                MyExtensions.Logging.LogLevel.SuperDebug);
             return;
          }
@@ -135,7 +135,7 @@ namespace ChatServer
          lock (backlock)
          {
             if (backlog.Count >= 30)
-               Logger.Warning(ThisUser.Username + "'s backlog is too big (30). Message thrown away.");
+               Log(ThisUser.Username + "'s backlog is too big (30). Message thrown away.", LogLevel.Warning);
             else
                backlog.Enqueue(message);
          }
@@ -164,13 +164,13 @@ namespace ChatServer
                   //OK, now we can send it off
                   try
                   {
-                     Logger.LogGeneral("Sending message: " + nextMessage.Truncate(100), MyExtensions.Logging.LogLevel.SuperDebug);
+                     Log("Sending message: " + nextMessage.Truncate(100), MyExtensions.Logging.LogLevel.SuperDebug);
                      Send(nextMessage);
-                     Logger.LogGeneral("Send success!", MyExtensions.Logging.LogLevel.SuperDebug);
+                     Log("Send success!", MyExtensions.Logging.LogLevel.SuperDebug);
                   }
                   catch (Exception e)
                   {
-                     Logger.Warning("Cannot send message: " + nextMessage + " to user: " + UserLogString + " because: " + e);
+                     Log("Cannot send message: " + nextMessage + " to user: " + UserLogString + " because: " + e, LogLevel.Warning);
                   }
                }
             }
@@ -181,7 +181,7 @@ namespace ChatServer
          }
          else
          {
-            Logger.LogGeneral("Queueing message for " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
+            Log("Queueing message for " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
          }
       }
 
@@ -199,7 +199,7 @@ namespace ChatServer
          }
          else
          {
-            Logger.Warning("Didn't get a proper container for a language tag. Using system message as default");
+            Log("Didn't get a proper container for a language tag. Using system message as default", LogLevel.Warning);
             ((SystemMessageJSONObject)container).message = message;
          }
 
@@ -233,9 +233,9 @@ namespace ChatServer
 
       //On closure of the websocket, remove ourselves from the list of active
       //chatters.
-      protected override void ClosedConnection()
+      public override void ClosedConnection()
       {
-         Logger.Log ("Session disconnect: " + uid);
+         Log ("Session disconnect: " + uid);
          manager.UpdateAuthUserlist();
 
          manager.BroadcastUserList();
@@ -247,7 +247,7 @@ namespace ChatServer
                Log("User session timer was in an invalid state!", LogLevel.Warning);
 
             if (ThisUser.ShowMessages)
-               Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
+               manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
          }
 //         manager.LeaveChat(this);
 //
@@ -271,7 +271,7 @@ namespace ChatServer
 //      }
 
       //I guess this is WHENEVER it receives a message?
-      protected override void ReceivedMessage(string rawMessage)
+      public override void ReceivedMessage(string rawMessage)
       {
          //Logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
 
@@ -321,12 +321,12 @@ namespace ChatServer
                   //Oops, username was invalid
                   if (newUser <= 0)
                   {
-                     Logger.Log("Tried to bind a bad UID: " + newUser);
+                     Log("Tried to bind a bad UID: " + newUser);
                      response.errors.Add("UID was invalid");
                   }
                   else
                   {
-                     List<Chat> removals;
+                     //List<Chat> removals;
                      string error;
 
                      if (!manager.CheckAuthentication(newUser, key, out error))  //newUser, key, out removals, out error))
@@ -336,7 +336,7 @@ namespace ChatServer
                      else
                      {
                         //Before we do anything, remove other chatting sessions
-                        foreach (Chat removeChat in GetAllUsers().Select(x => (Chat)x).Where(x => x.UID == UID))
+                        foreach (Chat removeChat in GetAllUsers().Select(x => (Chat)x).Where(x => x.UID == UID && x != this))
                            removeChat.CloseSelf();
                         
                            //Sessions.CloseSession(removeChat.ID);
@@ -358,12 +358,12 @@ namespace ChatServer
 
                         //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
                         if (!ThisUser.PerformOnChatEnter())
-                           Logger.Warning("Invalid session entry. Sessions may be broken");
+                           Log("Invalid session entry. Sessions may be broken", LogLevel.Warning);
 
                         manager.BroadcastUserList();
 
-                        Logger.Log("Authentication complete: UID " + uid + " maps to username " + ThisUser.Username +
-                        (ThisUser.CanStaffChat ? "(staff)" : ""));
+                        Log("Authentication complete: UID " + uid + " maps to username " + ThisUser.Username +
+                           (ThisUser.CanStaffChat ? "(staff)" : ""));
                         response.result = true;
 
                         List<JSONObject> outputs = new List<JSONObject>();
@@ -385,7 +385,7 @@ namespace ChatServer
                            }
                            else
                            {
-                              Logger.LogGeneral("Skipped " + module.ModuleName + " join processing", 
+                              Log("Skipped " + module.ModuleName + " join processing", 
                                  MyExtensions.Logging.LogLevel.Warning);
                            }
                         }
@@ -461,7 +461,7 @@ namespace ChatServer
                }
                else if (!manager.CheckKey(uid, key))
                {
-                  Logger.LogGeneral("Got invalid key " + key + " from " + UserLogString);
+                  Log("Got invalid key " + key + " from " + UserLogString);
                   response.errors.Add("Your key is invalid");
                }
                else if (!ThisUser.AcceptedPolicy)
@@ -516,7 +516,7 @@ namespace ChatServer
                   //Step 1: parse a possible command. If no command is parsed, no module will be written.
                   if (TryCommandParse(userMessage, out commandModule, out userCommand, out commandError))
                   {
-                     Logger.LogGeneral("Trying to use module " + commandModule.ModuleName + " to process command " + 
+                     Log("Trying to use module " + commandModule.ModuleName + " to process command " + 
                         userCommand.message + " from " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
 
                      //We found a command. Send it off to the proper module and get the output
@@ -546,7 +546,7 @@ namespace ChatServer
                      userMessage.SetHidden();
                      //userMessage.SetCommand();
 
-                     Logger.LogGeneral("Module " + commandModule.ModuleName + " processed command from " + UserLogString, 
+                     Log("Module " + commandModule.ModuleName + " processed command from " + UserLogString, 
                         MyExtensions.Logging.LogLevel.Debug);
                   }
                   else
@@ -601,7 +601,7 @@ namespace ChatServer
                         }
                         else
                         {
-                           Logger.LogGeneral("Skipped " + module.ModuleName + " message processing", 
+                           Log("Skipped " + module.ModuleName + " message processing", 
                               MyExtensions.Logging.LogLevel.Warning);
                         }
                      }
@@ -712,7 +712,7 @@ namespace ChatServer
                {
                   manager.BroadcastExclude(tempJSON.ToString(), tempJSON.tag);
                   //manager.Broadcast(tempJSON.ToString());
-                  Logger.LogGeneral("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
+                  Log("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
                }
                else
                {
