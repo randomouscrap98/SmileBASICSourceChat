@@ -14,6 +14,27 @@ namespace ChatEssentials
    {
       private DateTime enterDate = new DateTime(0);
       private DateTime leaveDate = new DateTime(0);
+      public readonly long ID = 0;
+
+      private static long NextID;
+      private static readonly Object IDLock = new Object();
+
+      public UserSession()
+      {
+         lock (IDLock)
+         {
+            ID = NextID++;
+         }
+      }
+
+      public static void SetNextID(long nextID)
+      {
+         lock (IDLock)
+         {
+            if(nextID > NextID)
+               NextID = nextID;
+         }
+      }
 
       //user just entered
       public void SetEnterNow()
@@ -88,6 +109,9 @@ namespace ChatEssentials
       public readonly TimeSpan AverageSessionTime;
       public readonly TimeSpan CurrentSessionTime;
       public readonly int SessionCount;
+      public readonly int BadSessionCount;
+      public readonly int OpenSessionCount;
+      public readonly long LastSessionID;
 
       public UserInfo(User user, bool loggedIn)
       {
@@ -117,6 +141,9 @@ namespace ChatEssentials
          ChatControl = user.ChatControl;
          ChatControlExtended = user.ChatControlExtended;
          SessionCount = user.SessionCount;
+         OpenSessionCount = user.OpenSessionCount;
+         BadSessionCount = user.BadSessionCount;
+         LastSessionID = user.LastSessionID;
       }
    }
 
@@ -391,6 +418,58 @@ namespace ChatEssentials
          }
       }
 
+      public long LastSessionID
+      {
+         get
+         {
+            lock (Lock)
+            {
+               UserSession session = sessions.Where(x => !x.Left).LastOrDefault();
+
+               if(session != default(UserSession))
+                  return sessions.Last().ID;
+               else
+                  return -1;
+            }
+         }
+      }
+
+      public long MaxSessionID
+      {
+         get
+         {
+            lock(Lock)
+            {
+               if (sessions.Count == 0)
+                  return 0;
+               
+               return sessions.Max(x => x.ID);
+            }
+         }
+      }
+
+      public int OpenSessionCount
+      {
+         get
+         {
+            lock (Lock)
+            {
+               return sessions.Count(x => !x.Left);
+            }
+         }
+      }
+
+      public int BadSessionCount
+      {
+         get
+         {
+            lock (Lock)
+            {
+               return sessions.Count(x => !x.Entered);
+            }
+         }
+      }
+
       public int SessionCount
       {
          get
@@ -467,14 +546,14 @@ namespace ChatEssentials
          }
       }
 
-      public bool PerformOnChatEnter()
+      public long PerformOnChatEnter()
       {
          //No, don't do anything for these guys.
          /*if (isIrcUser)
             return true;*/
          
          PerformOnPing(true);
-         bool result = false;
+         //bool result = false;
 
          lock (Lock)
          {
@@ -482,31 +561,44 @@ namespace ChatEssentials
             recentJoins.Add(DateTime.Now);
             recentJoins = recentJoins.Where(x => x > DateTime.Now.AddDays(-1)).ToList();
 
-            //If it's empty or we have no open sessions, add a new one
-            if (sessions.Count == 0 || sessions.All(x => x.Entered))
-            {
-               sessions.Add(new UserSession());
-               result = true;
-            }
+            //Fix bad sessions which may be present.
+            foreach (UserSession badSession in sessions.Where(x => !x.Entered))
+               badSession.SetEnterNow();
+            
+            //If a user is entering, close ALL other sessions.
+            foreach (UserSession openSession in sessions.Where(x => !x.Left))
+               openSession.SetLeaveNow();
 
-            try
-            {
-               //Look for the last session that hasn't entered yet and set the entry to now.
-               sessions.Last(x => !x.Entered).SetEnterNow();
-            }
-            catch
-            {
-               return false;
-            }
+            UserSession session = new UserSession();
+            session.SetEnterNow();
+            sessions.Add(session);
+//            //If it's empty or we have no open sessions, add a new one
+//            if (sessions.Count == 0 || sessions.All(x => x.Entered))
+//            {
+//               sessions.Add(new UserSession());
+//               result = true;
+//            }
+
+//            try
+//            {
+//               //Look for the last session that hasn't entered yet and set the entry to now.
+//               sessions.Last(x => !x.Entered).SetEnterNow();
+//            }
+//            catch
+//            {
+//               return false;
+//            }
+
+            return session.ID;
          }
 
          //We're only good if we succeeded AND there's only one session open
-         return result && (sessions.Count(x => !x.Left) == 1);
+         //return result && (sessions.Count(x => !x.Left) == 1);
       }
 
-      public bool PerformOnChatLeave()
+      public /*bool*/ void PerformOnChatLeave(long ID)
       {
-         bool result = true;
+         //bool result = true;
 
          //No, don't do anything for these guys.
          /*if (isIrcUser)
@@ -514,34 +606,39 @@ namespace ChatEssentials
 
          lock (Lock)
          {
-            //This is to set the "inactive" state on logout
-            lastPing = new DateTime(0);
-
-            //You shouldn't be leaving in this case. Come on now
-            if (sessions.Count == 0 || sessions.All(x => x.Left))
+            if (sessions.Any(x => x.ID == ID))
             {
-               result = false;
+               UserSession session = sessions.First(x => x.ID == ID);
+               session.SetLeaveNow();
             }
-            else
-            {
-               //If we have more than one open session, this is bad
-               if (sessions.Count(x => !x.Left) > 1)
-                  result = false;
-               
-               try
-               {
-                  //Close ALLL open sessions.
-                  foreach(UserSession session in sessions.Where(x => !x.Left))
-                     session.SetLeaveNow();
-               }
-               catch
-               {
-                  return false;
-               }
-            }
+//            //This is to set the "inactive" state on logout
+//            lastPing = new DateTime(0);
+//
+//            //You shouldn't be leaving in this case. Come on now
+//            if (sessions.Count == 0 || sessions.All(x => x.Left))
+//            {
+//               result = false;
+//            }
+//            else
+//            {
+//               //If we have more than one open session, this is bad
+//               if (sessions.Count(x => !x.Left) > 1)
+//                  result = false;
+//               
+//               try
+//               {
+//                  //Close ALLL open sessions.
+//                  foreach(UserSession session in sessions.Where(x => !x.Left))
+//                     session.SetLeaveNow();
+//               }
+//               catch
+//               {
+//                  return false;
+//               }
+//            }
          }
 
-         return result && sessions.All(x => x.Left);
+         //return result && sessions.All(x => x.Left);
       }
 
       public bool PullInfoFromQueryPage()

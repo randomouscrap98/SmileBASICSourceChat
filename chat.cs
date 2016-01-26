@@ -22,6 +22,7 @@ namespace ChatServer
       public const int HeaderSize = 64;
 
       private int uid = -1;
+      private long sessionID = 0;
 
       public readonly DateTime Startup = DateTime.Now;
       private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
@@ -238,8 +239,9 @@ namespace ChatServer
          //Only perform special leaving messages and processing if the user was real
          if (UID > 0)
          {
-            if (!ThisUser.PerformOnChatLeave())
-               Log("User session timer was in an invalid state!", LogLevel.Warning);
+            ThisUser.PerformOnChatLeave(sessionID);
+//            if (!ThisUser.PerformOnChatLeave())
+//               Log("User session timer was in an invalid state!", LogLevel.Warning);
 
             if (ThisUser.ShowMessages)
                manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
@@ -284,7 +286,7 @@ namespace ChatServer
       //I guess this is WHENEVER it receives a message?
       public override void ReceivedMessage(string rawMessage)
       {
-         //Logger.LogGeneral ("Got message: " + e.Data, MyExtensions.Logging.LogLevel.Debug);
+         //Log("Got message: " + rawMessage, MyExtensions.Logging.LogLevel.Debug);
 
          ResponseJSONObject response = new ResponseJSONObject();
          response.result = false;
@@ -368,8 +370,9 @@ namespace ChatServer
                            MySend(NewWarningFromTag(QuickParams(enterSpamWarning)).ToString());
 
                         //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
-                        if (!ThisUser.PerformOnChatEnter())
-                           Log("Invalid session entry. Sessions may be broken", LogLevel.Warning);
+                        sessionID = ThisUser.PerformOnChatEnter();
+//                        if (!ThisUser.PerformOnChatEnter())
+//                           Log("Invalid session entry. Sessions may be broken", LogLevel.Warning);
 
                         manager.BroadcastUserList();
 
@@ -825,8 +828,11 @@ namespace ChatServer
                         for (int j = 0; j < tempUserCommand.ArgumentParts[i].Count; j++)
                            tempUserCommand.ArgumentParts[i][j] = ParseUser(tempUserCommand.ArgumentParts[i][j]);
 
-                        if (tempUserCommand.ArgumentParts[i].Count == 0 && manager.UserLookup(tempUserCommand.Arguments[i]) < 0 ||
-                           tempUserCommand.ArgumentParts[i].Any(x => manager.UserLookup(x) < 0))
+                        if (!((tempUserCommand.MatchedCommand.Arguments[i].Repeat == RepeatType.ZeroOrOne ||
+                               tempUserCommand.MatchedCommand.Arguments[i].Repeat == RepeatType.ZeroOrMore) &&
+                              string.IsNullOrWhiteSpace(tempUserCommand.Arguments[i])) && 
+                           (tempUserCommand.ArgumentParts[i].Count == 0 && manager.UserLookup(tempUserCommand.Arguments[i]) < 0 ||
+                              tempUserCommand.ArgumentParts[i].Any(x => manager.UserLookup(x) < 0)))
                         {
                            error = "User does not exist";
                            return false;

@@ -11,6 +11,7 @@ using ChatEssentials;
 using ModuleSystem;
 using MyWebSocket;
 using MyExtensions.Logging;
+using System.Diagnostics;
 
 namespace ChatServer
 {
@@ -24,6 +25,7 @@ namespace ChatServer
       public int MaxMessageKeep = 100;
       public int MaxMessageSend = 5;
       public string GlobalTag = "";
+      public bool MonitorThreads = false;
 
       private List<string> acceptedTags = new List<string>();
       private string saveFolder = "";
@@ -63,6 +65,11 @@ namespace ChatServer
       public ChatServerSettings(int port, string service, Func<WebSocketUser> generator, Logger logger = null) 
          : base(port, service, generator, logger)
       {
+         
+      }
+
+      public void DumpSettings()
+      {
          Dictionary<string, string> settingValues = new Dictionary<string, string>();
 
          settingValues.Add("fileWait", this.MaxFileWait.ToString());
@@ -73,8 +80,9 @@ namespace ChatServer
          settingValues.Add("receiveBuffer", this.ReceiveBufferSize.ToString());
          settingValues.Add("sendBuffer", this.SendBufferSize.ToString());
          settingValues.Add("shutdownTimeout", this.ShutdownTimeout.ToString());
+         settingValues.Add("monitorThreads", this.MonitorThreads.ToString());
 
-         logger.LogGeneral("Settings dump: " + 
+         LogProvider.LogGeneral("Settings dump: " + 
             string.Join(" ", settingValues.Select(x => "[" + x.Key + "] " + x.Value)), LogLevel.Debug, "ChatSettings");
       }
    }
@@ -116,6 +124,8 @@ namespace ChatServer
       private readonly Dictionary<int, User> users = new Dictionary<int, User>();
       private Dictionary<string, PMRoom> rooms = new Dictionary<string, PMRoom>();
       private readonly System.Timers.Timer saveTimer;
+      private readonly System.Timers.Timer threadMonitorTimer;
+      private int lastThreadCount = 0;
       //private readonly System.Timers.Timer cleanupTimer;
       //private readonly System.Timers.Timer pingTimer;
       //private readonly SimpleIRCRelay relay;
@@ -200,6 +210,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          if (MySerialize.LoadObject<Dictionary<int, User>>(SavePath(UserFile), out tempUsers))
          {
             users = tempUsers;
+            UserSession.SetNextID(users.Max(x => x.Value.MaxSessionID) + 1);
             Log("Loaded user data from file", MyExtensions.Logging.LogLevel.Debug);
          }
          else
@@ -259,6 +270,13 @@ the actions of any user within the chat.".Replace("\n", " ");
          saveTimer = new System.Timers.Timer(settings.SaveInterval.TotalMilliseconds);//1000 * managerOptions.GetAsType<int>("saveInterval"));
          saveTimer.Elapsed += SaveTimerElapsed;
          saveTimer.Start();
+
+         if (settings.MonitorThreads)
+         {
+            threadMonitorTimer = new System.Timers.Timer(1000);
+            threadMonitorTimer.Elapsed += MonitorThreadsElapsed;
+            threadMonitorTimer.Start();
+         }
       }
 
       //Set up the logger when building the chat provider. Logging will go out to a file and the console
@@ -475,6 +493,27 @@ the actions of any user within the chat.".Replace("\n", " ");
       {
          SaveData();
          Log("Automatically saved chat data to files", MyExtensions.Logging.LogLevel.Debug);
+      }
+
+      //Check on the thread count to see when it increases.
+      private void MonitorThreadsElapsed(object source, System.Timers.ElapsedEventArgs e)
+      {
+         int thisThreadCount;
+         using(Process process = Process.GetCurrentProcess())
+         {
+            thisThreadCount = process.Threads.Count;
+         }
+
+         //If we've never run before, chill. Set the value so we'll have it for NEXT time.
+         if (lastThreadCount == 0)
+            lastThreadCount = thisThreadCount;
+
+         if (lastThreadCount < thisThreadCount)
+            Log("Threads +increased from " + lastThreadCount + " to " + thisThreadCount, LogLevel.Debug);
+         else if (lastThreadCount > thisThreadCount)
+            Log("Threads -decreased from " + lastThreadCount + " to " + thisThreadCount, LogLevel.Debug);
+         
+         lastThreadCount = thisThreadCount;
       }
 
       //Forces file save for all pertinent manager data

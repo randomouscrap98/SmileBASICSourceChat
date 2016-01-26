@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.0.4";
+      public const string Version = "2.1.0";
 
       //private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -116,8 +116,12 @@ namespace ChatServer
          settings.GlobalTag = GetOption<string>("globalTag");
          settings.SaveInterval = TimeSpan.FromSeconds(GetOption<int>("saveInterval"));
          settings.PingInterval = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
+         settings.MonitorThreads = true;
          settings.AcceptedTags = GetOption<string>("acceptedTags").Split(",".ToCharArray(), 
             StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+
+         //I want to see the settings that are hard to see while running!
+         settings.DumpSettings();
 
          chatServer = new ChatServer(settings, loader, authServer, languageTags);
 
@@ -243,7 +247,7 @@ namespace ChatServer
                { "ircChannel", "#smilebasic" },
                { "ircTag", "general" }
             };
-
+               
             //Set up and read options. We need to do this first so that the values can be used for init
             options = new MyExtensions.Options();
             options.AddOptions(OptionTag, defaultOptions);
@@ -280,6 +284,11 @@ namespace ChatServer
 
             logger.Log("ChatServer v" + Version + ", built on " + MyBuildDate().ToString(), LogTag);
             logger.Log("WebSocket Library v" + WebSocketServer.Version, LogTag);
+
+            int workerThreads, ioThreads;
+            ThreadPool.SetMaxThreads(Environment.ProcessorCount * 4, Environment.ProcessorCount * 2);
+            ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
+            logger.Log("Using " + workerThreads + " general threads and " + ioThreads + " IO threads");
 
             //Set up the module system
             loader = new ModuleLoader(logger);

@@ -25,6 +25,8 @@ namespace ChatServer
          Commands.Add(new ModuleCommand("simulatelock", new List<CommandArgument>(), "simulate a server deadlock"));
          Commands.Add(new ModuleCommand("savemodules", new List<CommandArgument>(), "save all module data now"));
          Commands.Add(new ModuleCommand("checkserver", new List<CommandArgument>(), "See important stats for server"));
+         Commands.Add(new ModuleCommand("debuginfo", new List<CommandArgument>()
+         { new CommandArgument("user", ArgumentType.User, RepeatType.ZeroOrOne) }, "See debug information about yourself or another user"));
          //commands.Add(new ModuleCommand("myrooms", new List<CommandArgument>(), "show pm rooms you're currently in"));
       }
 
@@ -32,6 +34,9 @@ namespace ChatServer
       {
          List<JSONObject> outputs = new List<JSONObject>();
          ModuleJSONObject moduleOutput = new ModuleJSONObject();
+
+         string message = "";
+         UserInfo parsedInfo;
 
          try
          {
@@ -99,7 +104,7 @@ namespace ChatServer
                   if(!user.ChatControl)
                      return FastMessage("You don't have access to this command!", true); 
 
-                  string message = "Information about the chat server:\n\n";
+                  message = "Information about the chat server:\n\n";
 
                   Dictionary<string, List<UserMessageJSONObject>> history = ChatRunner.Server.GetHistory();
                   List<UserMessageJSONObject> messages = ChatRunner.Server.GetMessages();
@@ -121,8 +126,39 @@ namespace ChatServer
                   using(Process process = Process.GetCurrentProcess())
                   {
                      message += "Virtual Memory: " + (process.PrivateMemorySize64 / 1048576) + "MiB\n";
-                     message += "Heap Allocated: " + (GC.GetTotalMemory(true) / 1048576) + "MiB"; 
+                     message += "Heap Allocated: " + (GC.GetTotalMemory(true) / 1048576) + "MiB\n"; 
+                     message += "Threads: " + process.Threads.Count;
                   }
+
+                  moduleOutput.message = message;
+                  outputs.Add(moduleOutput);
+
+                  break;
+
+               case "debuginfo":
+
+                  //if we can't parse the user, use yourself. Otherwise if it parsed but they don't have
+                  //access to this command, stop and let them know.
+                  if(string.IsNullOrWhiteSpace(command.Arguments[0]) || !GetUserFromArgument(command.Arguments[0], users, out parsedInfo))
+                     parsedInfo = user;
+                  else if(!user.ChatControl && parsedInfo.UID != user.UID)
+                     return FastMessage("You don't have access to this command!", true); 
+
+                  message = parsedInfo.Username + "'s debug information: \n\n";
+
+                  message += "Session ID: " + parsedInfo.LastSessionID + "\n";
+                  message += "Open sessions: " + parsedInfo.OpenSessionCount + "\n";
+                  message += "Bad sessions: " + parsedInfo.BadSessionCount + "\n";
+                  message += "Current session time: " + StringExtensions.LargestTime(parsedInfo.CurrentSessionTime) + "\n";
+                  message += "UID: " + parsedInfo.UID + "\n";
+                  message += "Active: " + parsedInfo.Active + "\n";
+                  message += "Last ping: " + StringExtensions.LargestTime(DateTime.Now - parsedInfo.LastPing) + "\n";
+                  message += "Last post: " + StringExtensions.LargestTime(DateTime.Now - parsedInfo.LastPing) + "\n";
+                  message += "Staff chat: " + parsedInfo.CanStaffChat + "\n";
+                  message += "Global chat: " + parsedInfo.CanGlobalChat + "\n";
+                  message += "Chat control: " + parsedInfo.ChatControl + "\n";
+                  message += "Chat control extended: " + parsedInfo.ChatControlExtended + "\n";
+                  message += "Avatar: " + user.Avatar + "\n";
 
                   moduleOutput.message = message;
                   outputs.Add(moduleOutput);

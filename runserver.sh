@@ -1,6 +1,6 @@
 #!/bin/sh
 
-folder=ChatServer/ChatServer/bin/Debug/
+folder=ChatServer/ChatServer/bin/Release/
 exe=ChatServer.exe
 build=build.txt
 dlls="ChatServer/ModulePackage1/bin/Debug/ModulePackage1.dll ChatServer/PortedModules/bin/Debug/PortedModules.dll"
@@ -36,7 +36,7 @@ mkdir -p $serverFolder/plugins
 cp $dlls $serverFolder/plugins
 cd $serverFolder 
 
-./chat.exe
+mono --gc=sgen ./chat.exe
 while [ $? -eq 99 ]
 do
    date +%s > crash.txt
