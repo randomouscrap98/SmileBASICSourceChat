@@ -4,3 +4,5 @@
 !*.dll
 !modules/
 !ChatServer/
+ChatServer/ChatServer/bin/*
+ChatServer/ChatServer/obj/*
