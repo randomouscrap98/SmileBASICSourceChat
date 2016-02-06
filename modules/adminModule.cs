@@ -7,8 +7,52 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace ModulePackage1
+namespace ChatServer
 {
+   public class AdminModule : Module
+   {
+      public AdminModule()
+      {
+         Commands.Add(new ModuleCommand("uptonogood", new List<CommandArgument>(), "Toggle the admin hidden state"));
+      }
+
+      public override bool Hidden(UserInfo user)
+      {
+         return !(user.ChatControl || user.ChatControlExtended);
+      }
+
+      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      {
+         User thisRealUser = ChatRunner.Server.GetUser(user.UID);
+
+         if (command.Command == "uptonogood")
+         {
+            if (!user.ChatControl)
+               return FastMessage("This command doesn't *AHEM* exist");
+
+            thisRealUser.Hiding = !thisRealUser.Hiding;
+
+            if (thisRealUser.Hiding)
+            {
+               ChatRunner.Server.BroadcastUserList();
+               ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Leave, thisRealUser), new SystemMessageJSONObject());
+
+               return FastMessage("You're now hiding. Hiding persists across reloads. Be careful, you can still use commands!");
+            }
+            else
+            {
+               thisRealUser.LastJoin = DateTime.Now;
+               ChatRunner.Server.BroadcastUserList();
+               ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), new SystemMessageJSONObject());
+
+               return FastMessage("You've come out of hiding.");
+            }
+         }
+
+         return new List<JSONObject>();
+      }
+   }
+
    /*public class AdminModule : Module
    {
       public AdminModule()

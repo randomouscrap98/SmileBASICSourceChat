@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.1.0";
+      public const string Version = "2.2.1";
 
       //private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
@@ -292,7 +292,7 @@ namespace ChatServer
 
             //Set up the module system
             loader = new ModuleLoader(logger);
-            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule), typeof(DebugModule), typeof(PmModule) };
+            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule), typeof(DebugModule), typeof(PmModule), typeof(AdminModule) };
 
             //Oops, couldn't load the modules. What the heck?
             if (!loader.Setup(ModuleConfigFile, extraModules))

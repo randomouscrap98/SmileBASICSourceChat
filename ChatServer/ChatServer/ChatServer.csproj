@@ -69,6 +69,9 @@
     <Compile Include="..\..\modules\pmModule.cs">
       <Link>pmModule.cs</Link>
     </Compile>
+    <Compile Include="..\..\modules\adminModule.cs">
+      <Link>adminModule.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />

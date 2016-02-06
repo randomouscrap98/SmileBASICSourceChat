@@ -61,11 +61,6 @@ namespace ChatServer
             tag += "X";
          
          manager.ChatSettings.LogProvider.LogGeneral(message, level, tag);
-
-//         if (manager != null)
-//            return manager.Logger;
-//         else
-//            return new MyExtensions.Logging.Logger(10);
       }
 
       //This should be the ONLY place where the active state changes
@@ -220,16 +215,6 @@ namespace ChatServer
          return new LanguageTagParameters(tag, ThisUser);
       }
 
-//      public void FillContainer(LanguageTagParameters parameters, JSONObject container)
-//      {
-//
-//      }
-
-//      protected override void OnOpen()
-//      {
-//         //I don't know what we're doing for OnOpen yet.
-//      }
-
       //On closure of the websocket, remove ourselves from the list of active
       //chatters.
       public override void ClosedConnection()
@@ -240,8 +225,6 @@ namespace ChatServer
          if (UID > 0)
          {
             ThisUser.PerformOnChatLeave(sessionID);
-//            if (!ThisUser.PerformOnChatLeave())
-//               Log("User session timer was in an invalid state!", LogLevel.Warning);
 
             if (ThisUser.ShowMessages)
                manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
@@ -286,8 +269,6 @@ namespace ChatServer
       //I guess this is WHENEVER it receives a message?
       public override void ReceivedMessage(string rawMessage)
       {
-         //Log("Got message: " + rawMessage, MyExtensions.Logging.LogLevel.Debug);
-
          ResponseJSONObject response = new ResponseJSONObject();
          response.result = false;
          dynamic json = new Object();
@@ -301,7 +282,7 @@ namespace ChatServer
          {
             manager.Bandwidth.AddIncoming(rawMessage.Length + HeaderSize);
          }
-
+            
          //First, just try to parse the JSON they gave us. If it's absolute
          //garbage (or just not JSON), let them know and quit immediately.
          try
@@ -460,6 +441,7 @@ namespace ChatServer
          }
          else if (type == "message")
          {
+            //Oh jeez, you're hiding and yet you're sending us a message? Dude.... not cool
             try
             {
                //First, gather information from the JSON. This is so that if
@@ -480,15 +462,15 @@ namespace ChatServer
                }
                else if (!ThisUser.AcceptedPolicy)
                {
-                  if(message != "/accept")
+                  if (message != "/accept")
                   {
                      response.errors.Add("The only command available right now is /accept");
                   }
                   else
                   {
                      ModuleJSONObject acceptSuccess = new ModuleJSONObject("You have accepted the SmileBASIC Source " +
-                        "chat policy. Please use the appropriate chat tab for discussion about SmileBASIC or off-topic " +
-                        "subjects!");
+                                                   "chat policy. Please use the appropriate chat tab for discussion about SmileBASIC or off-topic " +
+                                                   "subjects!");
                      MySend(acceptSuccess.ToString(), true);
 
                      Thread.Sleep(2000);
@@ -510,7 +492,7 @@ namespace ChatServer
                   StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now));
                }
                else if (tag == "admin" && !ThisUser.CanStaffChat ||
-                        tag == manager.ChatSettings.GlobalTag && !ThisUser.CanGlobalChat)
+                     tag == manager.ChatSettings.GlobalTag && !ThisUser.CanGlobalChat)
                {
                   response.errors.Add("You can't post messages here. I'm sorry.");
                }
@@ -530,8 +512,8 @@ namespace ChatServer
                   //Step 1: parse a possible command. If no command is parsed, no module will be written.
                   if (TryCommandParse(userMessage, out commandModule, out userCommand, out commandError))
                   {
-                     Log("Trying to use module " + commandModule.ModuleName + " to process command " + 
-                        userCommand.message + " from " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
+                     Log("Trying to use module " + commandModule.ModuleName + " to process command " +
+                     userCommand.message + " from " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
 
                      //We found a command. Send it off to the proper module and get the output
                      if (Monitor.TryEnter(commandModule.Lock, manager.ChatSettings.MaxModuleWait))
@@ -574,19 +556,26 @@ namespace ChatServer
                      }
                   }
 
-                  ChatTags warning = manager.AddMessage(userMessage);
+                  if (ThisUser.Hiding && userMessage.Display)
+                  {
+                     MySend((new WarningJSONObject("You're hiding! Don't send messages!")).ToString());
+                  }
+                  else
+                  {
+                     ChatTags warning = manager.AddMessage(userMessage);
+
+                     if (warning != ChatTags.None)
+                        outputs.Add(NewWarningFromTag(QuickParams(warning)));
+                  }
 
                   //Send off on relay
                   /*if(userMessage.Display && userMessage.tag == manager.IrcTag)
-                  {
-                     if(relay.SendMessage(userMessage.message))
-                        Logger.LogGeneral("Sent message on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
-                     else
-                        Logger.LogGeneral("Couldn't send on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
-                  }*/
-
-                  if (warning != ChatTags.None)
-                     outputs.Add(NewWarningFromTag(QuickParams(warning)));
+               {
+                  if(relay.SendMessage(userMessage.message))
+                     Logger.LogGeneral("Sent message on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
+                  else
+                     Logger.LogGeneral("Couldn't send on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
+               }*/
 
                   response.result = response.errors.Count == 0;
 
@@ -598,7 +587,7 @@ namespace ChatServer
                      manager.BroadcastMessageList();        //CRASH ALMOST CERTAINLY HAPPENS HERE!!!!!!!###$$$$$!!!!!!!!!!*$*$*$*
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
-                  if(manager.ChatSettings.AcceptedTags.Contains(userMessage.tag))
+                  if (manager.ChatSettings.AcceptedTags.Contains(userMessage.tag))
                   {
                      foreach (Module module in manager.GetModuleListCopy())
                      {
@@ -636,28 +625,6 @@ namespace ChatServer
                //response.errors.Add("Message was missing fields");
             }
          }
-//         else if (type == "createroom")
-//         {
-//            try
-//            {
-//               List<int> users = json.users.ToObject<List<int>>();
-//               string error;
-//
-//               if(!manager.CreatePMRoom(new HashSet<int>(users), ThisUser.UID, out error))
-//               {
-//                  response.errors.Add(error);
-//               }
-//               else
-//               {
-//                  MySend((new SystemMessageJSONObject("You created a chat room for " + string.Join(", ", users.Select(x => manager.GetUser(x).Username)))).ToString());
-//                  manager.BroadcastUserList();
-//               }
-//            }
-//            catch
-//            {
-//               response.errors.Add("Could not parse PM creation room message");
-//            }
-//         }
          else if (type == "request")
          {
             try

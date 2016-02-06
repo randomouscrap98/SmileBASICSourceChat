@@ -93,6 +93,7 @@ namespace ChatEssentials
       public readonly long UnixJoinDate;
       public readonly DateTime LastPost;
       public readonly DateTime LastPing;
+      public readonly DateTime LastJoin;
       public readonly bool Active;
       public readonly bool Banned;
       public readonly bool Blocked;
@@ -124,6 +125,7 @@ namespace ChatEssentials
          UnixJoinDate = user.UnixJoinDate;
          LastPing = user.LastPing;
          LastPost = user.LastPost;
+         LastJoin = user.LastJoin;
          Active = user.Active;
          Banned = user.Banned;
          BannedUntil = user.BannedUntil;
@@ -169,6 +171,8 @@ namespace ChatEssentials
 
       private double spamScore = 0;
       private int globalSpamScore = 0;
+
+      public bool Hiding = false;
 
       private bool staffChat = false;
       private bool globalChat = false;
@@ -259,13 +263,31 @@ namespace ChatEssentials
          get { return lastPing; }
       }
 
+      public DateTime LastJoin
+      {
+         get
+         {
+            if (recentJoins.Count == 0)
+               return new DateTime(0);
+            else
+               return recentJoins.Last();
+         }
+         set
+         {
+            recentJoins.Add(value);
+            recentJoins = recentJoins.Where(x => x > DateTime.Now.AddDays(-1)).ToList();
+         }
+      }
+
       public bool Active
       {
          get 
          { 
             /*if (isIrcUser)
                return ircActive;*/
-            
+            if (Hiding)
+               return false;
+
             return lastPing > DateTime.Now.AddMinutes(-InactiveMinutes); 
          }
       }
@@ -325,7 +347,7 @@ namespace ChatEssentials
 
       public bool ShowMessages
       {
-         get { return !Banned && !Blocked; }
+         get { return !Banned && !Blocked && !Hiding; }
       }
 
       public int GlobalSpamScore
@@ -557,9 +579,10 @@ namespace ChatEssentials
 
          lock (Lock)
          {
+            LastJoin = DateTime.Now;
             //Our last join was now (assuming this is called correctly)
-            recentJoins.Add(DateTime.Now);
-            recentJoins = recentJoins.Where(x => x > DateTime.Now.AddDays(-1)).ToList();
+//            recentJoins.Add(DateTime.Now);
+//            recentJoins = recentJoins.Where(x => x > DateTime.Now.AddDays(-1)).ToList();
 
             //Fix bad sessions which may be present.
             foreach (UserSession badSession in sessions.Where(x => !x.Entered))

@@ -153,7 +153,8 @@ namespace ChatServer
                   message += "UID: " + parsedInfo.UID + "\n";
                   message += "Active: " + parsedInfo.Active + "\n";
                   message += "Last ping: " + StringExtensions.LargestTime(DateTime.Now - parsedInfo.LastPing) + "\n";
-                  message += "Last post: " + StringExtensions.LargestTime(DateTime.Now - parsedInfo.LastPing) + "\n";
+                  message += "Last post: " + StringExtensions.LargestTime(DateTime.Now - parsedInfo.LastPost) + "\n";
+                  message += "Last entry: " + StringExtensions.LargestTime(DateTime.Now - parsedInfo.LastJoin) + "\n";
                   message += "Staff chat: " + parsedInfo.CanStaffChat + "\n";
                   message += "Global chat: " + parsedInfo.CanGlobalChat + "\n";
                   message += "Chat control: " + parsedInfo.ChatControl + "\n";
