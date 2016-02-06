@@ -210,7 +210,10 @@ the actions of any user within the chat.".Replace("\n", " ");
          if (MySerialize.LoadObject<Dictionary<int, User>>(SavePath(UserFile), out tempUsers))
          {
             users = tempUsers;
-            UserSession.SetNextID(users.Max(x => x.Value.MaxSessionID) + 1);
+            if(users.Count > 0)
+            {
+                UserSession.SetNextID(users.Max(x => x.Value.MaxSessionID) + 1);
+            };
             Log("Loaded user data from file", MyExtensions.Logging.LogLevel.Debug);
          }
          else
