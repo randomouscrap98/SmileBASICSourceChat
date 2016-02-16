@@ -91,13 +91,13 @@
       <Project>{42DCD240-6A25-4981-9017-2A566B99D42D}</Project>
       <Name>Module</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MyExtensions\MyExtensions.csproj">
-      <Project>{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}</Project>
-      <Name>MyExtensions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ChatEssentials\ChatEssentials.csproj">
       <Project>{11915F24-34FB-4C4D-8CE7-3F509F8D5A42}</Project>
       <Name>ChatEssentials</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MyExtensions\MyExtensions.csproj">
+      <Project>{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}</Project>
+      <Name>MyExtensions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

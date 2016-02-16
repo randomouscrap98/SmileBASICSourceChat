@@ -3,19 +3,21 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="../main.cs">
     <Files>
       <File FileName="../chat.cs" Line="1" Column="1" />
-      <File FileName="../chatManager.cs" Line="855" Column="11" />
-      <File FileName="../user.cs" Line="289" Column="29" />
-      <File FileName="../main.cs" Line="19" Column="35" />
-      <File FileName="../messages.cs" Line="98" Column="87" />
+      <File FileName="../chatManager.cs" Line="1" Column="1" />
+      <File FileName="../user.cs" Line="1" Column="1" />
+      <File FileName="../main.cs" Line="34" Column="45" />
+      <File FileName="../messages.cs" Line="1" Column="1" />
       <File FileName="../Options.cs" Line="1" Column="1" />
       <File FileName="../modules/module.cs" Line="1" Column="1" />
       <File FileName="../modules/debugModule.cs" Line="1" Column="1" />
-      <File FileName="../modules/CollectGameModule.cs" Line="1" Column="1" />
-      <File FileName="../modules/adminModule.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <DisabledProjects>
+    <String>PortedModules/PortedModules.csproj</String>
+    <String>ModulePackage1/ModulePackage1.csproj</String>
+  </DisabledProjects>
 </Properties>

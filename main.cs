@@ -23,9 +23,8 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.2.1";
+      public const string Version = "2.2.2";
 
-      //private static WebSocketServer webSocketServer;
       private static AuthServer authServer;
       private static MyExtensions.Logging.Logger logger;
       private static ModuleLoader loader;
@@ -134,16 +133,6 @@ namespace ChatServer
          {
             return true;
          }
-         //Set up the chat manager (the program that provides data to each chat instance)
-//         manager = new ChatManager(loader, authServer, languageTags,
-//               new MyExtensions.Options(options.GetOptionsForKey(OptionTag)), logger);
-            /*GetOption<int>("messageBacklog"), GetOption<int>("messageSend"),
-            GetOption<int>("saveInterval"), GetOption<int>("moduleWaitSeconds"),
-            GetOption<string>("acceptedTags"), GetOption<string>("globalTag"),
-            GetOption<string>("saveFolder"), GetOption<string>("ircServer"), 
-            GetOption<string>("ircChannel"), GetOption<string>("ircTag"), logger);*/
-
-         //manager.Request += PerformRequest;
       }
 
       //Delay a request so the control can return to the caller. Eventually we'll get back to this and do the real request.
@@ -177,36 +166,6 @@ namespace ChatServer
          worker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => { DelayedRequest(request); };
          worker.RunWorkerAsync();
       }
-
-//      private static void ResetEssentials()
-//      {
-//         //First
-//         webSocketServer = null;
-//         manager = null;
-//
-//         System.GC.Collect();
-//
-//         bool success = false;
-//
-//         while (!success)
-//         {
-//            try
-//            {
-//               SetupWebsocket();
-//               success = true;
-//            }
-//            catch
-//            {
-//               success = false;
-//               logger.Warning("Couldn't restart chat server. This indicate a problem!");
-//               System.Threading.Thread.Sleep(3000);
-//               System.GC.Collect();
-//            }
-//         }
-//         SetupChatManager();
-//
-//         logger.Log("The websocket server and chat manager have been reset.");
-//      }
 
       public static void Main()
       {
@@ -327,7 +286,6 @@ namespace ChatServer
 
             //This starts up the server!
             SetupChatManager();
-            //SetupWebsocket();
 
             int ShutdownSeconds = GetOption<int>("shutdownSeconds");
             Console.WriteLine(">> Press Q to nicely quit the server...");
@@ -336,52 +294,58 @@ namespace ChatServer
 
             restart = false;
 
-            //CrashTimeoutSeconds = GetOption<int>("crashDetectionTimeout");
-
             //Just before we start, we should ummmm set up the "please try again" timer for the stupid library
             System.Timers.Timer timer = new System.Timers.Timer(GetOption<int>("chatTimeout") * 1000);
             timer.Elapsed += CheckServer;
             timer.Start();
 
-            //Now enter the "server loop" and run forever?
-            while (true)
+            try
             {
-               if (Console.KeyAvailable)
+               //Now enter the "server loop" and run forever?
+               while (true)
                {
-                  ConsoleKeyInfo key = Console.ReadKey();
-                  if (key.Key == ConsoleKey.Q)
+                  if (Console.KeyAvailable)
                   {
-                     Console.WriteLine();
-                     Console.WriteLine("Stopping server in " + ShutdownSeconds + " seconds...");
-                     chatServer.GeneralBroadcast((new SystemMessageJSONObject() { 
-                        message = "System is shutting down in " + ShutdownSeconds + " seconds for maintenance..."
-                     }).ToString());
-                     Thread.Sleep(ShutdownSeconds * 1000);
-                     break;
+                     ConsoleKeyInfo key = Console.ReadKey();
+                     if (key.Key == ConsoleKey.Q)
+                     {
+                        Console.WriteLine();
+                        Console.WriteLine("Stopping server in " + ShutdownSeconds + " seconds...");
+                        chatServer.GeneralBroadcast((new SystemMessageJSONObject() { 
+                           message = "System is shutting down in " + ShutdownSeconds + " seconds for maintenance..."
+                        }).ToString());
+                        Thread.Sleep(ShutdownSeconds * 1000);
+                        break;
+                     }
+                     else if (key.Key == ConsoleKey.X)
+                     {
+                        break;
+                     }
+                     else if (key.Key == ConsoleKey.R)
+                     {
+                        restart = true;
+                        break;
+                     }
                   }
-                  else if (key.Key == ConsoleKey.X)
-                  {
-                     break;
-                  }
-                  else if (key.Key == ConsoleKey.R)
-                  {
-                     restart = true;
-                     break;
-                  }
-               }
 
-               //hmm, someone wants us to die. OK then
-               if(ShouldDie)
-               {
-                  logger.Log("Trying to die...");
-                  chatServer.SaveData();
-                  logger.Log("Dying...");
-                  logger.DumpToFile();
-                  System.Environment.Exit(99);
-                  return;
-               }
+                  //hmm, someone wants us to die. OK then
+                  if(ShouldDie)
+                  {
+                     throw new Exception("Server got an internal death signal");
+                  }
 
-               Thread.Sleep(AuthServer.ThreadSleepMilliseconds);
+                  Thread.Sleep(AuthServer.ThreadSleepMilliseconds);
+               }
+            }
+            catch(Exception e)
+            {
+               logger.Log("Caught unhandled exception: " + e);
+               logger.Log("Trying to die...");
+               chatServer.SaveData();
+               logger.Log("Dying...");
+               logger.DumpToFile();
+               System.Environment.Exit(99);
+               return;
             }
                
             if(!Finish())
@@ -390,6 +354,7 @@ namespace ChatServer
             }
 
          } while(restart);
+
 
          System.Environment.Exit(0);
       }
@@ -402,8 +367,6 @@ namespace ChatServer
             {
                if(!AttemptLock(chatServer.managerLock))
                   logger.LogGeneral("Manager is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
-//               else if(!AttemptLock(MySocketVariables.CrashLock))
-//                  logger.LogGeneral("Websocket is the one in a deadlock", MyExtensions.Logging.LogLevel.Debug);
                else
                   logger.LogGeneral("Chat server seems OK", MyExtensions.Logging.LogLevel.SuperDebug);
             }
@@ -454,8 +417,6 @@ namespace ChatServer
          logger.Log("Stopping auth server...", LogTag);
          authServer.Stop();
          logger.Log("Stopping chat server...", LogTag);
-         //webSocketServer.Stop();
-         //logger.Log("Stopping chat manager...", LogTag);
          chatServer.SafeStop();
          logger.Log("Stopping logger...", LogTag);
          logger.Log(message);
@@ -509,7 +470,7 @@ namespace ChatServer
 
       public static string AssemblyVersion()
       {
-         return Version; //FileVersion().ToString();
+         return Version;
       }
 
       public static Version FileVersion()
@@ -524,7 +485,6 @@ namespace ChatServer
          {
             string date = File.ReadAllText("build.txt");
             DateTime buildDate = MyExtensions.DateExtensions.FromUnixTime((double)int.Parse(date));
-            //buildDate = buildDate.AddHours(GetOption<int>("buildHourModifier"));
             return buildDate;
          }
          catch
@@ -539,7 +499,6 @@ namespace ChatServer
          {
             string date = File.ReadAllText("crash.txt");
             DateTime crashDate = MyExtensions.DateExtensions.FromUnixTime((double)int.Parse(date));
-            //buildDate = buildDate.AddHours(GetOption<int>("buildHourModifier"));
             return crashDate;
          }
          catch
