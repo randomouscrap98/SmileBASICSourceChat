@@ -880,7 +880,7 @@ namespace ChatServer
                   "Outgoing: " + bandwidth.GetTotalBandwidthOutgoing() + " (1h: " + bandwidth.GetHourBandwidthOutgoing() + ")\n" +
                   "Incoming: " + bandwidth.GetTotalBandwidthIncoming() + " (1h: " + bandwidth.GetHourBandwidthIncoming() + ")\n" +
                   "---Websocket---\n" +
-                  "Library Version: " + WebSocketServer.Version + "\n" +
+                  "Library Version: " + ChatServer.Version + "\n" +
                   "Last full crash: " + crashedString;
                outputs.Add(output);
                break;

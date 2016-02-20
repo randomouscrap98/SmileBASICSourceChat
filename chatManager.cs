@@ -89,7 +89,7 @@ namespace ChatServer
 
    //This is the manager for the chat. It includes information which all individual chat sessions
    //will probably need, and manages the saving/loading of resources.
-   public class ChatServer : WebSocketServer
+   public class ChatServer : WebSocketServerAsync
    {
       public const int HeaderSize = 64;
       public const string LogTag = "ChatServer";

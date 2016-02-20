@@ -23,12 +23,13 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.2.2";
+      public const string Version = "2.3.0";
 
       private static AuthServer authServer;
       private static MyExtensions.Logging.Logger logger;
       private static ModuleLoader loader;
       private static ChatServer chatServer = null;
+      private static Task serverWaitable = null;
       private static MyExtensions.Options options = new MyExtensions.Options();
 
       private static bool ShouldDie = false;
@@ -97,7 +98,7 @@ namespace ChatServer
 //         }
 //      }
 
-      private static bool SetupChatManager()
+      private static void SetupChatManager()
       {
          ChatServerSettings settings = new ChatServerSettings(GetOption<int>("chatServerPort"), "chatserver",
             () => { return new Chat(GetOption<int>("userUpdateInterval"), Server); }, logger);
@@ -123,16 +124,16 @@ namespace ChatServer
          settings.DumpSettings();
 
          chatServer = new ChatServer(settings, loader, authServer, languageTags);
-
-         if (!chatServer.Start())
-         {
-            logger.LogGeneral("WebSocket server couldn't be started!", MyExtensions.Logging.LogLevel.FatalError);
-            return false;
-         }
-         else
-         {
-            return true;
-         }
+         serverWaitable = chatServer.StartAsync();
+//         if (!chatServer.Start())
+//         {
+//            logger.LogGeneral("WebSocket server couldn't be started!", MyExtensions.Logging.LogLevel.FatalError);
+//            return false;
+//         }
+//         else
+//         {
+//            return true;
+//         }
       }
 
       //Delay a request so the control can return to the caller. Eventually we'll get back to this and do the real request.
@@ -414,25 +415,39 @@ namespace ChatServer
       //IDK a way to end everything.
       private static bool Finish(string message = "Done")
       {
-         logger.Log("Stopping auth server...", LogTag);
-         authServer.Stop();
-         logger.Log("Stopping chat server...", LogTag);
-         chatServer.SafeStop();
+         if (authServer != null)
+         {
+            logger.Log("Stopping auth server...", LogTag);
+            authServer.Stop();
+         }
+         if (chatServer != null)
+         {
+            logger.Log("Stopping chat server...", LogTag);
+            chatServer.SafeStop();
+         }
          logger.Log("Stopping logger...", LogTag);
          logger.Log(message);
          logger.DumpToFile();
 
          DateTime start = DateTime.Now;
+         TimeSpan wait = TimeSpan.FromSeconds(5);
 
-         while (chatServer.Running || authServer.Running)
+         while (/*chatServer.Running ||*/ authServer.Running)
          {
             Thread.Sleep(100);
 
-            if((DateTime.Now - start).TotalSeconds < 5)
+            if((DateTime.Now - start) >= wait)
             {
-               Console.WriteLine("-Can't stop the server!");
+               Console.WriteLine("-Can't stop the authserver!");
                return false;
             }
+         }
+
+         //Now the simple shutdown for the websocket server
+         if(serverWaitable != null && !serverWaitable.Wait(wait))
+         {
+            Console.WriteLine("-Can't stop the websocket server!");
+            return false;
          }
 
          return true;
