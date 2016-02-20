@@ -243,7 +243,7 @@ namespace ChatServer
             logger.StartInstantConsole();
 
             logger.Log("ChatServer v" + Version + ", built on " + MyBuildDate().ToString(), LogTag);
-            logger.Log("WebSocket Library v" + WebSocketServer.Version, LogTag);
+            logger.Log("WebSocket Library v" + ChatServer.Version, LogTag);
 
             int workerThreads, ioThreads;
             ThreadPool.SetMaxThreads(Environment.ProcessorCount * 4, Environment.ProcessorCount * 2);
