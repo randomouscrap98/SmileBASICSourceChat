@@ -5,11 +5,12 @@
       <File FileName="../chat.cs" Line="1" Column="1" />
       <File FileName="../chatManager.cs" Line="1" Column="1" />
       <File FileName="../user.cs" Line="1" Column="1" />
-      <File FileName="../main.cs" Line="241" Column="47" />
+      <File FileName="../main.cs" Line="244" Column="79" />
       <File FileName="../messages.cs" Line="1" Column="1" />
       <File FileName="../Options.cs" Line="1" Column="1" />
       <File FileName="../modules/module.cs" Line="1" Column="1" />
       <File FileName="../modules/debugModule.cs" Line="1" Column="1" />
+      <File FileName="../logger.cs" Line="21" Column="49" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

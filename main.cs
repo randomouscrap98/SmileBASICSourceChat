@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.3.0";
+      public const string Version = "2.3.1";
 
       private static AuthServer authServer;
       private static MyExtensions.Logging.Logger logger;
@@ -205,7 +205,9 @@ namespace ChatServer
                { "policyReminderHours", 24 },
                { "ircServer", "irc.freenode.net" },
                { "ircChannel", "#smilebasic" },
-               { "ircTag", "general" }
+               { "ircTag", "general" },
+               { "threadpoolMultiplier" , 4.0 },
+               { "connectionpoolMultiplier", 2.0 }
             };
                
             //Set up and read options. We need to do this first so that the values can be used for init
@@ -246,7 +248,8 @@ namespace ChatServer
             logger.Log("WebSocket Library v" + ChatServer.Version, LogTag);
 
             int workerThreads, ioThreads;
-            ThreadPool.SetMaxThreads(Environment.ProcessorCount * 4, Environment.ProcessorCount * 2);
+            ThreadPool.SetMaxThreads((int)Math.Ceiling(Environment.ProcessorCount * GetOption<double>("threadpoolMultiplier")), 
+               (int)Math.Ceiling(Environment.ProcessorCount * GetOption<double>("connectionpoolMultiplier")));
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
             logger.Log("Using " + workerThreads + " general threads and " + ioThreads + " IO threads");
 
