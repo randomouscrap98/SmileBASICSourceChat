@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Module", "Module\Module.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModulePackage1", "ModulePackage1\ModulePackage1.csproj", "{E7D4D252-BC74-4C17-8288-874D31208813}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyExtensions", "MyExtensions\MyExtensions.csproj", "{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatEssentials", "ChatEssentials\ChatEssentials.csproj", "{11915F24-34FB-4C4D-8CE7-3F509F8D5A42}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortedModules", "PortedModules\PortedModules.csproj", "{C3F1A924-C8B4-49DA-A014-A804BEA8F18B}"
@@ -31,10 +29,6 @@ Global
 		{42DCD240-6A25-4981-9017-2A566B99D42D}.Debug|x86.Build.0 = Debug|Any CPU
 		{42DCD240-6A25-4981-9017-2A566B99D42D}.Release|x86.ActiveCfg = Release|Any CPU
 		{42DCD240-6A25-4981-9017-2A566B99D42D}.Release|x86.Build.0 = Release|Any CPU
-		{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}.Debug|x86.Build.0 = Debug|Any CPU
-		{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}.Release|x86.ActiveCfg = Release|Any CPU
-		{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}.Release|x86.Build.0 = Release|Any CPU
 		{C3F1A924-C8B4-49DA-A014-A804BEA8F18B}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{C3F1A924-C8B4-49DA-A014-A804BEA8F18B}.Debug|x86.Build.0 = Debug|Any CPU
 		{C3F1A924-C8B4-49DA-A014-A804BEA8F18B}.Release|x86.ActiveCfg = Release|Any CPU

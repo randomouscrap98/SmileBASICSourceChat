@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.3.1";
+      public const string Version = "2.3.3";
 
       private static AuthServer authServer;
       private static MyExtensions.Logging.Logger logger;

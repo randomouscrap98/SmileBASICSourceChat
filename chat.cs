@@ -589,7 +589,7 @@ namespace ChatServer
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
                   if (manager.ChatSettings.AcceptedTags.Contains(userMessage.tag))
                   {
-                     foreach (Module module in manager.GetModuleListCopy())
+                     foreach (Module module in manager.GetModuleListCopy().Where(x => x.DoesProcessMessage))
                      {
                         if (Monitor.TryEnter(module.Lock, manager.ChatSettings.MaxModuleWait))
                         {

@@ -64,6 +64,18 @@ namespace ModuleSystem
          get { return ModuleName + ".json"; }
       }
 
+      public bool DoesProcessMessage
+      {
+         get
+         {
+            Type thisType = this.GetType();
+            MethodInfo method = thisType.GetMethod("ProcessMessage");
+
+            //If anyone other than us (the base class) declared ProcessMessage, it's probably doing something.
+            return method.DeclaringType != typeof(Module);
+         }
+      }
+
       /// <summary>
       /// Retrieves an option with the given name. If you have options you want loaded from the module config file,
       /// you can get the values from here.
@@ -280,23 +292,41 @@ namespace ModuleSystem
          get { return activeModules; }
       }
 
+      public T CallInSaveFolder<T>(Module module, Func<T> function)
+      {
+         string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
+            options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
+         string currentDirectory = Directory.GetCurrentDirectory();
+
+         Directory.CreateDirectory(saveDirectory);
+         Directory.SetCurrentDirectory(saveDirectory);
+
+         T result = function();
+
+         Directory.SetCurrentDirectory(currentDirectory);
+
+         return result;
+      }
+
       //Wrap module file loading so that it uses a custom directory.
       public bool LoadWrapper(Module module)
       {
          try
          {
-            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
-               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
-            string currentDirectory = Directory.GetCurrentDirectory();
-
-            Directory.CreateDirectory(saveDirectory);
-            Directory.SetCurrentDirectory(saveDirectory);
-
-            bool result = module.LoadFiles();
-
-            Directory.SetCurrentDirectory(currentDirectory);
-
-            return result;
+            return CallInSaveFolder<bool>(module, module.LoadFiles);
+//
+//            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
+//               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
+//            string currentDirectory = Directory.GetCurrentDirectory();
+//
+//            Directory.CreateDirectory(saveDirectory);
+//            Directory.SetCurrentDirectory(saveDirectory);
+//
+//            bool result = module.LoadFiles();
+//
+//            Directory.SetCurrentDirectory(currentDirectory);
+//
+//            return result;
          }
          catch
          {
@@ -309,18 +339,19 @@ namespace ModuleSystem
       {
          try
          {
-            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
-               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
-            string currentDirectory = Directory.GetCurrentDirectory();
-
-            Directory.CreateDirectory(saveDirectory);
-            Directory.SetCurrentDirectory(saveDirectory);
-
-            bool result = module.SaveFiles();
-
-            Directory.SetCurrentDirectory(currentDirectory);
-
-            return result;
+            return CallInSaveFolder<bool>(module, module.SaveFiles);
+//            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
+//               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
+//            string currentDirectory = Directory.GetCurrentDirectory();
+//
+//            Directory.CreateDirectory(saveDirectory);
+//            Directory.SetCurrentDirectory(saveDirectory);
+//
+//            bool result = module.SaveFiles();
+//
+//            Directory.SetCurrentDirectory(currentDirectory);
+//
+//            return result;
          }
          catch
          {

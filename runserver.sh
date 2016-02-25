@@ -3,7 +3,7 @@
 folder=ChatServer/ChatServer/bin/Release/
 exe=ChatServer.exe
 build=build.txt
-dlls="ChatServer/ModulePackage1/bin/Debug/ModulePackage1.dll ChatServer/PortedModules/bin/Debug/PortedModules.dll"
+dlls="ChatServer/ModulePackage1/bin/Release/ModulePackage1.dll ChatServer/PortedModules/bin/Release/PortedModules.dll"
 serverFolder=server/
 
 #Oops, some important files don't exist

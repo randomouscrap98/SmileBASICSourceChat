@@ -34,6 +34,9 @@
       <HintPath>..\..\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MyExtensions">
+      <HintPath>..\..\MyExtensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -51,10 +54,4 @@
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\MyExtensions\MyExtensions.csproj">
-      <Project>{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}</Project>
-      <Name>MyExtensions</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>
