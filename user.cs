@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using MyExtensions;
 using ChatEssentials;
 using System.Timers;
+using Newtonsoft.Json.Linq;
+using System.Runtime.Remoting;
 
 namespace ChatEssentials
 {
@@ -167,6 +169,7 @@ namespace ChatEssentials
       private string avatar = "";
       private string stars = "";
       private string language = "";
+      private string banReason = "";
       private DateTime joinDate = DateTime.Now;
 
       private double spamScore = 0;
@@ -178,6 +181,7 @@ namespace ChatEssentials
       private bool globalChat = false;
       private bool chatControl = false;
       private bool chatControlExtended = false;
+      private bool shadowBanned = false;
       private DateTime bannedUntil = new DateTime(0);
 
       private bool lastActive = true;
@@ -230,6 +234,11 @@ namespace ChatEssentials
       public string Language
       {
          get { return language; }
+      }
+
+      public string BanReason
+      {
+         get { return banReason; }
       }
 
       public int UID
@@ -288,7 +297,7 @@ namespace ChatEssentials
             if (Hiding)
                return false;
 
-            return lastPing > DateTime.Now.AddMinutes(-InactiveMinutes); 
+            return lastPing > DateTime.Now.AddMinutes(-InactiveMinutes) && OpenSessionCount > 0; 
          }
       }
 
@@ -314,7 +323,11 @@ namespace ChatEssentials
 
       public bool Banned
       {
-         get { return bannedUntil > DateTime.Now; }
+         get { return !ShadowBanned && bannedUntil > DateTime.Now; }
+      }
+      public bool ShadowBanned
+      {
+         get { return shadowBanned; } 
       }
       public DateTime BannedUntil
       {
@@ -570,19 +583,11 @@ namespace ChatEssentials
 
       public long PerformOnChatEnter()
       {
-         //No, don't do anything for these guys.
-         /*if (isIrcUser)
-            return true;*/
-         
          PerformOnPing(true);
-         //bool result = false;
 
          lock (Lock)
          {
             LastJoin = DateTime.Now;
-            //Our last join was now (assuming this is called correctly)
-//            recentJoins.Add(DateTime.Now);
-//            recentJoins = recentJoins.Where(x => x > DateTime.Now.AddDays(-1)).ToList();
 
             //Fix bad sessions which may be present.
             foreach (UserSession badSession in sessions.Where(x => !x.Entered))
@@ -595,38 +600,13 @@ namespace ChatEssentials
             UserSession session = new UserSession();
             session.SetEnterNow();
             sessions.Add(session);
-//            //If it's empty or we have no open sessions, add a new one
-//            if (sessions.Count == 0 || sessions.All(x => x.Entered))
-//            {
-//               sessions.Add(new UserSession());
-//               result = true;
-//            }
-
-//            try
-//            {
-//               //Look for the last session that hasn't entered yet and set the entry to now.
-//               sessions.Last(x => !x.Entered).SetEnterNow();
-//            }
-//            catch
-//            {
-//               return false;
-//            }
 
             return session.ID;
          }
-
-         //We're only good if we succeeded AND there's only one session open
-         //return result && (sessions.Count(x => !x.Left) == 1);
       }
 
-      public /*bool*/ void PerformOnChatLeave(long ID)
+      public void PerformOnChatLeave(long ID)
       {
-         //bool result = true;
-
-         //No, don't do anything for these guys.
-         /*if (isIrcUser)
-            return true;*/
-
          lock (Lock)
          {
             if (sessions.Any(x => x.ID == ID))
@@ -634,38 +614,14 @@ namespace ChatEssentials
                UserSession session = sessions.First(x => x.ID == ID);
                session.SetLeaveNow();
             }
-//            //This is to set the "inactive" state on logout
-//            lastPing = new DateTime(0);
-//
-//            //You shouldn't be leaving in this case. Come on now
-//            if (sessions.Count == 0 || sessions.All(x => x.Left))
-//            {
-//               result = false;
-//            }
-//            else
-//            {
-//               //If we have more than one open session, this is bad
-//               if (sessions.Count(x => !x.Left) > 1)
-//                  result = false;
-//               
-//               try
-//               {
-//                  //Close ALLL open sessions.
-//                  foreach(UserSession session in sessions.Where(x => !x.Left))
-//                     session.SetLeaveNow();
-//               }
-//               catch
-//               {
-//                  return false;
-//               }
-//            }
          }
-
-         //return result && sessions.All(x => x.Left);
       }
 
-      public bool PullInfoFromQueryPage()
+      public bool PullInfoFromQueryPage(out List<string> warnings)
       {
+         warnings = new List<string>();
+         dynamic json = false;
+
          try
          {
             using (WebClient client = new WebClient())
@@ -673,11 +629,7 @@ namespace ChatEssentials
                string url = Website + "/query/usercheck?getinfo=1&uid=" + uid;
                string htmlCode = client.DownloadString(url);
 
-               //Console.WriteLine("URL: " + url);
-               //Console.WriteLine("Username: " + username);
-               //Console.WriteLine("Result: " + htmlCode);
-
-               dynamic json = JsonConvert.DeserializeObject(htmlCode);
+               json = JsonConvert.DeserializeObject(htmlCode);
 
                lock(Lock)
                {
@@ -691,11 +643,23 @@ namespace ChatEssentials
                   bannedUntil = DateExtensions.FromUnixTime((double)json.result.banneduntil);
                   joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
                   language = json.result.language;
+                  banReason = json.result.banreason;
+                  shadowBanned = json.result.goodbye;
                }
             }
          }
          catch
          {
+            //Try to pull out some warnings if we can. Otherwise just say a generic "we failed"
+            try
+            {
+               warnings = json.warnings.ToObject<List<string>>();
+            }
+            catch
+            {
+               warnings.Add("Couldn't contact webserver for your information. Server may be down");
+            }
+
             return false;
          }
 

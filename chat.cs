@@ -23,6 +23,8 @@ namespace ChatServer
 
       private int uid = -1;
       private long sessionID = 0;
+      private string lastAvatar = "";
+      private DateTime lastBan = new DateTime(0);
 
       public readonly DateTime Startup = DateTime.Now;
       private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
@@ -215,6 +217,17 @@ namespace ChatServer
          return new LanguageTagParameters(tag, ThisUser);
       }
 
+      public List<JSONObject> AddModuleTags(List<JSONObject> outputs, Module module)
+      {
+         //List<JSONObject> commandOutput = commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers);
+
+         foreach(JSONObject jsonMessage in outputs)
+            if(jsonMessage is ModuleJSONObject)
+               ((ModuleJSONObject)jsonMessage).module = module.Nickname;
+
+         return outputs;
+      }
+
       //On closure of the websocket, remove ourselves from the list of active
       //chatters.
       public override void ClosedConnection()
@@ -226,7 +239,7 @@ namespace ChatServer
          {
             ThisUser.PerformOnChatLeave(sessionID);
 
-            if (ThisUser.ShowMessages)
+            if (ThisUser.ShowMessages && !ThisUser.ShadowBanned)
                manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
          }
 
@@ -270,12 +283,13 @@ namespace ChatServer
       public override void ReceivedMessage(string rawMessage)
       {
          ResponseJSONObject response = new ResponseJSONObject();
+         List<string> warnings = new List<string>();
          response.result = false;
          dynamic json = new Object();
          string type = "";
 
          //You HAVE to do this, even though it seems pointless. Users need to show up as banned immediately.
-         ThisUser.PullInfoFromQueryPage();
+         bool userPullSuccess = ThisUser.PullInfoFromQueryPage(out warnings);
 
          //Before anything else, log the amount of incoming data
          if (!string.IsNullOrEmpty(rawMessage))
@@ -338,7 +352,7 @@ namespace ChatServer
                         uid = newUser;
 
                         //BEFORE adding, broadcast the "whatever has entered the chat" message
-                        if (ThisUser.ShowMessages)
+                        if (ThisUser.ShowMessages && !ThisUser.ShadowBanned)
                         {
                            manager.Broadcast(QuickParams(ChatTags.Join), new SystemMessageJSONObject(),
                               new List<Chat> { this });
@@ -371,7 +385,7 @@ namespace ChatServer
                            {
                               try
                               {
-                                 outputs.AddRange(module.OnUserJoin(currentUsers[ThisUser.UID], currentUsers));
+                                 outputs.AddRange(AddModuleTags(module.OnUserJoin(currentUsers[ThisUser.UID], currentUsers), module));
                               }
                               finally
                               {
@@ -450,8 +464,27 @@ namespace ChatServer
                string message = System.Security.SecurityElement.Escape((string)json.text);
                string tag = json.tag;
 
+               //Oh and if the user's avatar was updated, we should probably broadcast the userlist.
+               if((!string.IsNullOrWhiteSpace(lastAvatar) && lastAvatar != ThisUser.Avatar) ||
+                  (lastBan.Ticks != 0 && lastBan != ThisUser.BannedUntil))
+               {
+                  if(lastAvatar != ThisUser.Avatar)
+                     Log(ThisUser.Username + " updated avatar", LogLevel.Debug);
+                  else if (lastBan != ThisUser.BannedUntil)
+                     Log(ThisUser.Username + " ban status changed", LogLevel.Debug);
+                  manager.BroadcastUserList();
+               }
+
+               lastAvatar = ThisUser.Avatar;
+               lastBan = ThisUser.BannedUntil;
+
                //These first things don't increase spam score in any way
-               if (string.IsNullOrWhiteSpace(message))
+               if (!userPullSuccess)
+               {
+                  foreach (string warning in warnings)
+                     MySend((new WarningJSONObject("Chat Warning: " + warning)).ToString());
+               }
+               else if (string.IsNullOrWhiteSpace(message))
                {
                   response.errors.Add("No empty messages please");
                }
@@ -489,7 +522,7 @@ namespace ChatServer
                else if (ThisUser.Banned)
                {
                   response.errors.Add("You are banned from chat for " +
-                  StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now));
+                  StringExtensions.LargestTime(ThisUser.BannedUntil - DateTime.Now) + ". Reason: " + ThisUser.BanReason);
                }
                else if (tag == "admin" && !ThisUser.CanStaffChat ||
                      tag == manager.ChatSettings.GlobalTag && !ThisUser.CanGlobalChat)
@@ -520,7 +553,10 @@ namespace ChatServer
                      {
                         try
                         {
-                           outputs.AddRange(commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers));
+                           outputs.AddRange(AddModuleTags(
+                              commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers), 
+                              commandModule
+                           ));
                         }
                         finally
                         {
@@ -556,7 +592,7 @@ namespace ChatServer
                      }
                   }
 
-                  if (ThisUser.Hiding && userMessage.Display)
+                  if (ThisUser.Hiding && userMessage.Display && !manager.IsPMTag(userMessage.tag))
                   {
                      MySend((new WarningJSONObject("You're hiding! Don't send messages!")).ToString());
                   }
@@ -584,7 +620,7 @@ namespace ChatServer
 
                   //Since we added a new message, we need to broadcast.
                   if (response.result && userMessage.Display)
-                     manager.BroadcastMessageList();        //CRASH ALMOST CERTAINLY HAPPENS HERE!!!!!!!###$$$$$!!!!!!!!!!*$*$*$*
+                     manager.BroadcastMessageList(); 
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
                   if (manager.ChatSettings.AcceptedTags.Contains(userMessage.tag))
@@ -622,7 +658,6 @@ namespace ChatServer
             catch (Exception messageError)
             {
                response.errors.Add("Internal server error: " + messageError/*.Message*/);
-               //response.errors.Add("Message was missing fields");
             }
          }
          else if (type == "request")
@@ -691,7 +726,10 @@ namespace ChatServer
 
                if(tempJSON.broadcast)
                {
-                  manager.BroadcastExclude(tempJSON.ToString(), tempJSON.tag);
+                  if(ThisUser.ShadowBanned)
+                     MySend(tempJSON.ToString());
+                  else
+                     manager.BroadcastExclude(tempJSON.ToString(), tempJSON.tag);
                   //manager.Broadcast(tempJSON.ToString());
                   Log("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
                }
@@ -699,9 +737,20 @@ namespace ChatServer
                {
                   //No recipients? You probably meant to send it to the current user.
                   if(tempJSON.recipients.Count == 0)
+                  {
                      MySend(tempJSON.ToString());
+                  }
                   else
+                  {
+                     //Only includ the shadowbanned user in the recipients (remove
+                     //all others)
+                     if(ThisUser.ShadowBanned)
+                     {
+                        tempJSON.recipients = tempJSON.recipients.Where(x => x ==
+                              ThisUser.UID).ToList();
+                     }
                      manager.SendMessage(tempJSON);
+                  }
                }
             }
          }

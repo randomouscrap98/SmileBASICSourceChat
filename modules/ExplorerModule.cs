@@ -28,7 +28,8 @@ namespace WikiaChatLogger
 
 		private List<WorldInstance> worlds = new List<WorldInstance>();
 		private Dictionary<int, ExplorerPlayer> allPlayers = new Dictionary<int, ExplorerPlayer>();
-		private DateTime lastRefresh = new DateTime(0);
+      private DateTime lastRefresh = new DateTime(0);
+      private DateTime lastCommand = new DateTime(0);
 		private int generateCode = -1;
 		private int closeCode = -1;
 		private int closeWorld = -1;
@@ -41,10 +42,15 @@ namespace WikiaChatLogger
 		{
          AddOptions(new Dictionary<string, object> {
             {"cheating", false },
+            {"fullMap", false },
             {"treeHours", 1.0 }, 
             {"stoneHours", 0.15},
             {"fruitHours",1.0},
             {"superFruitHours", 1.2},
+            //{"fullnessIncrease", 5.0},
+            {"fruitPerFullness", 20.0 },
+            {"fullnessDecayMinutes", 0.6},
+            {"extraFruitPerMagicStone", 0.5},
             {"torchSteps",200 },
             {"hourlyStamina", 100},
             {"caveChance", 0.020},
@@ -67,8 +73,19 @@ namespace WikiaChatLogger
             }, "Perform actions (move up, down, left, right; pick up; use equipped; toggle strafing; face up, down, left, right)"),
             new ModuleCommand("exitemlist", NoArguments, "Get the list of item names"),
             new ModuleCommand("exitems", NoArguments, "See the list of all your items"),
-            new ModuleCommand("exequip", new List<CommandArgument> 
+            new ModuleCommand("exstorage", NoArguments, "See the list of all your stored items"),
+            new ModuleCommand("exstore", new List<CommandArgument> 
             { 
+               new CommandArgument("item", ArgumentType.Word),
+               new CommandArgument("amount", ArgumentType.Integer, RepeatType.ZeroOrOne)
+            }, "Put amount of item in storage (by name, like Fn)"),
+            new ModuleCommand("extake", new List<CommandArgument> 
+            { 
+               new CommandArgument("item", ArgumentType.Word),
+               new CommandArgument("amount", ArgumentType.Integer, RepeatType.ZeroOrOne)
+            }, "Take amount of item out of storage (by name, like Fn)"),
+            new ModuleCommand("exequip", new List<CommandArgument> 
+            {
                new CommandArgument("item", ArgumentType.Word)
             }, "Equip given item (by name, like Fn)"),
             new ModuleCommand("excraft", new List<CommandArgument> 
@@ -86,7 +103,7 @@ namespace WikiaChatLogger
             new ModuleCommand("exmap", new List<CommandArgument> 
             { 
                new CommandArgument("world", ArgumentType.Integer)
-            }, "View map of given world"),
+            }, "View map of given world", true),
             new ModuleCommand("extop", NoArguments, "See the top explorers"),
             new ModuleCommand("exclose", NoArguments, "See your rank in the top explorers"),
             new ModuleCommand("exrespawn", NoArguments, "Go back to the spawn (if you get stuck)"),
@@ -94,11 +111,20 @@ namespace WikiaChatLogger
             { 
                new CommandArgument("mastercode", ArgumentType.Integer, RepeatType.ZeroOrOne)
             }, "Generate a new world (only top admins)"),
+            new ModuleCommand("exmastertest", new List<CommandArgument>
+            {
+               new CommandArgument("worldtype", ArgumentType.Integer)
+            }, "Test world generation (only top admins)"),
             new ModuleCommand("exmasterclose", new List<CommandArgument> 
             { 
                new CommandArgument("world", ArgumentType.Integer),
                new CommandArgument("mastercode", ArgumentType.Integer, RepeatType.ZeroOrOne)
-            }, "Close an old world (only top admins)")
+            }, "Close an old world (only top admins)"),
+            new ModuleCommand("exmasterflagscatter", new List<CommandArgument> 
+            { 
+               new CommandArgument("amount", ArgumentType.Integer),
+               new CommandArgument("world", ArgumentType.Integer)
+            }, "Scatter some flags throughout the world (only top admins)")
          });
 
          Commands.AddRange(Player.DefaultOptions.Select(x => new ModuleCommand("extoggle" + x.Key.ToString().ToLower(),
@@ -282,9 +308,12 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
       /// Must reimplement this!
       /// </summary>
       /// <param name="world">World.</param>
-		public void SaveWorldImage(WorldInstance world)
+      public void SaveWorldImage(WorldInstance world, bool fullMap = false)
 		{
-         world.WorldData.GetFullMapImage(true).Save(StringExtensions.PathFixer(GetOption<string>("mapFolder")) + "world" + world.WorldID + ".png");
+         if (GetOption<bool>("fullMap"))
+            fullMap = true;
+         
+         world.WorldData.GetFullMapImage(!fullMap).Save(StringExtensions.PathFixer(GetOption<string>("mapFolder")) + "world" + world.WorldID + ".png");
 		}
 
       public List<string> SortedModuleItems(Dictionary<int, ChatEssentials.UserInfo> users)
@@ -319,6 +348,10 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
             ExplorerConstants.Items.TorchSteps = GetOption<int>("torchSteps");
             ExplorerConstants.Probability.CaveChance = GetOption<double>("caveChance");
             ExplorerConstants.Player.HourlyStaminaRegain = GetOption<int>("hourlyStamina");
+            //ExplorerConstants.Player.FruitFullnessIncrease = GetOption<double>("fullnessIncrease");
+            ExplorerConstants.Player.FruitPerFullness = GetOption<double>("fruitPerFullness");
+            ExplorerConstants.Player.FullnessDecayMinutes = GetOption<double>("fullnessDecayMinutes");
+            ExplorerConstants.Items.ExtraFruitPerMagicStone = GetOption<double>("extraFruitPerMagicStone");
 
             string temp = GetOption<string>("player");
             if (temp.Length > 0)
@@ -335,6 +368,11 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
             GenerateWorld();
          }
             
+         foreach (WorldInstance world in worlds)
+            world.RefreshFullness((DateTime.Now - lastCommand).TotalMinutes / ExplorerConstants.Player.FullnessDecayMinutes);
+
+         lastCommand = DateTime.Now;
+
          if ((DateTime.Now - lastRefresh).TotalHours >= 1.0 / ExplorerConstants.Player.HourlyStaminaRegain)
          {
             foreach (WorldInstance world in worlds)
@@ -354,6 +392,42 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
 
 			try
 			{
+            if(command.Command == "exmastertest")
+            {
+               if(!user.ChatControlExtended)
+                  return FastMessage("You don't have access to this command", true);
+
+               int worldType;
+               if (!int.TryParse(command.Arguments[0], out worldType))
+                  worldType = 0;
+
+               World world = new World();
+               world.Generate(worldType % ExplorerConstants.Generation.PresetBases.Count);
+               world.GetFullMapImage(false).Save(StringExtensions.PathFixer(GetOption<string>("mapFolder")) + "test" + worldType + ".png");
+
+               return FastMessage("Test " + worldType + " map: " + GetOption<string>("mapLink") + "/test" + worldType + ".png");
+            }
+
+            if(command.Command == "exmasterflagscatter")
+            {
+               if(!user.ChatControlExtended)
+                  return FastMessage("You don't have access to this command", true);
+
+               int amount, world;
+               if (!int.TryParse(command.Arguments[0], out amount) || amount > 10000)
+                  return FastMessage("You can't spawn that many flags!");
+               if (!int.TryParse(command.Arguments[1], out world) || !worlds.Any(x => x.Operating && x.WorldID == world))
+                  return FastMessage("The world you gave was invalid!");
+
+               int actualCount = worlds.First(x => x.Operating && x.WorldID == world).WorldData.ScatterFlags(amount);
+
+               ModuleJSONObject broadcast = new ModuleJSONObject("Hey, " + user.Username + " has just spawned " + actualCount +
+                  " flags in exgame world " + world + "!");
+               broadcast.broadcast = true;
+               
+               return new List<JSONObject>{ broadcast };
+            }
+
 				#region mastergenerate
 				//match = Regex.Match(chunk.Message, @"^\s*/exmastergenerate\s*([0-9]+)?\s*$");
             if (command.Command == "exmastergenerate")
@@ -670,6 +744,48 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
                return StyledMessage(results.Item1.PlayerItems(user.UID));
 				}
 				#endregion
+
+            #region storage
+            if (command.Command == "exstorage")//Regex.IsMatch(chunk.Message, @"^\s*/exitems\s*$"))
+            {
+               if (!WorldCommandCheck(user.UID, out results))
+                  return FastMessage(results.Item2, true);
+
+               return StyledMessage(results.Item1.PlayerStorage(user.UID));
+            }
+            #endregion
+
+            #region store
+            //match = Regex.Match(chunk.Message, @"^\s*/excraft\s+([^0-9]+)\s*([0-9]*)\s*$");
+            if (command.Command == "exstore")//match.Success)
+            {
+               if (!WorldCommandCheck(user.UID, out results))
+                  return FastMessage(results.Item2, true);
+
+               int amount;
+
+               if (!int.TryParse(/*match.Groups[2].Value*/command.Arguments[1], out amount))
+                  amount = int.MaxValue;
+
+               return FastMessage(results.Item1.StoreItems(user.UID, command.Arguments[0].Trim()/*match.Groups[1].Value.Trim()*/, amount));
+            }
+            #endregion
+
+            #region store
+            //match = Regex.Match(chunk.Message, @"^\s*/excraft\s+([^0-9]+)\s*([0-9]*)\s*$");
+            if (command.Command == "extake")//match.Success)
+            {
+               if (!WorldCommandCheck(user.UID, out results))
+                  return FastMessage(results.Item2, true);
+
+               int amount;
+
+               if (!int.TryParse(/*match.Groups[2].Value*/command.Arguments[1], out amount))
+                  amount = int.MaxValue;
+
+               return FastMessage(results.Item1.TakeItems(user.UID, command.Arguments[0].Trim()/*match.Groups[1].Value.Trim()*/, amount));
+            }
+            #endregion
 
 				#region teleport
 				//match = Regex.Match(chunk.Message, @"^\s*/exteleport\s+([0-9]+)\s*-\s*([0-9]+)\s*$");

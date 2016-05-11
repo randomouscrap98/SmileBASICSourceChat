@@ -1,17 +1,14 @@
 ﻿<Properties StartupItem="ChatServer/ChatServer.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../main.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../chat.cs">
     <Files>
-      <File FileName="../chat.cs" Line="1" Column="1" />
+      <File FileName="../chat.cs" Line="205" Column="76" />
       <File FileName="../chatManager.cs" Line="1" Column="1" />
       <File FileName="../user.cs" Line="1" Column="1" />
-      <File FileName="../main.cs" Line="5" Column="17" />
+      <File FileName="../main.cs" Line="1" Column="1" />
       <File FileName="../messages.cs" Line="1" Column="1" />
-      <File FileName="../modules/module.cs" Line="430" Column="75" />
+      <File FileName="../modules/module.cs" Line="1" Column="1" />
       <File FileName="../modules/debugModule.cs" Line="1" Column="1" />
-      <File FileName="../modules/ExplorerClasses.cs" Line="890" Column="24" />
-      <File FileName="../modules/ExplorerModule.cs" Line="228" Column="26" />
-      <File FileName="../modules/CollectGameModule.cs" Line="206" Column="35" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -19,7 +16,7 @@
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <DisabledProjects>
-    <String>ModulePackage1/ModulePackage1.csproj</String>
     <String>MyExtensions/MyExtensions.csproj</String>
+    <String>ModulePackage1/ModulePackage1.csproj</String>
   </DisabledProjects>
 </Properties>

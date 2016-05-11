@@ -37,11 +37,22 @@ cp $dlls $serverFolder/plugins
 cd $serverFolder 
 
 mono --gc=sgen ./chat.exe
-while [ $? -eq 99 ]
+exitCode=$?
+
+echo "Exit code: $exitCode"
+while [ $exitCode -ne 0 ] #-eq 99 ]
 do
    date +%s > crash.txt
-   echo "The server killed itself. Let's try to restart it in 3 seconds..."
+   echo "`date` : Code $exitCode" >> crashlog.txt
+
+   if [ $exitCode -eq 99 ]; then
+      echo "The server killed itself. Let's try to restart it in 3 seconds..."
+   else
+      echo "The server exited incorrectly. Restarting in 3 seconds!"
+   fi
+
    sleep 3
-   ./chat.exe
+   mono --gc=sgen ./chat.exe
+   exitCode=$?
 done
 

@@ -79,6 +79,7 @@ namespace ChatEssentials
       public readonly int uid = 0;
       public readonly long joined = 0;
       public bool active = false;
+      public bool banned = false;
 
       public UserJSONObject(User user)
       {
@@ -88,6 +89,7 @@ namespace ChatEssentials
          stars = user.StarString;
          active = user.Active;
          joined = user.UnixJoinDate;
+         banned = user.Banned;
       }
    }
 
@@ -110,6 +112,7 @@ namespace ChatEssentials
       public readonly string avatar = "";
       public readonly int uid = 0;
       public readonly bool active = false;
+      public readonly bool banned = false;
 
       public RoomUserJSONObject(User user)
       {
@@ -117,6 +120,7 @@ namespace ChatEssentials
          avatar = user.Avatar;
          uid = user.UID;
          active = user.Active;
+         banned = user.Banned;
       }
    }
 
@@ -132,6 +136,7 @@ namespace ChatEssentials
       public bool broadcast = false;
       public bool safe = true;
       public string tag = "";
+      public string module = "";
       public List<int> recipients = new List<int>();
 
       public string message

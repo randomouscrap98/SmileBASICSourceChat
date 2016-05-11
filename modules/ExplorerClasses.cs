@@ -95,14 +95,19 @@ namespace Explorer
 		}
 		public static class Player
 		{
-            public static int HourlyStaminaRegain = 100;
+         //These can be set
+         public static double FruitPerFullness = 20.0; //FruitFullnessIncrease = 5.0;
+         public static double FullnessDecayMinutes = 0.6;
+         public static int HourlyStaminaRegain = 100;
 			public static char CurrentPlayerToken = '¥';
 
 			public const int ExploreScore = 1;
 			public const int StatueScore = 5;
 			public const int TowerScore = 25;
+         public const int FlagScore = 20;
 			public const int NewWorldScore = 200;
 
+         public const int MaxFullness = 100;
 			public const int StartingStamina = 100;
 			public const int PlayerIDBits = 20;
 			public static int MaxPlayerID
@@ -230,17 +235,35 @@ namespace Explorer
 
 			public static readonly List<Tuple<Items.IDS, GenerationData>> BasicGenerationData = new List<Tuple<Items.IDS, GenerationData>>
 			{
-				Tuple.Create(Items.IDS.Fruit, new GenerationData(SandLevel, 0.31, 1.5, 0.22, false)),
-				Tuple.Create(Items.IDS.Fruit, new GenerationData(0.31, 0.35, 1.5, 0.18, true)),
-				Tuple.Create(Items.IDS.Flower, new GenerationData(0.32, 0.37, 1.0, 0.10, false)),
-				Tuple.Create(Items.IDS.Flower, new GenerationData(0.37, 0.42, 1.0, 0.10, true)),
+				Tuple.Create(Items.IDS.Fruit, new GenerationData(SandLevel, 0.31, 1.85, 0.22, false)),
+				Tuple.Create(Items.IDS.Fruit, new GenerationData(0.31, 0.35, 1.85, 0.18, true)),
+				Tuple.Create(Items.IDS.Flower, new GenerationData(0.29, 0.37, 1.3, 0.10, false)),
+				Tuple.Create(Items.IDS.Flower, new GenerationData(0.37, 0.42, 1.3, 0.10, true)),
+            /*Tuple.Create(Items.IDS.Flower2, new GenerationData(0.33, 0.40, 1.0, 0.10, false)),
+            Tuple.Create(Items.IDS.Flower2, new GenerationData(0.40, 0.48, 1.0, 0.10, true)),*/
+            Tuple.Create(Items.IDS.Flower2, new GenerationData(SandLevel, 0.40, 1.5, 0.10, false)),
+            Tuple.Create(Items.IDS.Flower2, new GenerationData(0.40, 0.48, 1.5, 0.10, true)),
+            Tuple.Create(Items.IDS.Flower3, new GenerationData(SandLevel, 0.31, 1.0, 1.0, false)),
+            Tuple.Create(Items.IDS.Flower3, new GenerationData(0.31, 0.35, 1.0, 1.0, true)),
+            Tuple.Create(Items.IDS.Flower3, new GenerationData(0.29, 0.36, 1.0, 1.0, false)),
+            Tuple.Create(Items.IDS.Flower3, new GenerationData(0.36, 0.43, 1.0, 1.0, true)),
 				//Tuple.Create(Items.IDS.Flower, new GenerationData(0.38, 0.40, 8.0, 0.75, false)),
-				Tuple.Create(Items.IDS.Wood, new GenerationData(0.38, 0.50, 1.3, 1.0, false)),
+				Tuple.Create(Items.IDS.Wood, new GenerationData(0.37, 0.50, 1.3, 1.0, false)),
 				Tuple.Create(Items.IDS.Stone, new GenerationData(0.50, 1.0, 0.0, 1.0, false)),
 				Tuple.Create(Items.IDS.Iron, new GenerationData(0.60, 1.0, 1.5, 0.95, false)),
 				Tuple.Create(Items.IDS.Coal, new GenerationData(0.50, 0.80, 1.35, 0.65, false)),
 				Tuple.Create(Items.IDS.Coal, new GenerationData(0.80, 1.0, 1.35, 0.65, true)),
+				Tuple.Create(Items.IDS.CaveExit, new GenerationData(SandLevel, 0.3, 1.3, 1.0, false)),
+				Tuple.Create(Items.IDS.CaveExit, new GenerationData(0.3, 0.50, 0.0, 0.0, false)),
 			};
+
+         public static readonly List<Tuple<Items.IDS, GenerationData, int>> BiomeGenerationData = new List<Tuple<Items.IDS, GenerationData, int>>
+         {
+            Tuple.Create(Items.IDS.Flower2, new GenerationData(0, 0.25, 0.0, 1.0, false), 0),
+            Tuple.Create(Items.IDS.CaveExit, new GenerationData(0.4, 1.0, 2.2, 0.8, false), 0),
+            Tuple.Create(Items.IDS.Fruit, new GenerationData(0, 0.55, 0.0, 1.0, false), 1),
+            Tuple.Create(Items.IDS.Flower3, new GenerationData(0.55, 1.0, 1.4, 0.3, false), 2)
+         };
 
 			public const double WaterLevel = 0.25;
 			public const double SandLevel = 0.267;
@@ -263,6 +286,18 @@ namespace Explorer
 			{
 				return TimeSeedHex + PresetBases[random.Next(PresetBases.Count)];
 			}
+         public static string GetBiome(int preset)
+         {
+            //Just use the default preset if the given preset is garbage
+            if (preset < 0 || preset >= PresetBases.Count)
+               preset = 0;
+
+            return TimeSeedHex + BiomeBases[preset];
+         }
+         public static string GetRandomBiome()
+         {
+            return TimeSeedHex + BiomeBases[random.Next(BiomeBases.Count)];
+         }
 
 			public static readonly List<string> PresetBases = new List<string>()
 			{
@@ -275,6 +310,13 @@ namespace Explorer
 				"00000090.000000AF.00000FFF.00000000.00000000" + Map.MapDimensionsHex + "00",
 			};
 
+         public static readonly List<string> BiomeBases = new List<string>()
+         {
+            "0000000A.00000014.00002710.00000000.00000000" + Map.MapDimensionsHex + "00",
+            "00000010.00000025.00002000.00000000.00000000" + Map.MapDimensionsHex + "00",
+            "00000030.00000060.00000FFF.00000000.00000000" + Map.MapDimensionsHex + "00",
+         };
+
 			public static readonly List<int> CaveSurviveStates = new List<int> { 3, 4, 5, 6, 7, 8 };
 			public static readonly List<int> CaveBornStates = new List<int> { 6, 7, 8 };
 			public const double CaveDensity = 0.43;
@@ -282,10 +324,12 @@ namespace Explorer
 		}
 		public static class Items
 		{
-            public const int MagicStoneStaminaIncrease = 10;
-            public const int FruitStaminaRestore = 10;
-            public static int TorchSteps = 200;
-            public const int SuperFruitStaminaRestore = 25;
+         public static int TorchSteps = 200;
+         public static double ExtraFruitPerMagicStone = 0.5;
+
+         public const int MagicStoneStaminaIncrease = 10;
+         public const int FruitStaminaRestore = 10;
+         public const int SuperFruitStaminaRestore = 25;
 
 			public enum Types
 			{
@@ -317,7 +361,8 @@ namespace Explorer
 				CaveExit, BlockingBlock, PlayerToken, 
 				CaveStone, CaveFloor, CaveFloor2,
 				Dirt, SuperSeed, SuperFruit, Flower, Sand,
-				AreaLocker, MeteorSummoner
+				AreaLocker, MeteorSummoner, Flower2, Flower3, FlowerBomb,
+            StoneWall, Flag, OwnedFlag
 			}
 
 			public static IDS IntToID(int id)
@@ -358,9 +403,12 @@ namespace Explorer
 				{ IDS.Fruit, new ItemBlueprint(IDS.Fruit, "Fruit", "Fr", (int)(Types.Pickup | Types.CanAutoPickup), '∞', 0xFFFFCC)},
 				{ IDS.SuperSeed, new ItemBlueprint(IDS.SuperSeed, "Super Seed", "SS", (int)(Types.Placeable | Types.Pickup | Types.SetTimeStamp), '"', 0x5CE62E)},
 				{ IDS.SuperFruit, new ItemBlueprint(IDS.SuperFruit, "Super Fruit", "SF", (int)(Types.Pickup | Types.CanAutoPickup), '♣', 0xFFDD00)},
-				{ IDS.Flower, new ItemBlueprint(IDS.Flower, "Flower", "Fl", (int)(Types.Placeable | Types.Pickup), '*', 0xCCCCFF)},
+				{ IDS.Flower, new ItemBlueprint(IDS.Flower, "Flower 1", "F1", (int)(Types.Placeable | Types.Pickup), '*', 0xCCCCFF)},
+            { IDS.Flower2, new ItemBlueprint(IDS.Flower2, "Flower 2", "F2", (int)(Types.Placeable | Types.Pickup), '+', 0xff74cd/*0xff8bd5/*0xFFAEDD*/)},
+            { IDS.Flower3, new ItemBlueprint(IDS.Flower3, "Flower 3", "F3", (int)(Types.Placeable | Types.Pickup), '×', /*0xcd96d3/*0xe1584e*/0xFF613E)},
 				{ IDS.WaterBucket, new ItemBlueprint(IDS.WaterBucket, "Water Bucket", "WB", (int)(Types.Pickup | Types.Placeable), '?', 0xFFFFFF/*0x1947A3*/)},
 				{ IDS.Fence, new ItemBlueprint(IDS.Fence, "Fence", "Fn", (int)(Types.Solid | Types.Placeable | Types.Pickup | Types.Owned | Types.RequiresOwner), '≡', 0x7a5229)},
+            { IDS.StoneWall, new ItemBlueprint(IDS.StoneWall, "Stone Wall", "SW", (int)(Types.Solid | Types.Placeable | Types.Pickup | Types.Owned | Types.RequiresOwner), 'œ', 0x555555)},
 				{ IDS.Gate, new ItemBlueprint(IDS.Gate, "Gate", "Gt", (int)(Types.Solid | Types.Placeable | Types.Pickup | Types.Owned | Types.RequiresOwner), '=', 0x957554)},
 				{ IDS.Planks, new ItemBlueprint(IDS.Planks, "Plank", "Pl", (int)(Types.Pickup | Types.Placeable), '═', 0x754719)},
 				{ IDS.StoneGrower, new ItemBlueprint(IDS.StoneGrower, "Stone Grower", "SG", (int)(Types.Solid | Types.Pickup | Types.Placeable | Types.SetTimeStamp), '•', 0xfcfcfc)},
@@ -380,6 +428,9 @@ namespace Explorer
 				{ IDS.CaveFloor2, new ItemBlueprint(IDS.CaveFloor2, "Cave Floor 2", "C2", (int)(Types.Immortal), '░', 0x624930, 1, 0, 0, Map.Layers.PermaLayer) },
 				{ IDS.AreaLocker, new ItemBlueprint(IDS.AreaLocker, "Area Locker", "AL", (int)(Types.Pickup | Types.Placeable | Types.Solid | Types.Owned | Types.RequiresOwner), '¢', 0x006666)},
 				{ IDS.MeteorSummoner, new ItemBlueprint(IDS.MeteorSummoner, "Sacrificial Altar", "SA", (int)(Types.Pickup | Types.Placeable | Types.Solid | Types.NonOwned), '!', 0x00FFFF)},
+            { IDS.FlowerBomb, new ItemBlueprint(IDS.FlowerBomb, "Flower Bomb", "FB", (int)(Types.Pickup | Types.Placeable | Types.Solid | Types.NonOwned), '@', 0x0FF00FF)},
+            { IDS.Flag, new ItemBlueprint(IDS.Flag, "Generic Flag", "", (int)(Types.Placeable | Types.Pickup), '¶', 0xFFFFFF) },
+            { IDS.OwnedFlag, new ItemBlueprint(IDS.OwnedFlag, "Flag", "Fl", (int)(Types.Placeable | Types.Pickup | Types.Owned | Types.RequiresOwner), '¶', 0xFFFFFF) }
 			};
 
 			public static readonly Dictionary<IDS, Tuple<IDS, int, int>> GetExtra = new Dictionary<IDS, Tuple<IDS, int, int>>()
@@ -395,6 +446,11 @@ namespace Explorer
 			{
 				{IDS.WaterBucket, IDS.Water},
 			};
+         public static readonly Dictionary<IDS, IDS> PickupTransformations = new Dictionary<IDS, IDS>()
+         {
+            {IDS.Flag, IDS.OwnedFlag},
+            {IDS.CaveStone, IDS.Stone}
+         };
 			public static readonly Dictionary<IDS, Tuple<IDS, int>> AfterUseLeftovers = new Dictionary<IDS, Tuple<IDS, int>>()
 			{
 				{IDS.WaterBucket, Tuple.Create(IDS.Iron, 2)},
@@ -407,8 +463,10 @@ namespace Explorer
 					{IDS.Iron, 4},
 					{IDS.StarCrystal, 1},
 					{IDS.Coal, 4}}},
-				{IDS.Fence, new	Dictionary<IDS, int>{
+				{IDS.Fence, new Dictionary<IDS, int>{
 					{IDS.Wood, 5}}},
+            {IDS.StoneWall, new Dictionary<IDS, int>{
+                  {IDS.Stone, 5}}},
 				{IDS.Statue, new Dictionary<IDS, int>{
 					{IDS.Stone, 20},
 					{IDS.Wood, 20}}},
@@ -446,7 +504,13 @@ namespace Explorer
 					{IDS.Fruit, 100},
 					{IDS.Seed, 100},
 					{IDS.Sapling, 100},
-					}}
+					}},
+            {IDS.FlowerBomb, new Dictionary<IDS, int>{
+                  {IDS.Wood, 25},
+                  {IDS.Fruit, 25},
+                  {IDS.Seed, 25},
+                  {IDS.Sapling, 25},
+               }}
 			};
 			public static readonly Dictionary<IDS, IDS> CraftingProximityRequirements = new Dictionary<IDS, IDS>()
 			{
@@ -682,6 +746,12 @@ namespace Explorer
 			}
 
 			float[,] baseMap = HillGenerator.Generate(new HillGeneratorOptions(ExplorerConstants.Generation.GetFullPreset(preset)));
+         float[][,] biomes = new float[ExplorerConstants.Generation.BiomeBases.Count][,]; 
+
+         for(int i = 0; i < ExplorerConstants.Generation.BiomeBases.Count; i++)
+            biomes[i] = HillGenerator.Generate(new HillGeneratorOptions(ExplorerConstants.Generation.GetBiome(i)));
+         
+         //float[,] biome = HillGenerator.Generate(new HillGeneratorOptions(ExplorerConstants.Generation.GetRandomBiome()));
 
 			//The most basic of generation
 			for (int i = 0; i < WidthFull; i++)
@@ -700,6 +770,13 @@ namespace Explorer
 					{
 						if (baseMap[i, j] > genData.Item2.Lower && baseMap[i, j] <= genData.Item2.Upper && ShouldSpawn(baseMap[i, j], genData.Item2))
 						{
+                     if (ExplorerConstants.Generation.BiomeGenerationData.Any(x => x.Item1 == genData.Item1) &&
+                        !ExplorerConstants.Generation.BiomeGenerationData.Any(x => x.Item1 == genData.Item1 && 
+                           biomes[x.Item3][i,j] > x.Item2.Lower && biomes[x.Item3][i,j] <= x.Item2.Upper && ShouldSpawn(biomes[x.Item3][i,j], x.Item2)))
+                     {
+                        continue;
+                     }
+
 							ForcePut(genData.Item1, i, j);
 
 							if (genData.Item1 == ExplorerConstants.Items.IDS.Stone)
@@ -711,6 +788,14 @@ namespace Explorer
 					{
 						ForcePut(ExplorerConstants.Items.IDS.SuperFruit, i, j);
 					}
+
+               //As part of the bad system, I'm using other items to represent
+               //duplicate generation items.
+               if(GetObjectUnsafe(i, j, ExplorerConstants.Map.Layers.ObjectLayer) == 
+                  ExplorerConstants.Items.IDS.CaveExit)
+               {
+                  ForcePut(ExplorerConstants.Items.IDS.Wood, i, j);
+               }
 				}
 			}
 
@@ -739,6 +824,9 @@ namespace Explorer
 			Tuple<int, int> bestAcre = emptySpaceCounts.OrderByDescending(x => x.Item2).FirstOrDefault().Item1;
 			spawnAcreX = bestAcre.Item1;
 			spawnAcreY = bestAcre.Item2;
+
+         //Now, generate some flags for funsies!
+         ScatterFlags();
 
 			generated = true;
 		}
@@ -793,7 +881,7 @@ namespace Explorer
 			emptyBlocks.RemoveAll(x => Math.Abs(x.Item1 - spawnTuple.Item1) < 5 && Math.Abs(x.Item2 - spawnTuple.Item2) < 5);
 
 			//Eww, we're repurposing the spawn parameters as block spawn!
-			spawnAcreX = spawnTuple.Item1;
+			spawnAcreX = spawnTuple.Item1 + 1;
 			spawnAcreY = spawnTuple.Item2 + 1;
 
 			//Set up the area
@@ -835,7 +923,8 @@ namespace Explorer
 
 			//If world time goes past midnight for today, rewind one day
 			if (worldTime.TotalDays >= 1.0)
-				worldTime = worldTime.Subtract(new TimeSpan(24, 0, 0));
+				worldTime = worldTime.Subtract(TimeSpan.FromDays(Math.Floor(worldTime.TotalDays)));
+                  //new TimeSpan(24, 0, 0));
 
 			//Oops, something weird happened and we have a negative timespan. Let's just bring it up to
 			//a nice 9 oclock.
@@ -862,36 +951,48 @@ namespace Explorer
 				{
 					ExplorerConstants.Items.IDS item = ExplorerConstants.Items.IntToID(worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer]);
 
-					if (item == ExplorerConstants.Items.IDS.Sapling && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.TreeGrowthHours)
-					{
-						worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.Wood;
-						SetBlockMeta(i, j, 0);
-					}
-					else if (item == ExplorerConstants.Items.IDS.Seed && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.FruitGrowthHours)
-					{
-						worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.Fruit;
-						SetBlockMeta(i, j, 0);
-					}
-					else if (item == ExplorerConstants.Items.IDS.SuperSeed && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.SuperFruitGrowthHours)
-					{
-						worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.SuperFruit;
-						SetBlockMeta(i, j, 0);
-					}
-					else if (item == ExplorerConstants.Items.IDS.StoneGrower && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.StoneGrowthHours)
-					{
-						Tuple<int, int> stoneBlock = FindCloseHaltable(i, j);
-						if(Math.Abs(stoneBlock.Item1 - i) <= 1 && Math.Abs(stoneBlock.Item2 - j) <= 1)
-							worldData[stoneBlock.Item1, stoneBlock.Item2, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.Stone;
+               if (item == ExplorerConstants.Items.IDS.Sapling && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.TreeGrowthHours)
+               {
+                  worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.Wood;
+                  SetBlockMeta(i, j, 0);
+               }
+               else if (item == ExplorerConstants.Items.IDS.Seed && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.FruitGrowthHours)
+               {
+                  worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.Fruit;
+                  SetBlockMeta(i, j, 0);
+               }
+               else if (item == ExplorerConstants.Items.IDS.SuperSeed && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.SuperFruitGrowthHours)
+               {
+                  worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.SuperFruit;
+                  SetBlockMeta(i, j, 0);
+               }
+               else if (item == ExplorerConstants.Items.IDS.StoneGrower && (DateTime.Now - new DateTime(GetBlockMeta(i, j))).TotalHours >= ExplorerConstants.Simulation.StoneGrowthHours)
+               {
+                  Tuple<int, int> stoneBlock = FindCloseHaltable(i, j);
+                  if (Math.Abs(stoneBlock.Item1 - i) <= 1 && Math.Abs(stoneBlock.Item2 - j) <= 1)
+                     worldData[stoneBlock.Item1, stoneBlock.Item2, (int)ExplorerConstants.Map.Layers.ObjectLayer] = (byte)ExplorerConstants.Items.IDS.Stone;
 
-						SetBlockMeta(i, j, DateTime.Now.Ticks);
-					}
-					else if (item == ExplorerConstants.Items.IDS.MeteorSummoner)
-					{
-						SmashMeteor(i, j);
+                  SetBlockMeta(i, j, DateTime.Now.Ticks);
+               }
+               else if (item == ExplorerConstants.Items.IDS.MeteorSummoner)
+               {
+                  SmashMeteor(i, j);
 
-						if(GetObjectUnsafe(i, j, ExplorerConstants.Map.Layers.ObjectLayer) == ExplorerConstants.Items.IDS.MeteorSummoner)
-							ForceRemoval(ExplorerConstants.Map.Layers.ObjectLayer, i, j);
-					}
+                  if (GetObjectUnsafe(i, j, ExplorerConstants.Map.Layers.ObjectLayer) == ExplorerConstants.Items.IDS.MeteorSummoner)
+                     ForceRemoval(ExplorerConstants.Map.Layers.ObjectLayer, i, j);
+               }
+               else if (item == ExplorerConstants.Items.IDS.FlowerBomb)
+               {
+                  SmashMeteor(i, j, true);
+
+                  if (GetObjectUnsafe(i, j, ExplorerConstants.Map.Layers.ObjectLayer) == ExplorerConstants.Items.IDS.FlowerBomb)
+                     ForceRemoval(ExplorerConstants.Map.Layers.ObjectLayer, i, j);
+               }
+               //TODO: This removes ALL blocking blocks that aren't above caves! This may not be good...
+               else if (item == ExplorerConstants.Items.IDS.BlockingBlock && !HasCave(i, j))
+               {
+                  worldData[i, j, (int)ExplorerConstants.Map.Layers.ObjectLayer] = 0;
+               }
 //					else if (item == ExplorerConstants.Items.IDS.CaveEntrance && HasCave(i, j))
 //					{
 //						caves[Tuple.Create(i, j)] = null;
@@ -951,6 +1052,9 @@ namespace Explorer
 				(double)totalFlowers / totalBlocks <= ExplorerConstants.Simulation.FlowerMinimumPercent ||
 				(double)totalTrees / totalBlocks <= ExplorerConstants.Simulation.TreeMinimumPercent)
 			{
+            List<ExplorerConstants.Items.IDS> flowers = new List<ExplorerConstants.Items.IDS> {
+               ExplorerConstants.Items.IDS.Flower, ExplorerConstants.Items.IDS.Flower2, ExplorerConstants.Items.IDS.Flower3
+            };
 				Tuple<int, int> acre = GetRandomExploredUnownedAcre();
 				Tuple<int, int> centerBlock = Tuple.Create((int)((acre.Item1 + 0.5) * ExplorerConstants.Map.AcreWidth), (int)((acre.Item2 + 0.5) * ExplorerConstants.Map.AcreHeight));
 
@@ -970,15 +1074,42 @@ namespace Explorer
 					if (radius < Math.Pow(5, 2))
 						SafePutCannotOwn(ExplorerConstants.Items.IDS.Wood, randX, randY);
 					else if (radius < Math.Pow(9, 2))
-						SafePutCannotOwn(ExplorerConstants.Items.IDS.Flower, randX, randY);
+                  SafePutCannotOwn(flowers[random.Next(flowers.Count)], randX, randY);
 					else if (radius < Math.Pow(13, 2))
 						SafePutCannotOwn(ExplorerConstants.Items.IDS.Fruit, randX, randY);
 				}
 			}
 		}
 
-		public void SmashMeteor(int blockX, int blockY)
+      public int ScatterFlags(int amount = 100)
+      {
+         const int retryMultiplier = 100;
+         int flagX, flagY, retries = 0, flags = 0;
+
+         for (int i = 0; i < amount; i++)
+         {
+            do
+            {
+               flagX = random.Next(WidthFull);
+               flagY = random.Next(HeightFull);
+               retries++;
+
+               if(retries >= amount * retryMultiplier)
+                  goto ScatterEnd;
+               
+            } while(GetObject(flagX, flagY, ExplorerConstants.Map.Layers.ObjectLayer) == ExplorerConstants.Items.IDS.Flag ||
+               !SafePutCannotOwn(ExplorerConstants.Items.IDS.Flag, flagX, flagY));
+
+            flags++;
+         }
+
+         ScatterEnd:
+         return flags;
+      }
+
+      public void SmashMeteor(int blockX, int blockY, bool flowers = false)
 		{
+         double FlowerRate = 0.5;
 			Bitmap meteorImage = new Bitmap(ExplorerConstants.Map.AcreWidth, ExplorerConstants.Map.AcreHeight);
 
 			Pen stonePen = new Pen(new SolidBrush(Color.FromArgb(ExplorerConstants.Simulation.StoneColor)));
@@ -1021,17 +1152,41 @@ namespace Explorer
 					int realY = -ExplorerConstants.Map.AcreHeight / 2 + j + blockY;
 					switch (meteorImage.GetPixel(i, j).ToArgb())
 					{
-						case ExplorerConstants.Simulation.StoneColor:
-							SafePutCannotOwn(ExplorerConstants.Items.IDS.Stone, realX, realY);
-							ForcePut(ExplorerConstants.Items.IDS.Dirt, realX, realY);
+                  case ExplorerConstants.Simulation.StoneColor:
+                     if (flowers)
+                     {
+                        if(random.NextDouble() > FlowerRate)
+                           SafePutCannotOwn(ExplorerConstants.Items.IDS.Flower, realX, realY);
+                     }
+                     else
+                     {
+                        SafePutCannotOwn(ExplorerConstants.Items.IDS.Stone, realX, realY);
+                        ForcePut(ExplorerConstants.Items.IDS.Dirt, realX, realY);
+                     }
 							break;
-						case ExplorerConstants.Simulation.CoalColor:
-							SafePutCannotOwn(ExplorerConstants.Items.IDS.Coal, realX, realY);
-							ForcePut(ExplorerConstants.Items.IDS.Dirt, realX, realY);
+                  case ExplorerConstants.Simulation.CoalColor:
+                     if (flowers)
+                     {
+                        if(random.NextDouble() > FlowerRate)
+                           SafePutCannotOwn(ExplorerConstants.Items.IDS.Flower2, realX, realY);
+                     }
+                     else
+                     {
+                        SafePutCannotOwn(ExplorerConstants.Items.IDS.Coal, realX, realY);
+                        ForcePut(ExplorerConstants.Items.IDS.Dirt, realX, realY);
+                     }
 							break;
-						case ExplorerConstants.Simulation.IronColor:
-							SafePutCannotOwn(ExplorerConstants.Items.IDS.Iron, realX, realY);
-							ForcePut(ExplorerConstants.Items.IDS.Dirt, realX, realY);
+                  case ExplorerConstants.Simulation.IronColor:
+                     if (flowers)
+                     {
+                        if(random.NextDouble() > FlowerRate)
+                           SafePutCannotOwn(ExplorerConstants.Items.IDS.Flower3, realX, realY);
+                     }
+                     else
+                     {
+                        SafePutCannotOwn(ExplorerConstants.Items.IDS.Iron, realX, realY);
+                        ForcePut(ExplorerConstants.Items.IDS.Dirt, realX, realY);
+                     }
 							break;
 					}
 				}
@@ -1616,32 +1771,41 @@ namespace Explorer
 
 			return Tuple.Create(-1, -1);
 		}
-		public Tuple<int, int> FindCloseHaltable(int blockX, int blockY)
+      public Tuple<int, int> FindCloseHaltable(int blockX, int blockY, int firstLookX = -1, int firstLookY = -1)
 		{
 			Tuple<int, int> found = Tuple.Create(-1, -1);
+         int scanSquare = 1;
+         int x, y;
 
-			int scanSquare = 1;
+         Func<int, int, bool> GoodBlock = (checkX, checkY) => 
+         {
+            return ValidBlock(checkX, checkY) && PlayerCanHalt(checkX, checkY) && !IsCaveEntrance(checkX, checkY);
+         };
+
+         //First, check the square they want us to. If it works, just quit now.
+         if (GoodBlock(firstLookX, firstLookY))
+            return Tuple.Create(firstLookX, firstLookY);
+
 			do
 			{
-				int x, y;
 				for (int i = -scanSquare; i <= scanSquare; i++)
 				{
 					x = i + blockX;
 					y = blockY - scanSquare;
-					if (ValidBlock(x, y) && PlayerCanHalt(x, y) && !IsCaveEntrance(x, y))
+               if (GoodBlock(x, y))
 						found = Tuple.Create(x, y);
 
 					y = blockY + scanSquare;
-					if (ValidBlock(x, y) && PlayerCanHalt(x, y) && !IsCaveEntrance(x, y))
+               if (GoodBlock(x, y))
 						found = Tuple.Create(x, y);
 
 					x = blockX - scanSquare;
 					y = i + blockY;
-					if (ValidBlock(x, y) && PlayerCanHalt(x, y) && !IsCaveEntrance(x, y))
+               if (GoodBlock(x, y))
 						found = Tuple.Create(x, y);
 
 					x = blockX + scanSquare;
-					if (ValidBlock(x, y) && PlayerCanHalt(x, y) && !IsCaveEntrance(x, y))
+               if (GoodBlock(x, y))
 						found = Tuple.Create(x, y);
 				}
 
@@ -2075,12 +2239,14 @@ namespace Explorer
 		//Items/Data
 		private Random random = new Random();
 		private Dictionary<ExplorerConstants.Items.IDS, int> inventory = new Dictionary<ExplorerConstants.Items.IDS, int>();
+      private Dictionary<ExplorerConstants.Items.IDS, int> userStorage = new Dictionary<ExplorerConstants.Items.IDS, int>();
 		private int playerID = -1;
 		private List<int> blockXList = new List<int>();
 		private List<int> blockYList = new List<int>();
 		private int blockListDepth = -1;
 		private int maxStamina = ExplorerConstants.Player.StartingStamina;
 		private int stamina = ExplorerConstants.Player.StartingStamina;
+      private double fullness = 0;
 		private ExplorerConstants.Items.IDS equipped = ExplorerConstants.Items.IDS.Empty;
 		private ExplorerConstants.Player.Directions facingDirection = ExplorerConstants.Player.Directions.Down;
 
@@ -2131,6 +2297,14 @@ namespace Explorer
 
 			return stamina;
 		}
+      public int ReduceFullness(double amount)
+      {
+         fullness -= amount;
+         if (fullness < 0)
+            fullness = 0;
+
+         return Fullness;
+      }
 		public int IncreaseMaxStamina(int amount)
 		{
 			maxStamina += amount;
@@ -2181,9 +2355,47 @@ namespace Explorer
 			bool strafing = false;
 			int oblockX = BlockX;
 			int oblockY = BlockY;
+         int lookaheadX = BlockX;
+         int lookaheadY = BlockY;
 			Tuple<int, int> acre;
 			List<string> errorMessages = new List<string>();
 			int beforeFruit = ItemAmount(ExplorerConstants.Items.IDS.Fruit) + ItemAmount(ExplorerConstants.Items.IDS.SuperFruit);
+
+         Action<ExplorerConstants.Items.IDS> EatFruit = x =>
+         {
+            if (CanEat)
+            {
+               if(x == ExplorerConstants.Items.IDS.Fruit)
+               {
+                  RestoreStamina(ExplorerConstants.Items.FruitStaminaRestore);
+               }
+               else if (x == ExplorerConstants.Items.IDS.SuperFruit)
+               {
+                  RestoreStamina(ExplorerConstants.Items.SuperFruitStaminaRestore);
+               }
+               else
+               {
+                  errorMessages.Add("-You can't eat that!");
+                  return;
+               }
+
+               fullness += FruitFullnessIncrease;
+
+               if(EquippedItem == x)
+               {
+                  UseEquippedItem();
+               }
+               else
+               {
+                  if(!RemoveItem(x, 1))
+                     errorMessages.Add("-Internal error: tried to eat fruit that you didn't have!");
+               }
+            }
+            else
+            {
+               errorMessages.Add("-You can't eat anymore; you're full!");
+            }
+         };
 
 			//Force the removal of your token so it doesn't get in the way
 			if(!InCave)
@@ -2243,17 +2455,25 @@ namespace Explorer
 							}
 							else if (world.PickupObject(facingX, facingY))
 							{
-								GetItem(facingItem);
+                        if (ExplorerConstants.Items.PickupTransformations.ContainsKey(facingItem))
+                           GetItem(ExplorerConstants.Items.PickupTransformations[facingItem]);
+                        else
+                           GetItem(facingItem);
+                        
 								stamina -= facingInfo.StaminaRequired;
-								if (facingItem == ExplorerConstants.Items.IDS.Statue)
-								{
-									score -= ExplorerConstants.Player.StatueScore;
-								}
-								else if (facingItem == ExplorerConstants.Items.IDS.AreaLocker && !world.IsCave)
-								{
-									world.SetLocked(acre.Item1, acre.Item2, false);
-									errorMessages.Add("-You've unlocked acre " + acre.Item1 + "-" + acre.Item2 + " plus the surrounding acres");
-								}
+                        if (facingItem == ExplorerConstants.Items.IDS.Statue)
+                        {
+                           score -= ExplorerConstants.Player.StatueScore;
+                        }
+                        else if (facingItem == ExplorerConstants.Items.IDS.AreaLocker && !world.IsCave)
+                        {
+                           world.SetLocked(acre.Item1, acre.Item2, false);
+                           errorMessages.Add("-You've unlocked acre " + acre.Item1 + "-" + acre.Item2 + " plus the surrounding acres");
+                        }
+                        else if (facingItem == ExplorerConstants.Items.IDS.Flag)
+                        {
+                           score += ExplorerConstants.Player.FlagScore;
+                        }
 
 								if (facingItem == ExplorerConstants.Items.IDS.ChatCoins)
 								{
@@ -2309,28 +2529,32 @@ namespace Explorer
 					case ExplorerConstants.Player.Actions.LookRight:
 						facingDirection = ExplorerConstants.Player.Directions.Right;
 						break;
-					case ExplorerConstants.Player.Actions.MoveDown:
-						if(!strafing)
-							facingDirection = ExplorerConstants.Player.Directions.Down;
-						newY++;
+               case ExplorerConstants.Player.Actions.MoveDown:
+                  if (!strafing)
+                     facingDirection = ExplorerConstants.Player.Directions.Down;
+                  newY++;
+                  lookaheadY = newY + 1;
 						TryMove(newX, newY, world);
 						break;
 					case ExplorerConstants.Player.Actions.MoveUp:
 						if (!strafing)
 							facingDirection = ExplorerConstants.Player.Directions.Up;
 						newY--;
+                  lookaheadY = newY - 1;
 						TryMove(newX, newY, world);
 						break;
 					case ExplorerConstants.Player.Actions.MoveLeft:
 						if (!strafing)
 							facingDirection = ExplorerConstants.Player.Directions.Left;
 						newX--;
+                  lookaheadX = newX - 1;
 						TryMove(newX, newY, world);
 						break;
 					case ExplorerConstants.Player.Actions.MoveRight:
 						if (!strafing)
 							facingDirection = ExplorerConstants.Player.Directions.Right;
 						newX++;
+                  lookaheadX = newX + 1;
 						TryMove(newX, newY, world);
 						break;
 					case ExplorerConstants.Player.Actions.Strafe:
@@ -2338,15 +2562,9 @@ namespace Explorer
 						break;
 					case ExplorerConstants.Player.Actions.UseEquippedItem:
 						acre = world.ConvertToAcre(facingX, facingY);
-						if(equipped == ExplorerConstants.Items.IDS.Fruit)
+						if(equipped == ExplorerConstants.Items.IDS.Fruit || equipped == ExplorerConstants.Items.IDS.SuperFruit)
 						{
-							RestoreStamina(ExplorerConstants.Items.FruitStaminaRestore);
-							UseEquippedItem();
-						}
-						else if (equipped == ExplorerConstants.Items.IDS.SuperFruit)
-						{
-							RestoreStamina(ExplorerConstants.Items.SuperFruitStaminaRestore);
-							UseEquippedItem();
+                     EatFruit(equipped);
 						}
 						else if (equipped == ExplorerConstants.Items.IDS.MagicStone)
 						{
@@ -2425,20 +2643,23 @@ namespace Explorer
 				{
 					if (ItemAmount(ExplorerConstants.Items.IDS.Fruit) > 0)
 					{
-						if (!RemoveItem(ExplorerConstants.Items.IDS.Fruit, 1))
-							errorMessages.Add("-Fatal error: Inconsistent item counts. Please report this bug!");
-						else
-							RestoreStamina(ExplorerConstants.Items.FruitStaminaRestore);
+                  EatFruit(ExplorerConstants.Items.IDS.Fruit);
+//						if (!RemoveItem(ExplorerConstants.Items.IDS.Fruit, 1))
+//							errorMessages.Add("-Fatal error: Inconsistent item counts. Please report this bug!");
+//						else
+//							RestoreStamina(ExplorerConstants.Items.FruitStaminaRestore);
 					}
 					else if (ItemAmount(ExplorerConstants.Items.IDS.SuperFruit) > 0)
 					{
-						if (!RemoveItem(ExplorerConstants.Items.IDS.SuperFruit, 1))
-							errorMessages.Add("-Fatal error: Inconsistent item counts. Please report this bug!");
-						else
-							RestoreStamina(ExplorerConstants.Items.SuperFruitStaminaRestore);
+                  EatFruit(ExplorerConstants.Items.IDS.SuperFruit);
+//						if (!RemoveItem(ExplorerConstants.Items.IDS.SuperFruit, 1))
+//							errorMessages.Add("-Fatal error: Inconsistent item counts. Please report this bug!");
+//						else
+//							RestoreStamina(ExplorerConstants.Items.SuperFruitStaminaRestore);
 					}
 				}
 
+            //Torch reuse
 				if (EquippedSteps >= ExplorerConstants.Items.TorchSteps &&
 					equipped == ExplorerConstants.Items.IDS.Torch)
 				{
@@ -2453,7 +2674,7 @@ namespace Explorer
 
 				if (stamina == 0)
 				{
-					errorMessages.Add("-You're out of stamina! Don't forget: you can refill it with Fruit or use Chat Coins.");
+					errorMessages.Add("-You're out of stamina! Refill it with Fruit or rest for a bit.");
 					break;
 				}
 			}
@@ -2461,7 +2682,7 @@ namespace Explorer
 			if ((oblockX != BlockX || oblockY != BlockY) && !world.PlayerCanHalt(BlockX, BlockY))
 			{
 				errorMessages.Add("-You halted in a block which cannot be occupied, so you have been moved to a nearby location");
-				Tuple<int, int> newLocation = world.FindCloseHaltable(BlockX, BlockY);
+				Tuple<int, int> newLocation = world.FindCloseHaltable(BlockX, BlockY, lookaheadX, lookaheadY);
 
 				if (!TryMove(newLocation.Item1, newLocation.Item2, world, true))
 					errorMessages.Add("-Fatal error! You could not be moved from the previous bad location!");
@@ -2546,6 +2767,12 @@ namespace Explorer
 			while (RetreatWorldDepth())
 				retreatCount++;
 
+         //Get out of the cave you're in. Also remove that cave if... you know.
+         if (world.HasCave(inCaveLocation.Item1, inCaveLocation.Item2))
+            world.RemoveCave(inCaveLocation.Item1, inCaveLocation.Item2);
+
+         inCaveLocation = Tuple.Create(-1, -1);
+            
 			Tuple<int, int> spawn = world.GetASpawn();
 
 			//You only need to move the player token if they were still in the world when they respawned
@@ -2565,11 +2792,14 @@ namespace Explorer
 		{
 			GetItem(ExplorerConstants.Items.IDS.Wood, amount);
 			GetItem(ExplorerConstants.Items.IDS.StarCrystal, amount);
+         GetItem(ExplorerConstants.Items.IDS.MagicStone, amount);
 			GetItem(ExplorerConstants.Items.IDS.Stone, amount);
 			GetItem(ExplorerConstants.Items.IDS.Coal, amount);
 			GetItem(ExplorerConstants.Items.IDS.Iron, amount);
+         GetItem(ExplorerConstants.Items.IDS.SuperFruit, amount);
 			GetItem(ExplorerConstants.Items.IDS.Fruit, amount);
 			GetItem(ExplorerConstants.Items.IDS.Seed, amount);
+         GetItem(ExplorerConstants.Items.IDS.SuperSeed, amount);
 			GetItem(ExplorerConstants.Items.IDS.Sapling, amount);
 			GetItem(ExplorerConstants.Items.IDS.AreaLocker, amount);
 		}
@@ -2580,6 +2810,52 @@ namespace Explorer
 
 			return inventory[item];
 		}
+
+      /// <summary>
+      /// Transfer FROM bank1 INTO bank2
+      /// </summary>
+      /// <returns><c>true</c>, if transfer was generaled, <c>false</c> otherwise.</returns>
+      /// <param name="item">Item.</param>
+      /// <param name="amount">Amount.</param>
+      /// <param name="bank1">Bank1.</param>
+      /// <param name="bank2">Bank2.</param>
+      private static int GeneralTransfer(ExplorerConstants.Items.IDS item, int amount,
+         Dictionary<ExplorerConstants.Items.IDS, int> bank1,
+         Dictionary<ExplorerConstants.Items.IDS, int> bank2)
+      {
+         //Make sure both the storage and inventory have the item in question.
+         if (!bank1.ContainsKey(item))
+            bank1.Add(item, 0);
+         if (!bank2.ContainsKey(item))
+            bank2.Add(item, 0);
+
+         //Can't transfer what you don't have.
+         if(bank1[item] < 1)
+            return -1;
+
+         amount = Math.Min(amount, bank1[item]);
+
+         bank1[item] -= amount;
+         bank2[item] += amount;
+
+         return amount;
+             }
+      public int TransferToStorage(ExplorerConstants.Items.IDS item, int amount, 
+         Dictionary<ExplorerConstants.Items.IDS, int> storage = null)
+      {
+         if (storage == null)
+            storage = this.userStorage;
+
+         return GeneralTransfer(item, amount, inventory, storage);
+      }
+      public int TransferFromStorage(ExplorerConstants.Items.IDS item, int amount, 
+         Dictionary<ExplorerConstants.Items.IDS, int> storage = null)
+      {
+         if (storage == null)
+            storage = this.userStorage;
+
+         return GeneralTransfer(item, amount, storage, inventory);
+      }
 
 		//The amount is taken care of automatically
 		private void GetItem(ExplorerConstants.Items.IDS ID, int forceAmount = 0)
@@ -2621,7 +2897,7 @@ namespace Explorer
 
 			//First, go ahead and just get the item if we have autopickup turned on
 			if (newBlockInfo.CanAutoPickup && GetOption(PlayerOptions.Autopickup) && !world.InLockedArea(LockID, acres.Item1, acres.Item2) &&
-				world.PickupObject(newX, newY))
+            newBlockInfo.StaminaRequired <= stamina && world.PickupObject(newX, newY))
 			{
 				GetItem(newBlockItem);
 			}
@@ -2660,6 +2936,10 @@ namespace Explorer
 		{
 			return inventory.Select(x => Tuple.Create(x.Key, x.Value)).OrderByDescending(x => x.Item2).ToList();
 		}
+      public List<Tuple<ExplorerConstants.Items.IDS, int>> GetSortedStorage()
+      {
+         return userStorage.Select(x => Tuple.Create(x.Key, x.Value)).OrderByDescending(x => x.Item2).ToList();
+      }
 
 		public int Score
 		{
@@ -2673,6 +2953,10 @@ namespace Explorer
 		{
 			get { return stamina; }
 		}
+      public int Fullness
+      {
+         get { return (int)Math.Ceiling(fullness); }
+      }
 		public int MaxStamina
 		{
 			get { return maxStamina; }
@@ -2753,8 +3037,21 @@ namespace Explorer
 		}
 		public bool InCave
 		{
-			get { return inCaveLocation.Item1 > 0 && inCaveLocation.Item2 > 0; }
+			get { return inCaveLocation.Item1 >= 0 && inCaveLocation.Item2 >= 0; }
 		}
+      public double FruitFullnessIncrease
+      {
+         get
+         {
+            return ExplorerConstants.Player.MaxFullness / (ExplorerConstants.Player.FruitPerFullness + 
+                  ((MaxStamina - ExplorerConstants.Player.StartingStamina) / ExplorerConstants.Items.MagicStoneStaminaIncrease *
+                  ExplorerConstants.Items.ExtraFruitPerMagicStone));
+         }
+      }
+      public bool CanEat
+      {
+         get { return fullness + FruitFullnessIncrease <= ExplorerConstants.Player.MaxFullness; }
+      }
 	}
 
 	//This is the actual class that the module will see. All actions should be performed on this module
@@ -2919,8 +3216,9 @@ namespace Explorer
 			output += "+\n";
 
 			output += "Stamina: " + players[player].Stamina + "/" + players[player].MaxStamina + " Facing: " + players[player].FacingDirection;
+         output += "\nFullness: " + players[player].Fullness + "%";
 			if (players[player].EquippedUses >= 0)
-				output += "\nEquipment uses: " + players[player].EquippedUses;
+				output += " Equipment uses: " + players[player].EquippedUses;
 
 			return (!string.IsNullOrWhiteSpace(errors) ? errors + "\n\n" : "") + output;
 		}
@@ -2931,15 +3229,76 @@ namespace Explorer
 				players[player].CheatResources(999);
 			}
 		}
+      public ExplorerConstants.Items.IDS GetAndCheckItem(int player, string item, out string error)
+      {
+         error = "";
+
+         if (!ExplorerConstants.Items.AllBlueprints.Any(x => x.Value.ShorthandName == item))
+         {
+            error = "I couldn't find an item with this name";
+            return ExplorerConstants.Items.IDS.Empty;
+         }
+
+         if (!string.IsNullOrWhiteSpace(CheckPlayer(player)))
+         {
+            error = CheckPlayer(player);
+            return ExplorerConstants.Items.IDS.Empty;
+         }
+
+         return ExplorerConstants.Items.AllBlueprints.FirstOrDefault(x => x.Value.ShorthandName == item).Key;
+      }
+      public bool PlayerOwnsCurrentAcre(int player)
+      {
+         if (!players.ContainsKey(player))
+            return false;
+
+         return (world.GetOwner(players[player].AcreX, players[player].AcreY) == players[player].PlayerID);
+      }
+      public string StoreItems(int player, string item, int amount)
+      {
+         string error;
+         ExplorerConstants.Items.IDS itemID = GetAndCheckItem(player, item, out error);
+
+         if (itemID == ExplorerConstants.Items.IDS.Empty)
+            return error;
+
+         if (!PlayerOwnsCurrentAcre(player))
+            return "You must be in one of your acres to use storage!";
+
+         int transferedItems = players[player].TransferToStorage(itemID, amount);
+         if (transferedItems < 0)
+            return "You don't have any " + ExplorerConstants.Items.AllBlueprints[itemID].DisplayName + " to store!";
+
+         return "You transferred " + transferedItems + " " + 
+            ExplorerConstants.Items.AllBlueprints[itemID].DisplayName.Pluralify(transferedItems) + " to storage";
+         //if (!
+      }
+      public string TakeItems(int player, string item, int amount)
+      {
+         string error;
+         ExplorerConstants.Items.IDS itemID = GetAndCheckItem(player, item, out error);
+
+         if (itemID == ExplorerConstants.Items.IDS.Empty)
+            return error;
+
+         if (!PlayerOwnsCurrentAcre(player))
+            return "You must be in one of your acres to use storage!";
+
+         int transferedItems = players[player].TransferFromStorage(itemID, amount);
+         if (transferedItems < 0)
+            return "You don't have any " + ExplorerConstants.Items.AllBlueprints[itemID].DisplayName + " in storage!";
+
+         return "You took " + transferedItems + " " + 
+            ExplorerConstants.Items.AllBlueprints[itemID].DisplayName.Pluralify(transferedItems) + " out of storage";
+         //if (!
+      }
 		public string CraftItem(int player, string item, int amount)
 		{
-			if (!ExplorerConstants.Items.AllBlueprints.Any(x => x.Value.ShorthandName == item))
-				return "I couldn't find an item with this name";
+         string error;
+         ExplorerConstants.Items.IDS itemID = GetAndCheckItem(player, item, out error);
 
-			if (!string.IsNullOrWhiteSpace(CheckPlayer(player)))
-				return CheckPlayer(player);
-
-			ExplorerConstants.Items.IDS itemID = ExplorerConstants.Items.AllBlueprints.FirstOrDefault(x => x.Value.ShorthandName == item).Key;
+         if (itemID == ExplorerConstants.Items.IDS.Empty)
+            return error;
 
 			if(!ExplorerConstants.Items.CraftingRecipes.ContainsKey(itemID))
 				return "This is not a craftable item";
@@ -2963,13 +3322,11 @@ namespace Explorer
 		}
 		public string EquipItem(int player, string item)
 		{
-			if (!ExplorerConstants.Items.AllBlueprints.Any(x => x.Value.ShorthandName == item))
-				return "I couldn't find an item with this name";
+         string error;
+         ExplorerConstants.Items.IDS itemID = GetAndCheckItem(player, item, out error);
 
-			if (!string.IsNullOrWhiteSpace(CheckPlayer(player)))
-				return CheckPlayer(player);
-
-			ExplorerConstants.Items.IDS itemID = ExplorerConstants.Items.AllBlueprints.FirstOrDefault(x => x.Value.ShorthandName == item).Key;
+         if (itemID == ExplorerConstants.Items.IDS.Empty)
+            return error;
 
 			if (players[player].EquipItem(itemID))
 				return "You equipped item: " + ExplorerConstants.Items.AllBlueprints[itemID].DisplayName;
@@ -3029,21 +3386,55 @@ namespace Explorer
 			return "You've been teleported close to your tower in Acre " + towerAcre.Item1 + "-" + towerAcre.Item2 + 
 				"\n\n" + PerformActions(player, "", out whatever);
 		}
+      private enum ItemListTypes
+      {
+         Inventory, Storage
+      }
+      private string GenericItemList(int player, ItemListTypes type)
+      {
+         if (!string.IsNullOrWhiteSpace(CheckPlayer(player)))
+            return CheckPlayer(player);
+
+         List<Tuple<ExplorerConstants.Items.IDS, int>> inventory = new List<Tuple<ExplorerConstants.Items.IDS, int>>();
+         string listType = "";
+         bool showEquipped = false;
+
+         if (type == ItemListTypes.Inventory)
+         {
+            inventory = players[player].GetSortedItems();
+            listType = "inventory";
+            showEquipped = true;
+         }
+         else if (type == ItemListTypes.Storage)
+         {
+            inventory = players[player].GetSortedStorage();
+            listType = "storage";
+         }
+            
+         inventory = inventory.Where(x => x.Item2 > 0).OrderBy(
+            x => ExplorerConstants.Items.AllBlueprints[x.Item1].ShorthandName).ToList();
+
+         string output = "Your World " + worldID + " " + listType + ": ";
+
+         for (int i = 0; i < inventory.Count; i++)
+         {
+            output += "\n" + (inventory[i].Item1 == players[player].EquippedItem && showEquipped ? "*" : "-") + 
+               ExplorerConstants.Items.AllBlueprints[inventory[i].Item1].ShorthandName + ": " + inventory[i].Item2;
+         }
+
+         return output;
+      }
 		public string PlayerItems(int player)
 		{
-			if (!string.IsNullOrWhiteSpace(CheckPlayer(player)))
-				return CheckPlayer(player);
-
-			List<Tuple<ExplorerConstants.Items.IDS, int>> inventory = players[player].GetSortedItems().Where(x => x.Item2 > 0).OrderBy(x => ExplorerConstants.Items.AllBlueprints[x.Item1].ShorthandName).ToList();
-			string output = "Your World " + worldID + " inventory: ";
-
-			for (int i = 0; i < inventory.Count; i++)
-			{
-				output += "\n" + (inventory[i].Item1 == players[player].EquippedItem ? "*" : "-") + ExplorerConstants.Items.AllBlueprints[inventory[i].Item1].ShorthandName + ": " + inventory[i].Item2;
-			}
-
-			return output;
+         return GenericItemList(player, ItemListTypes.Inventory);
 		}
+      public string PlayerStorage(int player)
+      {
+         if (!PlayerOwnsCurrentAcre(player))
+            return "You must be in one of your acres to use storage!";
+         
+         return GenericItemList(player, ItemListTypes.Storage);
+      }
 		public int RestoreStamina(int player, int amount, bool amountIsPercent = false)
 		{
 			if (!string.IsNullOrWhiteSpace(CheckPlayer(player)))
@@ -3072,6 +3463,11 @@ namespace Explorer
 			foreach (Player player in players.Values.ToList())
 				player.RestoreStamina(amount);
 		}
+      public void RefreshFullness(double amount)
+      {
+         foreach (Player player in players.Values.ToList())
+            player.ReduceFullness(amount);
+      }
 		public void SimulateTime()
 		{
          if(CanPlay)

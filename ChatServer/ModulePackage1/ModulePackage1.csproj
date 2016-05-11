@@ -34,6 +34,9 @@
       <HintPath>..\..\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MyExtensions">
+      <HintPath>..\..\MyExtensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,10 +65,6 @@
     <ProjectReference Include="..\ChatEssentials\ChatEssentials.csproj">
       <Project>{11915F24-34FB-4C4D-8CE7-3F509F8D5A42}</Project>
       <Name>ChatEssentials</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MyExtensions\MyExtensions.csproj">
-      <Project>{A03209C8-3E2E-46B4-B3BF-3F47415F0D3C}</Project>
-      <Name>MyExtensions</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

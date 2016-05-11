@@ -226,7 +226,8 @@ the actions of any user within the chat.".Replace("\n", " ");
          #region HistoryLoad
          Dictionary<string, List<UserMessageJSONObject>> tempHistory;
 
-         if (MySerialize.LoadObject<Dictionary<string, List<UserMessageJSONObject>>>(SavePath(HistoryFile), out tempHistory))
+         if (MySerialize.LoadObject<Dictionary<string, List<UserMessageJSONObject>>>
+               (SavePath(HistoryFile), out tempHistory) && tempHistory != null)
          {
             history = tempHistory;
             PMRoom.FindNextID(history.SelectMany(x => x.Value.Select(y => y.tag)).ToList());
@@ -511,6 +512,14 @@ the actions of any user within the chat.".Replace("\n", " ");
          return AllAcceptedTagsForUser(user).Contains(tag);
       }
 
+      public bool IsPMTag(string tag)
+      {
+         lock(managerLock)
+         {
+            return rooms.Any(x => x.Key == tag);
+         }
+      }
+
       public bool LeavePMRoom(int user, string room, out string error)
       {
          error = "";
@@ -637,12 +646,13 @@ the actions of any user within the chat.".Replace("\n", " ");
       public bool CheckAuthentication(int uid, string key, out string error)
       {
          error = "";
+         List<string> warnings = new List<string>();
 
          if (authServer.CheckAuth(uid, key))
          {
             if (TryRegister(uid, key))
             {
-               if (!GetUser(uid).PullInfoFromQueryPage())
+               if (!GetUser(uid).PullInfoFromQueryPage(out warnings))
                {
                   error = "Couldn't authenticate because your user information couldn't be found";
                   Log("Authentication failed: Couldn't get user information from website", LogLevel.Warning);
@@ -850,8 +860,15 @@ the actions of any user within the chat.".Replace("\n", " ");
             rooms = rooms.Where(x => !x.Value.HasExpired).ToDictionary(x => x.Key, y => y.Value);
 
             //Now we can finally do the user thing
-            userList.users = LoggedInUsers().OrderBy(x => x.Value.LastJoin).Select(x => new UserJSONObject(x.Value)).ToList();
-            userList.rooms = rooms.Where(x => x.Value.Users.Contains(caller)).Select(x => new RoomJSONObject(x.Value, users)).ToList();
+            userList.users = LoggedInUsers()
+               .Where(x => !x.Value.ShadowBanned || x.Value.UID == caller)
+               .OrderBy(x => x.Value.LastJoin)
+               .Select(x => new UserJSONObject(x.Value)).ToList();
+            userList.rooms = rooms
+               .Where(x => x.Value.Users.Contains(caller) && 
+                     users.ContainsKey(x.Value.Creator) &&
+                     (!users[x.Value.Creator].ShadowBanned || x.Value.Creator == caller))
+               .Select(x => new RoomJSONObject(x.Value, users)).ToList();
          }
          return userList.ToString();
       }
@@ -861,7 +878,15 @@ the actions of any user within the chat.".Replace("\n", " ");
       {
          MessageListJSONObject jsonMessages = new MessageListJSONObject();
 
-         jsonMessages.messages = history.Where(x => AllAcceptedTagsForUser(user).Contains(x.Key)).SelectMany(x => x.Value).OrderBy(x => x.id).ToList();
+         lock (managerLock)
+         {
+            jsonMessages.messages = history
+               .Where(x => AllAcceptedTagsForUser(user).Contains(x.Key))
+               .SelectMany(x => x.Value)
+               .Where(x => users.ContainsKey(x.uid) && 
+                  (!users[x.uid].ShadowBanned || x.uid == user))
+               .OrderBy(x => x.id).ToList();
+         }
 
          return jsonMessages.ToString();
       }
