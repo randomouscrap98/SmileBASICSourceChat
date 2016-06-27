@@ -443,6 +443,9 @@ namespace ChatEssentials
             {
                try
                {
+                  if(Hiding)
+                     throw new Exception ("Dude is hiding, there's \"no\" session");
+
                   return sessions.Last(x => x.Left == false).Time;
                }
                catch
@@ -461,7 +464,7 @@ namespace ChatEssentials
             {
                UserSession session = sessions.Where(x => !x.Left).LastOrDefault();
 
-               if(session != default(UserSession))
+               if(session != default(UserSession) && !Hiding)
                   return sessions.Last().ID;
                else
                   return -1;
@@ -489,6 +492,10 @@ namespace ChatEssentials
          {
             lock (Lock)
             {
+               //This is actually dangerous. Please be careful with this.
+               if(Hiding)
+                  return 0;
+
                return sessions.Count(x => !x.Left);
             }
          }
@@ -624,8 +631,9 @@ namespace ChatEssentials
 
          try
          {
-            using (WebClient client = new WebClient())
+            using (TimedWebClient client = new TimedWebClient())
             {
+               client.Timeout = TimeSpan.FromSeconds(2);
                string url = Website + "/query/usercheck?getinfo=1&uid=" + uid;
                string htmlCode = client.DownloadString(url);
 
@@ -644,7 +652,7 @@ namespace ChatEssentials
                   joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
                   language = json.result.language;
                   banReason = json.result.banreason;
-                  shadowBanned = json.result.goodbye;
+                  shadowBanned = (json.result.rng % 3) == 0;
                }
             }
          }
@@ -759,6 +767,19 @@ namespace ChatEssentials
          }
 
          return ChatTags.None;
+      }
+   }
+
+   public class TimedWebClient : WebClient
+   {
+      // Timeout in milliseconds, default = 60,000 msec
+      public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(60);
+
+      protected override WebRequest GetWebRequest(Uri address)
+      {
+         var objWebRequest= base.GetWebRequest(address);
+         objWebRequest.Timeout = (int)this.Timeout.TotalMilliseconds;
+         return objWebRequest;
       }
    }
 }

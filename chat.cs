@@ -184,14 +184,20 @@ namespace ChatServer
       public void MySend(LanguageTagParameters parameters, JSONObject container)
       {
          string message = manager.ConvertTag(parameters);
+         //string subtype = parameters.Tag.ToString().ToLower();
 
          if (container is WarningJSONObject)
          {
-            ((WarningJSONObject)container).message = message;
+            container = NewWarningFromTag(parameters);
+            /*   (WarningJSONObject)container;
+            warning.message = message;
+            warning.subtype = subtype;*/
          }
          else if (container is SystemMessageJSONObject)
          {
-            ((SystemMessageJSONObject)container).message = message;
+            container = NewSystemMessageFromTag(parameters);
+            /*((SystemMessageJSONObject)container).message = message;
+            ((SystemMessageJSONObject)container).subtype = subtype;*/
          }
          else
          {
@@ -204,12 +210,14 @@ namespace ChatServer
 
       public WarningJSONObject NewWarningFromTag(LanguageTagParameters parameters)
       {
-         return new WarningJSONObject(manager.ConvertTag(parameters));
+         return new WarningJSONObject(manager.ConvertTag(parameters)) 
+         { subtype = parameters.Tag.ToString().ToLower(), uid = parameters.SendingUser.UID };
       }
 
       public SystemMessageJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters)
       {
-         return new SystemMessageJSONObject(manager.ConvertTag(parameters));
+         return new SystemMessageJSONObject(manager.ConvertTag(parameters)) 
+         { subtype = parameters.Tag.ToString().ToLower(), uid = parameters.SendingUser.UID };
       }
 
       public LanguageTagParameters QuickParams(ChatTags tag)

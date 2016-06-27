@@ -1,14 +1,15 @@
 ﻿<Properties StartupItem="ChatServer/ChatServer.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../chat.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../LanguageTags.cs">
     <Files>
-      <File FileName="../chat.cs" Line="205" Column="76" />
-      <File FileName="../chatManager.cs" Line="1" Column="1" />
+      <File FileName="../chat.cs" Line="370" Column="50" />
+      <File FileName="../chatManager.cs" Line="925" Column="33" />
       <File FileName="../user.cs" Line="1" Column="1" />
-      <File FileName="../main.cs" Line="1" Column="1" />
-      <File FileName="../messages.cs" Line="1" Column="1" />
+      <File FileName="../main.cs" Line="10" Column="23" />
+      <File FileName="../messages.cs" Line="59" Column="26" />
       <File FileName="../modules/module.cs" Line="1" Column="1" />
       <File FileName="../modules/debugModule.cs" Line="1" Column="1" />
+      <File FileName="../LanguageTags.cs" Line="19" Column="11" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

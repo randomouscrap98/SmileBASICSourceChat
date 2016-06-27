@@ -42,6 +42,8 @@ namespace ChatEssentials
          this.message = message;
       }
       public string message = "";
+      public string subtype = "";
+      public int uid = 0;
    }
 
    //System messages have a similar format to warnings.
@@ -53,6 +55,8 @@ namespace ChatEssentials
          this.message = message;
       }
       public string message = "";
+      public string subtype = "";
+      public int uid = 0;
    }
 
    //The list of messages sent out in JSON should follow this format

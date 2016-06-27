@@ -215,6 +215,9 @@ namespace ModulePackage1
       //Get stats for given user. This is a statistics-specific function
       public string GetUserStats(UserInfo user)
       {
+         if(!userStatistics.ContainsKey(user.UID))
+            return "No statistics found for " + user.Username + "!";
+
          List<UserStatistics> allStats = userStatistics.Select(x => x.Value).ToList();
          UserStatistics myStats = userStatistics[user.UID];
          long totalMessages = allStats.Sum(x => x.TotalMessages);
