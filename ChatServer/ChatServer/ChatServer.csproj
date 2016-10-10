@@ -72,6 +72,7 @@
     <Compile Include="..\..\modules\adminModule.cs">
       <Link>adminModule.cs</Link>
     </Compile>
+    <Compile Include="ConnectionCacheServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />
@@ -87,6 +88,9 @@
     </Reference>
     <Reference Include="MyExtensions">
       <HintPath>..\..\MyExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="websocket-sharp">
+      <HintPath>..\..\websocket-sharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

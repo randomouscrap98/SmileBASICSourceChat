@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatEssentials", "ChatEssen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortedModules", "PortedModules\PortedModules.csproj", "{C3F1A924-C8B4-49DA-A014-A804BEA8F18B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModulePackage2", "ModulePackage2\ModulePackage2.csproj", "{E93C9655-76FE-4841-81A7-AC0CA565D105}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -37,6 +39,10 @@ Global
 		{E7D4D252-BC74-4C17-8288-874D31208813}.Debug|x86.Build.0 = Debug|Any CPU
 		{E7D4D252-BC74-4C17-8288-874D31208813}.Release|x86.ActiveCfg = Release|Any CPU
 		{E7D4D252-BC74-4C17-8288-874D31208813}.Release|x86.Build.0 = Release|Any CPU
+		{E93C9655-76FE-4841-81A7-AC0CA565D105}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E93C9655-76FE-4841-81A7-AC0CA565D105}.Debug|x86.Build.0 = Debug|Any CPU
+		{E93C9655-76FE-4841-81A7-AC0CA565D105}.Release|x86.ActiveCfg = Release|Any CPU
+		{E93C9655-76FE-4841-81A7-AC0CA565D105}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

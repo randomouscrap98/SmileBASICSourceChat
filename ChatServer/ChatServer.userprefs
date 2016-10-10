@@ -1,15 +1,19 @@
 ﻿<Properties StartupItem="ChatServer/ChatServer.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../LanguageTags.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../chatManager.cs">
     <Files>
-      <File FileName="../chat.cs" Line="370" Column="50" />
-      <File FileName="../chatManager.cs" Line="925" Column="33" />
+      <File FileName="../chat.cs" Line="185" Column="34" />
+      <File FileName="../chatManager.cs" Line="893" Column="7" />
       <File FileName="../user.cs" Line="1" Column="1" />
-      <File FileName="../main.cs" Line="10" Column="23" />
-      <File FileName="../messages.cs" Line="59" Column="26" />
+      <File FileName="../main.cs" Line="1" Column="1" />
+      <File FileName="../messages.cs" Line="1" Column="1" />
       <File FileName="../modules/module.cs" Line="1" Column="1" />
       <File FileName="../modules/debugModule.cs" Line="1" Column="1" />
-      <File FileName="../LanguageTags.cs" Line="19" Column="11" />
+      <File FileName="ModulePackage2/DrawModule.cs" Line="1" Column="1" />
+      <File FileName="../modules/LoggerModule.cs" Line="1" Column="1" />
+      <File FileName="../auth.cs" Line="1" Column="1" />
+      <File FileName="ChatServer/ConnectionCacheServer.cs" Line="214" Column="25" />
+      <File FileName="../LanguageTags.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -18,6 +22,8 @@
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <DisabledProjects>
     <String>MyExtensions/MyExtensions.csproj</String>
+    <String>PortedModules/PortedModules.csproj</String>
+    <String>ModulePackage2/ModulePackage2.csproj</String>
     <String>ModulePackage1/ModulePackage1.csproj</String>
   </DisabledProjects>
 </Properties>

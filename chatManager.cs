@@ -24,6 +24,7 @@ namespace ChatServer
       public TimeSpan SaveInterval = TimeSpan.FromSeconds(30);
       public int MaxMessageKeep = 100;
       public int MaxMessageSend = 5;
+      public int MaxUserQueryFailures = 3;
       public string GlobalTag = "";
       public bool MonitorThreads = false;
 
@@ -81,6 +82,7 @@ namespace ChatServer
          settingValues.Add("sendBuffer", this.SendBufferSize.ToString());
          settingValues.Add("shutdownTimeout", this.ShutdownTimeout.ToString());
          settingValues.Add("monitorThreads", this.MonitorThreads.ToString());
+         settingValues.Add("maxUserQueryFailures", this.MaxUserQueryFailures.ToString());
 
          LogProvider.LogGeneral("Settings dump: " + 
             string.Join(" ", settingValues.Select(x => "[" + x.Key + "] " + x.Value)), LogLevel.Debug, "ChatSettings");
@@ -193,7 +195,7 @@ the actions of any user within the chat.".Replace("\n", " ");
 
          if (MySerialize.LoadObject<Dictionary<int, User>>(SavePath(UserFile), out tempUsers))
          {
-            users = tempUsers;
+            users = tempUsers.Where(x => !String.IsNullOrWhiteSpace(x.Value.Username)).ToDictionary(x => x.Key, y => y.Value);
 
             if(users.Count > 0)
                UserSession.SetNextID(users.Max(x => x.Value.MaxSessionID) + 1);
@@ -724,7 +726,7 @@ the actions of any user within the chat.".Replace("\n", " ");
 
       public ChatTags AddMessage(UserMessageJSONObject message)
       {
-         ChatTags warning = ChatTags.None;
+         ChatTags warning = ChatTags.None, warning2 = ChatTags.None;
 
          User user = GetUser(message.uid);
 
@@ -737,6 +739,14 @@ the actions of any user within the chat.".Replace("\n", " ");
                warning = user.MessageSpam(messages, message.message);
                Log("Exit messagespam lock", MyExtensions.Logging.LogLevel.Locks);
             }
+         }
+
+         //Update spam score directly. If warning2 actually is something, update the real warning.
+         lock (managerLock)
+         {
+            warning2 = user.DirectSpam(message.spamValue);
+            if (warning2 != ChatTags.None)
+               warning = warning2;
          }
 
          //Only add message to message list if we previously set that we should.
@@ -869,23 +879,41 @@ the actions of any user within the chat.".Replace("\n", " ");
                      users.ContainsKey(x.Value.Creator) &&
                      (!users[x.Value.Creator].ShadowBanned || x.Value.Creator == caller))
                .Select(x => new RoomJSONObject(x.Value, users)).ToList();
+
+            if(!GetUser(caller).AnimatedAvatars)
+            {
+               foreach(UserJSONObject user in userList.users)
+                  user.avatar = GetUser(user.uid).AvatarStatic;
+               foreach(RoomUserJSONObject user in userList.rooms.SelectMany(x => x.users))
+                  user.avatar = GetUser(user.uid).AvatarStatic;
+            }
          }
          return userList.ToString();
       }
 
-      //Get a JSON string representing a list of the last 10 messages
-      public string ChatMessageList(int user)
+      //Get a JSON string representing a list of the last X messages
+      public string ChatMessageList(int user, int messageCount = 2)
       {
          MessageListJSONObject jsonMessages = new MessageListJSONObject();
+
+         //This may change to a legacy number, like 10
+         if (messageCount < 1)
+            messageCount = ChatSettings.MaxMessageSend;
 
          lock (managerLock)
          {
             jsonMessages.messages = history
                .Where(x => AllAcceptedTagsForUser(user).Contains(x.Key))
-               .SelectMany(x => x.Value)
+               .SelectMany(x => x.Value.Take(messageCount))
                .Where(x => users.ContainsKey(x.uid) && 
                   (!users[x.uid].ShadowBanned || x.uid == user))
                .OrderBy(x => x.id).ToList();
+
+            bool animatedAvatars = GetUser(user).AnimatedAvatars;
+
+            //A HORRIBLE hack! This will make the avatars bounce back and forth!
+            foreach(UserMessageJSONObject message in jsonMessages.messages)
+               message.avatar = animatedAvatars ? GetUser(message.uid).Avatar : GetUser(message.uid).AvatarStatic;
          }
 
          return jsonMessages.ToString();

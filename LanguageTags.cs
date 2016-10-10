@@ -164,6 +164,7 @@ namespace ChatEssentials
          if (parameters.Tag == ChatTags.None)
             return "";
 
+         //parameters.
          try
          {
             //For a lot of errors, we're better off returning the default tag
@@ -183,7 +184,9 @@ namespace ChatEssentials
             //Oops, the user's language couldn't be found (wut). Use default
             else if (!tags.ContainsKey(parameters.Language))
             {
-               Log(parameters.User.Username + "'s language (" + parameters.Language + ") was not found! Using default");
+               if(parameters.User.UID > 0)
+                  Log(parameters.User.Username + "'s language (" + parameters.Language + ") was not found! Using default", LogLevel.Debug);
+               
                return defaultReplacement;
             }
 

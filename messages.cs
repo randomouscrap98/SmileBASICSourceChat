@@ -9,11 +9,25 @@ namespace ChatEssentials
    [Serializable]
    public abstract class JSONObject
    {
+      public string tag;
+      public string encoding;
       public readonly string type;
 
       public JSONObject(string type)
       {
          this.type = type;
+         this.encoding = "text";
+         this.tag = "";
+      }
+
+      public JSONObject(JSONObject copy)
+      {
+         if (copy != null)
+         {
+            tag = copy.tag;
+            encoding = copy.encoding;
+            type = copy.type;
+         }
       }
 
       public override string ToString ()
@@ -31,6 +45,7 @@ namespace ChatEssentials
       public string from = "unknown";
       public bool result = false;
       public List<string> errors = new List<string>();
+      public Dictionary<string, object> extras = new Dictionary<string, object>();
    }
 
    //Warnings to be sent to (usually one) users
@@ -78,12 +93,14 @@ namespace ChatEssentials
    public class UserJSONObject
    {
       public readonly string username = "";
-      public readonly string avatar = "";
       public readonly string stars = "";
+      public readonly int level = 0;
       public readonly int uid = 0;
       public readonly long joined = 0;
+      public string avatar = "";
       public bool active = false;
       public bool banned = false;
+      public List<Badge> badges = new List<Badge>();
 
       public UserJSONObject(User user)
       {
@@ -91,9 +108,11 @@ namespace ChatEssentials
          username = user.Username;
          avatar = user.Avatar;
          stars = user.StarString;
+         level = user.Level;
          active = user.Active;
          joined = user.UnixJoinDate;
          banned = user.Banned;
+         badges = user.Badges;
       }
    }
 
@@ -113,7 +132,7 @@ namespace ChatEssentials
    public class RoomUserJSONObject
    {
       public readonly string username = "";
-      public readonly string avatar = "";
+      public string avatar = "";
       public readonly int uid = 0;
       public readonly bool active = false;
       public readonly bool banned = false;
@@ -139,7 +158,7 @@ namespace ChatEssentials
       public int uid = 0;
       public bool broadcast = false;
       public bool safe = true;
-      public string tag = "";
+      //public string tag = "";
       public string module = "";
       public List<int> recipients = new List<int>();
 
@@ -192,38 +211,46 @@ namespace ChatEssentials
    {
       public readonly int uid;
       public readonly string username;
-      public readonly string avatar;
+      public string avatar;
       public readonly string stars;
+      public readonly int level;
       public readonly string message;
       public readonly long id;
-      public readonly string tag;
+      public List<Badge> badges = new List<Badge>();
       private readonly DateTime postTime;
       private static long NextID = 0;
 
       private bool display = true;
       private bool spamUpdate = true;
-      //private bool isCommand = false;
 
-      public UserMessageJSONObject(User user, string message, string tag) : base("message")
+      //This may become private.
+      public double spamValue = 0;
+
+      public UserMessageJSONObject(UserInfo user, string message, string tag = "") : base("message")
       {
          this.uid = user.UID;
          this.username = user.Username;
          this.avatar = user.Avatar;
          this.stars = user.StarString;
+         this.level = user.Level;
          this.message = message;
          this.tag = tag;
          this.postTime = DateTime.Now;
          this.id = Interlocked.Increment(ref NextID);
+         this.badges = user.Badges;
       }
 
-      public UserMessageJSONObject(UserMessageJSONObject copy) : base("message")
+      public UserMessageJSONObject(UserMessageJSONObject copy) : base(copy)
       {
          if (copy != null)
          {
+            username = copy.username;
+            avatar = copy.avatar;
+            stars = copy.stars;
             uid = copy.uid;
             message = copy.message;
             id = copy.id;
-            tag = copy.tag;
+            //tag = copy.tag;
             postTime = copy.postTime;
          }
       }
@@ -235,7 +262,7 @@ namespace ChatEssentials
          avatar = "";
          stars = "";
          message = "";
-         tag = "";
+         //tag = "";
          postTime = new DateTime(0);
          id = -1;
       }
@@ -281,6 +308,16 @@ namespace ChatEssentials
       {
          spamUpdate = false;
       }
+
+//      public void SetSpamValue(int value)
+//      {
+//         spamValue = value;
+//      }
+//
+//      public int GetSpamValue()
+//      {
+//         return spamValue;
+//      }
 
       public bool Spammable
       {

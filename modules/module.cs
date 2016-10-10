@@ -558,7 +558,7 @@ namespace ModuleSystem
             string repeatCharacter = RepeatCharacter(Repeat);
 
             if (!string.IsNullOrWhiteSpace(repeatCharacter))
-               return @"(?:" + BaseRegex + @"\s*)" + repeatCharacter;
+               return @"(?:" + BaseRegex + @"\b\s*)" + repeatCharacter;
             else
                return BaseRegex;
          }
@@ -571,7 +571,7 @@ namespace ModuleSystem
             string repeatCharacter = RepeatCharacter(Repeat);
 
             if (!string.IsNullOrWhiteSpace(repeatCharacter))
-               return @"(" + BaseRegex + @"\s*)" + repeatCharacter;
+               return @"(" + BaseRegex + @"\b\s*)" + repeatCharacter;
             else
                return BaseRegex;
          }

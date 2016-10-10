@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using MyExtensions;
+using MyExtensions.Logging;
 using ChatEssentials;
 using System.Timers;
 using Newtonsoft.Json.Linq;
@@ -83,6 +84,36 @@ namespace ChatEssentials
       }
    }
 
+   public class Badge
+   {
+      public int bid = 0;
+      public string name = "";
+      public string description = "";
+      public string groupname = "";
+      public string groupdescription = "";
+      public bool givable = false;
+      public bool hidden = false;
+      public bool single = false;
+      public bool startergroup = false;
+      public bool singlegroup = true;
+
+      public Badge() { }
+
+      public Badge(Badge copybadge)
+      {
+         bid = copybadge.bid;
+         name = copybadge.name;
+         description = copybadge.description;
+         groupname = copybadge.groupname;
+         groupdescription = copybadge.groupdescription;
+         givable = copybadge.givable;
+         hidden = copybadge.hidden;
+         single = copybadge.single;
+         startergroup = copybadge.startergroup;
+         singlegroup = copybadge.singlegroup;
+      }
+   }
+
    //Just information on User
    public class UserInfo
    {
@@ -90,8 +121,10 @@ namespace ChatEssentials
       public readonly int UID;
       public readonly string Username;
       public readonly string Avatar;
+      public readonly string AvatarStatic;
       public readonly string StarString;
       public readonly string Language;
+      public readonly int Level;
       public readonly long UnixJoinDate;
       public readonly DateTime LastPost;
       public readonly DateTime LastPing;
@@ -99,6 +132,7 @@ namespace ChatEssentials
       public readonly bool Active;
       public readonly bool Banned;
       public readonly bool Blocked;
+      public readonly bool Shadowed;
       public readonly DateTime BannedUntil;
       public readonly DateTime BlockedUntil;
       public readonly int SpamScore;
@@ -115,6 +149,7 @@ namespace ChatEssentials
       public readonly int BadSessionCount;
       public readonly int OpenSessionCount;
       public readonly long LastSessionID;
+      public readonly List<Badge> Badges;
 
       public UserInfo(User user, bool loggedIn)
       {
@@ -122,7 +157,9 @@ namespace ChatEssentials
          UID = user.UID;
          Username = user.Username;
          Avatar = user.Avatar;
+         AvatarStatic = user.AvatarStatic;
          StarString = user.StarString;
+         Level = user.Level;
          Language = user.Language;
          UnixJoinDate = user.UnixJoinDate;
          LastPing = user.LastPing;
@@ -131,6 +168,7 @@ namespace ChatEssentials
          Active = user.Active;
          Banned = user.Banned;
          BannedUntil = user.BannedUntil;
+         Shadowed = user.ShadowBanned;
          BlockedUntil = user.BlockedUntil;
          user.RequestDecayUpdate();
          SpamScore = user.SpamScore;
@@ -148,28 +186,36 @@ namespace ChatEssentials
          OpenSessionCount = user.OpenSessionCount;
          BadSessionCount = user.BadSessionCount;
          LastSessionID = user.LastSessionID;
+         Badges = user.Badges;
       }
    }
 
    [Serializable]
    public class User
    {
+      public const double BanSpamScore = 100;
       public const double JoinSpamMinutes = 2.0;
       //public const string IrcAppendTag = "-irc";
 
       private static TimeSpan PolicyReminderTime = TimeSpan.FromDays(1);
+      private static TimeSpan QueryUserTimeout = TimeSpan.FromSeconds(1);
       private static bool AutomaticBlocking = true;
       private static int SpamBlockSeconds = 1;
       private static int InactiveMinutes = 1;
+      private static Logger Logger = Logger.DefaultLogger;
       private static string Website = "";
+      private static string ChatRequest = "";
 
       private readonly int uid = 0;
       private string username = "default";
       //private string ircUsername = "";
       private string avatar = "";
+      private string avatarStatic = "";
       private string stars = "";
       private string language = "";
       private string banReason = "";
+      private int level = 0;
+      private bool animatedAvatars = true;
       private DateTime joinDate = DateTime.Now;
 
       private double spamScore = 0;
@@ -198,17 +244,25 @@ namespace ChatEssentials
       private DateTime blockedUntil = new DateTime(0);
       private List<UserSession> sessions = new List<UserSession>();
       private List<DateTime> recentJoins = new List<DateTime>();
-
-//      [JsonIgnore]
-//      private readonly Timer userUpdate = new Timer(1000);
+      private List<Badge> badges = new List<Badge>();
 
       public readonly Object Lock = new Object();
 
       public User(int uid)
       {
          this.uid = uid;
-//         userUpdate.Elapsed += SpamDecay;
-//         userUpdate.Start();
+      }
+
+      public void Log(string message, LogLevel level = LogLevel.Normal)
+      {
+         string tag = "UserClass";
+
+         if (uid > 0)
+            tag += uid;
+         else
+            tag += "X";
+         
+         Logger.LogGeneral(message, level, tag);
       }
 
       public string Username
@@ -226,9 +280,24 @@ namespace ChatEssentials
          get { return avatar; }
       }
 
+      public string AvatarStatic
+      {
+         get { return avatarStatic; }
+      }
+
+      public bool AnimatedAvatars
+      {
+         get { return animatedAvatars; }
+      }
+
       public string StarString
       {
          get { return stars; }
+      }
+
+      public int Level
+      {
+         get { return level; }
       }
 
       public string Language
@@ -251,15 +320,26 @@ namespace ChatEssentials
          get { return MyExtensions.DateExtensions.ToUnixTime(joinDate); }
       }
 
-      //Set static user parameters (constants, probably from an options file)
-      public static void SetUserParameters(int spamBlockSeconds, int inactiveMinutes, string website, bool automaticBlocking,
-         double reminderHours)
+      public List<Badge> Badges
       {
+         get { return badges.Select(x => new Badge(x)).ToList(); }
+      }
+
+      //Set static user parameters (constants, probably from an options file)
+      public static void SetUserParameters(Logger logger, int spamBlockSeconds, int inactiveMinutes, 
+            string website, bool automaticBlocking, double reminderHours, double maxQuerySeconds,
+            string chatrequest)
+      {
+         if(logger != null)
+            Logger = logger;
+
          SpamBlockSeconds = spamBlockSeconds;
          InactiveMinutes = inactiveMinutes;
          Website = website;
          AutomaticBlocking = automaticBlocking;
          PolicyReminderTime = TimeSpan.FromHours(reminderHours);
+         QueryUserTimeout = TimeSpan.FromSeconds(maxQuerySeconds);
+         ChatRequest = chatrequest;
       }
 
       public DateTime LastPost
@@ -628,44 +708,62 @@ namespace ChatEssentials
       {
          warnings = new List<string>();
          dynamic json = false;
+         string htmlCode = "";
+         string url = Website + "/query/request/user?small=1&chatrequest=" + 
+            ChatRequest + "&uid=" + uid;
 
          try
          {
             using (TimedWebClient client = new TimedWebClient())
             {
-               client.Timeout = TimeSpan.FromSeconds(2);
-               string url = Website + "/query/usercheck?getinfo=1&uid=" + uid;
-               string htmlCode = client.DownloadString(url);
-
+               client.Timeout = QueryUserTimeout; 
+               htmlCode = client.DownloadString(url);
                json = JsonConvert.DeserializeObject(htmlCode);
 
                lock(Lock)
                {
+                  /*Console.WriteLine("Website: " + url);
+                  Console.WriteLine("RNG: " + json.result.rng);
+                  Console.WriteLine("RNG type: " +
+                  json.result.rng.GetType());*/
                   username = json.result.username;
-                  avatar = json.result.avatar;
-                  stars = json.result.starlevel;
+                  avatar = json.result.computed.avatar;
+                  avatarStatic = json.result.computed.avatarstatic;
+                  animatedAvatars = json.result.computed.options.animatedAvatars.value;
+                  stars = json.result.computed.leveltitle;
+                  level = json.result.computed.level;
                   staffChat = json.result.permissions.staffchat;
                   globalChat = json.result.permissions.chatany;
                   chatControl = json.result.permissions.chatcontrol;
                   chatControlExtended = json.result.permissions.chatcontrolextended;
-                  bannedUntil = DateExtensions.FromUnixTime((double)json.result.banneduntil);
+                  bannedUntil = DateExtensions.FromUnixTime((double)json.result.computed.banneduntil);
                   joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
-                  language = json.result.language;
-                  banReason = json.result.banreason;
-                  shadowBanned = (json.result.rng % 3) == 0;
+                  language = json.result.computed.language;
+                  banReason = json.result.computed.banreason;
+                  shadowBanned = json.result.computed.shadowbanned; //((int)json.result.rng % 3) == 0;
+                  badges = json.result.computed.displayedbadges.ToObject<List<Badge>>();
                }
             }
          }
-         catch
+         catch(WebException ex)
+         {
+            Log("Couldn't pull user information: " + ex, LogLevel.Debug);
+            warnings.Add("Couldn't contact webserver for your information. Server isn't responding");
+         }
+         catch(Exception ex)
          {
             //Try to pull out some warnings if we can. Otherwise just say a generic "we failed"
             try
             {
+               Log("Couldn't parse user JSON: " + ex, LogLevel.Warning);
+               Log("URL used: " + url);
+               Log("Result: " + htmlCode);
                warnings = json.warnings.ToObject<List<string>>();
             }
-            catch
+            catch(Exception ex2)
             {
-               warnings.Add("Couldn't contact webserver for your information. Server may be down");
+               warnings.Add("Website is producing garbage. The query backend is failing!");
+               Log("Completely malformed json: " + htmlCode + " (" + ex2 + ")", LogLevel.Warning);
             }
 
             return false;
@@ -691,6 +789,11 @@ namespace ChatEssentials
             points = 0;
          
          return UpdateSpam(points);
+      }
+
+      public ChatTags DirectSpam(double percentage)
+      {
+         return UpdateSpam(percentage * BanSpamScore);
       }
 
       public ChatTags MessageSpam(List<UserMessageJSONObject> messages, string current)
@@ -744,7 +847,7 @@ namespace ChatEssentials
             if (AutomaticBlocking)
             {
                //Block if spam score is too high
-               if (RealSpamScore >= 100)
+               if (RealSpamScore >= BanSpamScore)
                {
                   RealSpamScore = 0;   //Just reset spamscore; they're blocked anyway.
                   GlobalSpamScore++;

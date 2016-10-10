@@ -4,21 +4,33 @@ using System.Collections.Generic;
 using ChatEssentials;
 using System.Text.RegularExpressions;
 using System.Net;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace ChatServer
 {
-   public class AdminModule : Module
+   public class SneakyModule : Module
    {
-      public AdminModule()
+      //public Dictionary<int, 
+      public SneakyModule()
       {
-         Commands.Add(new ModuleCommand("uptonogood", new List<CommandArgument>(), "Toggle the admin hidden state"));
+         Commands.Add(new ModuleCommand("uptonogood", new List<CommandArgument>(), "Toggle the hidden state", true));
       }
 
-      public override bool Hidden(UserInfo user)
+      /*public override bool Hidden(UserInfo user)
       {
          return !(user.ChatControl || user.ChatControlExtended);
+      }*/
+
+      public static void UnhideUser(int uid)
+      {
+         User thisRealUser = ChatRunner.Server.GetUser(uid);
+         thisRealUser.Hiding = false;
+         thisRealUser.LastJoin = DateTime.Now;
+         ChatRunner.Server.BroadcastUserList();
+         ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), 
+               new SystemMessageJSONObject());
       }
 
       public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
@@ -27,8 +39,8 @@ namespace ChatServer
 
          if (command.Command == "uptonogood")
          {
-            if (!user.ChatControl)
-               return FastMessage("This command doesn't *AHEM* exist");
+            /*if (!user.ChatControl)
+               return FastMessage("This command doesn't *AHEM* exist");*/
 
             thisRealUser.Hiding = !thisRealUser.Hiding;
 
@@ -41,9 +53,10 @@ namespace ChatServer
             }
             else
             {
-               thisRealUser.LastJoin = DateTime.Now;
+               UnhideUser(user.UID);
+               /*thisRealUser.LastJoin = DateTime.Now;
                ChatRunner.Server.BroadcastUserList();
-               ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), new SystemMessageJSONObject());
+               ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), new SystemMessageJSONObject());*/
 
                return FastMessage("You've come out of hiding.");
             }
@@ -53,6 +66,73 @@ namespace ChatServer
       }
    }
 
+   public class AdminModule : Module
+   {
+      //public Dictionary<int, 
+      public AdminModule()
+      {
+         Commands.Add(new ModuleCommand("showhiding", new List<CommandArgument>(), "See sneaks"));
+         Commands.Add(new ModuleCommand("expose", new List<CommandArgument>() { 
+            new CommandArgument("user", ArgumentType.User) }, "Kick a user out from hiding"));
+         //Commands.Add(new ModuleCommand("expose", new List<CommandArgument>(), "See sneaks", true));
+      }
+
+      //Ugh hidden returns false IF the user CAN'T view it.
+      public override bool Hidden(UserInfo user)
+      {
+         return !(user.ChatControl || user.ChatControlExtended);
+      }
+
+      public List<User> GetHidingUsers(Dictionary<int, UserInfo> users)
+      {
+         List<User> hidingUsers = new List<User>();
+
+         foreach(User hidingUser in users.Select(
+                  x => ChatRunner.Server.GetUser(x.Value.UID)).Where(x => x.Hiding).ToList())
+         {
+            hidingUser.Hiding = false;
+
+            if (hidingUser.OpenSessionCount > 0)
+               hidingUsers.Add(hidingUser);
+
+            hidingUser.Hiding = true;
+         }
+
+         return hidingUsers;
+      }
+
+      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      {
+         string output = "";
+         UserInfo parsedUser = null;
+
+         if (command.Command == "showhiding")
+         {
+            if (!user.ChatControlExtended)
+               return FastMessage("This command doesn't *AHEM* exist");
+
+            output = "Users that are hiding:\n" + String.Join("\n", GetHidingUsers(users).Select(x => x.Username));
+
+            return FastMessage(output);
+         }
+         else if (command.Command == "expose")
+         {
+            if (!user.ChatControlExtended)
+               return FastMessage("This command doesn't *AHEM* exist");
+
+            //This should eventually use AddError instead.
+            if(!GetUserFromArgument(command.Arguments[0], users, out parsedUser))
+               return FastMessage("Something weird happened in the backend during user parse!", true); 
+            else if (!GetHidingUsers(users).Any(x => x.UID == parsedUser.UID))
+               return FastMessage(parsedUser.Username + " isn't hiding!", true);
+
+            SneakyModule.UnhideUser(parsedUser.UID);
+            return FastMessage("You forced " + parsedUser.Username + " out of hiding!");
+         }
+
+         return new List<JSONObject>();
+      }
+   }
    /*public class AdminModule : Module
    {
       public AdminModule()

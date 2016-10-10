@@ -23,9 +23,10 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.4.3";
+      public const string Version = "2.6.1";
 
       private static AuthServer authServer;
+      private static ConnectionCacheServer proxyServer = null;
       private static MyExtensions.Logging.Logger logger;
       private static ModuleLoader loader;
       private static ChatServer chatServer = null;
@@ -109,6 +110,7 @@ namespace ChatServer
          if(!languageTags.InitFromURL(GetOption<string>("website") + GetOption<string>("languageURL")))
             logger.Warning("Couldn't load language tags! Hopefully the default will suffice");
 
+         settings.MaxUserQueryFailures = GetOption<int>("maxUserQueryFailures");
          settings.MaxMessageKeep = GetOption<int>("messageBacklog");
          settings.MaxMessageSend = GetOption<int>("messageSend");
          settings.MaxModuleWait = TimeSpan.FromSeconds(GetOption<int>("moduleWaitSeconds"));
@@ -190,11 +192,14 @@ namespace ChatServer
                { "spamBlockSeconds", 20 },
                { "buildHourModifier", -4 },
                { "website", "http://development.smilebasicsource.com" },
+               { "chatrequest", "GUID" },
                { "shutdownSeconds", 5 },
                { "saveFolder", "save" },
                { "saveInterval", 300 },
                { "cleanInterval", 5 },
                { "moduleWaitSeconds", 5 },
+               { "maxQueryWaitSeconds", 1.0 },
+               { "maxUserQueryFailures", 3 },
                { "fakeAuthentication", false },
                { "consoleLogLevel", "Normal" },
                { "fileLogLevel", "Debug" },
@@ -207,7 +212,9 @@ namespace ChatServer
                { "ircChannel", "#smilebasic" },
                { "ircTag", "general" },
                { "threadpoolMultiplier" , 4.0 },
-               { "connectionpoolMultiplier", 2.0 }
+               { "connectionpoolMultiplier", 2.0 },
+               { "staticChatProxy", false },
+               { "staticChatProxyPort", 45691 }
             };
                
             //Set up and read options. We need to do this first so that the values can be used for init
@@ -246,6 +253,7 @@ namespace ChatServer
 
             logger.Log("ChatServer v" + Version + ", built on " + MyBuildDate().ToString(), LogTag);
             logger.Log("WebSocket Library v" + ChatServer.Version, LogTag);
+            logger.Log("Extension Library v" + MyExtensions.MyExtensionsData.Version, LogTag);
 
             int workerThreads, ioThreads;
             ThreadPool.SetMaxThreads((int)Math.Ceiling(Environment.ProcessorCount * GetOption<double>("threadpoolMultiplier")), 
@@ -255,7 +263,8 @@ namespace ChatServer
 
             //Set up the module system
             loader = new ModuleLoader(logger);
-            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule), typeof(DebugModule), typeof(PmModule), typeof(AdminModule) };
+            List<Type> extraModules = new List<Type>(){ typeof(GlobalModule), typeof(DebugModule), 
+               typeof(PmModule), typeof(SneakyModule), typeof(AdminModule) };
 
             //Oops, couldn't load the modules. What the heck?
             if (!loader.Setup(ModuleConfigFile, extraModules))
@@ -284,12 +293,31 @@ namespace ChatServer
             }
 
             //Also set user parameters
-            User.SetUserParameters(GetOption<int>("spamBlockSeconds"), GetOption<int>("inactiveMinutes"),
+            User.SetUserParameters(logger, GetOption<int>("spamBlockSeconds"), GetOption<int>("inactiveMinutes"),
                GetOption<string>("website"), GetOption<bool>("automaticBlocking"), 
-               GetOption<int>("policyReminderHours"));
+               GetOption<int>("policyReminderHours"), GetOption<double>("maxQueryWaitSeconds"),
+               GetOption<string>("chatrequest"));
 
             //This starts up the server!
             SetupChatManager();
+
+            if(GetOption<bool>("staticChatProxy"))
+            {
+               logger.LogGeneral("Chat proxy enabled: setting up", MyExtensions.Logging.LogLevel.Debug, LogTag);
+               proxyServer = new ConnectionCacheServer(GetOption<int>("staticChatProxyPort"), 
+                  "ws://127.0.0.1:" + chatServer.ChatSettings.Port + "/chatserver", logger);
+
+               if(!proxyServer.Start())
+               {
+                  logger.LogGeneral("Proxy server could not be started!", MyExtensions.Logging.LogLevel.FatalError, LogTag);
+                  Finish("Fatal error. Exiting");
+                  return;
+               }
+               else
+               {
+                  logger.Log("Proxy server running on port " + proxyServer.Port, LogTag);
+               }
+            }
 
             int ShutdownSeconds = GetOption<int>("shutdownSeconds");
             Console.WriteLine(">> Press Q to nicely quit the server...");
@@ -422,6 +450,11 @@ namespace ChatServer
          {
             logger.Log("Stopping auth server...", LogTag);
             authServer.Stop();
+         }
+         if (proxyServer != null)
+         {
+            logger.Log("Stopping proxy server...", LogTag);
+            proxyServer.Stop();
          }
          if (chatServer != null)
          {
