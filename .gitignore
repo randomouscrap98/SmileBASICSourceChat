@@ -6,6 +6,9 @@
 !modules/
 !ChatServer/
 !ChatServer/*
+!ChatServer/**
 !ChatServer/makefile
 !old/
 *.mdb
+bin
+obj
