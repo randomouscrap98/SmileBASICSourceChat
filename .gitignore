@@ -10,5 +10,6 @@
 !ChatServer/makefile
 !old/
 *.mdb
+.fuse*
 bin
 obj
