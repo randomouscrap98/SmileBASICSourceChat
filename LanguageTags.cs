@@ -221,7 +221,7 @@ namespace ChatEssentials
       public readonly ChatTags Tag;
       public readonly Dictionary<ChatReplaceables, string> Replacements;
       private UserInfo user;
-      private UserInfo sendingUser;
+      private User sendingUser;
 
       public LanguageTagParameters(ChatTags tag, User user, User userForDictionary = null)
       {
@@ -230,7 +230,8 @@ namespace ChatEssentials
 
          Tag = tag;
          this.user = new UserInfo(user, true);
-         this.sendingUser = new UserInfo(user, true);
+         this.sendingUser = user;
+         //this.sendingUser = new UserInfo(user, true);
          Replacements = LanguageTags.QuickDictionary(new UserInfo(userForDictionary, true));
       }
 
@@ -250,6 +251,11 @@ namespace ChatEssentials
       }
 
       public UserInfo SendingUser
+      {
+         get { return new UserInfo(sendingUser, true); }
+      }
+
+      public User RawSendingUser
       {
          get { return sendingUser; }
       }

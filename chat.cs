@@ -314,6 +314,7 @@ namespace ChatServer
          catch
          {
             response.errors.Add("Could not parse JSON");
+            response.errors.Add("Given string: " + rawMessage);
          }
 
          //If we got a bind message, let's try to authorize this channel.

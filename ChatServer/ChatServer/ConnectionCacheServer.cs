@@ -58,7 +58,7 @@ namespace ChatServer
 
          lock(connectionLock)
          {
-            endedConnections = connections.Where(x => x.Value.TimeSinceLastFlush > TimeSpan.FromMinutes(1));
+            endedConnections = connections.Where(x => x.Value.TimeSinceLastRequest > TimeSpan.FromMinutes(1));
          }
 
          //Because I don't trust the websocket library, I do NOT close inside a lock. NO WAY.
@@ -93,10 +93,20 @@ namespace ChatServer
       private void WriteResultToStream(ProxyResult result, ref NetworkStream stream)
       {
          //First, serialize result. Then convert to bytes. Finally write.
-         string serializedResult = JsonConvert.SerializeObject(result);
-         byte[] resultData = System.Text.Encoding.UTF8.GetBytes(serializedResult);
-         stream.Write(resultData, 0, resultData.Length);
+         WriteToStream(JsonConvert.SerializeObject(result), ref stream);
          //Log("Result length: " + resultData.Length + ", Serialized: " + serializedResult, LogLevel.SuperDebug);
+      }
+
+      /// <summary>
+      /// Write the given string data to the given stream. It is assumed that the stream
+      /// is the PHP proxy page (for our system)
+      /// </summary>
+      /// <param name="data">The string to write</param>
+      /// <param name="stream">The stream to write it to.</param>
+      private void WriteToStream(string data, ref NetworkStream stream)
+      {
+         byte[] resultData = System.Text.Encoding.UTF8.GetBytes(data);
+         stream.Write(resultData, 0, resultData.Length);
       }
 
       /// <summary>
@@ -181,7 +191,9 @@ namespace ChatServer
             {
                if(connectionCached)
                {
-                  WriteResultToStream(GetErrorResult("You have already started a proxy session with this id"), ref stream);
+                  ProxyResult result = new ProxyResult(-1);
+                  result.warnings.Add("You have already started a proxy session with this id");
+                  WriteResultToStream(result, ref stream);
                   Log("Tried to start proxy connection when connection already started. ID: " + id);
                }
                else
@@ -211,13 +223,14 @@ namespace ChatServer
                   {
                      string encoding = "text";
 
-                     try
-                     {
-                        encoding = json.encoding;
+                     try 
+                     { 
+                        encoding = json.encoding; 
                      }
-                     catch
-                     {
-                        encoding = "text";
+                     catch 
+                     { 
+                        encoding = "text"; 
+                        Log("proxySend did not pass an encoding. Assuming 'text'", LogLevel.SuperDebug);
                      }
 
                      string chatData = json.data;
@@ -234,8 +247,86 @@ namespace ChatServer
                   }
                   else if (type == "proxyReceive")
                   {
-                     List<string> backlog = AtomicAction<List<string>>(() => connections[id].FlushInboundBacklog());
-                     WriteResultToStream(new ProxyResult(backlog), ref stream);
+                     long lastRetrieveTicks = -1;
+
+                     try 
+                     { 
+                        lastRetrieveTicks = json.lastretrieve; 
+                     }
+                     catch 
+                     { 
+                        lastRetrieveTicks = -1; 
+                        Log("proxyReceive did not pass a lastretrieve. Assuming -1 (get all + flush)", LogLevel.SuperDebug);
+                     }
+
+                     //If they're using the new system where you can give the
+                     //tick count of the last message retrieved, do so.
+                     //Otherwise, do the old flushing system.
+                     if (lastRetrieveTicks >= 0)
+                     {
+                        SpecialRetrieve backlog = AtomicAction<SpecialRetrieve>(() => 
+                           {
+                              //Retrieve any messages since the APPARENT last retrieval time. Also store 
+                              //the current retrieval time in case no messages are retrieved
+                              DateTime messageRetrievalTime = DateTime.Now;
+                              List<Tuple<string,DateTime>> messages = 
+                                 connections[id].GetInboundBacklogSince(new DateTime(lastRetrieveTicks));
+
+                              //Get rid of any old messages (older than 10 minutes)
+                              connections[id].FlushInboundBacklogBefore(DateTime.Now.AddMinutes(-10));
+
+                              return new SpecialRetrieve 
+                              { 
+                                 messages = messages.Select(x => x.Item1).ToList(), 
+                                 lastretrieve = messages.Count > 0 ? 
+                                    messages.Max(x => x.Item2.Ticks) : messageRetrievalTime.Ticks
+                              };
+                           });
+                        WriteResultToStream(new ProxyResult(backlog), ref stream);
+                     }
+                     else
+                     {
+                        List<string> backlog = AtomicAction<List<string>>(() => 
+                           {
+                              List<Tuple<string,DateTime>> messages = 
+                                 connections[id].GetInboundBacklogSince(new DateTime(0));
+                              connections[id].FlushInboundBacklogBefore(DateTime.Now);
+                              return messages.Select(x => x.Item1).ToList();
+                           });
+                        WriteResultToStream(new ProxyResult(backlog), ref stream);
+                     }
+
+                  }
+                  else if (type == "proxyEventStream")
+                  {
+                     TimeSpan desiredBacklogRange; //= TimeSpan.FromMinutes(1);
+
+                     try 
+                     { 
+                        desiredBacklogRange = TimeSpan.FromMilliseconds((int)json.backlog); 
+                     }
+                     catch 
+                     { 
+                        desiredBacklogRange = TimeSpan.FromMinutes(1); 
+                        Log("proxyEventStream did not pass a desired backlog. Assuming 60000 (1 minute)", LogLevel.SuperDebug);
+                     }
+
+                     List<Tuple<string,DateTime>> backlog = AtomicAction<List<Tuple<string,DateTime>>>(() =>
+                        {
+                           connections[id].FlushInboundBacklogBefore(DateTime.Now.AddMinutes(-10));
+                           return connections[id].GetInboundBacklogSince(DateTime.Now.Subtract(desiredBacklogRange));
+                        });
+
+                     StringBuilder output = new StringBuilder("retry: 200\n");
+
+                     foreach(Tuple<string,DateTime> messageData in backlog)
+                     {
+                        output.AppendFormat("id: {0}\n", messageData.Item2.Ticks);
+                        output.AppendFormat("data: {0}\n\n", 
+                              Convert.ToBase64String(Encoding.UTF8.GetBytes(messageData.Item1)));
+                     }
+
+                     WriteToStream(output.ToString(), ref stream);
                   }
                   else if (type == "proxyEnd")
                   {
@@ -270,6 +361,7 @@ namespace ChatServer
    {
       public object result = true;
       public List<string> errors = new List<string>();
+      public List<string> warnings = new List<string>();
 
       public ProxyResult() { }
 
@@ -277,6 +369,12 @@ namespace ChatServer
       {
          this.result = result;
       }
+   }
+
+   public class SpecialRetrieve
+   {
+      public List<string> messages = new List<string>();
+      public long lastretrieve = 0;
    }
 
    public class WebSocketInstance
@@ -291,28 +389,28 @@ namespace ChatServer
          get { return connected; }
       }
 
-      public DateTime LastFlush
+      public DateTime LastRequest
       {
-         get { return lastFlush; }
+         get { return lastRequest; }
       }
 
-      public TimeSpan TimeSinceLastFlush
+      public TimeSpan TimeSinceLastRequest
       {
-         get { return (DateTime.Now - LastFlush); }
+         get { return (DateTime.Now - lastRequest); }
       }
 
       private WebSocketSharp.WebSocket connection;
-      private List<string> backlog;
+      private List<Tuple<string,DateTime>> backlog;
       private bool connected;
       private MyExtensions.Logging.Logger logger;
       private readonly object instanceLock;
-      private DateTime lastFlush = DateTime.Now;
+      private DateTime lastRequest = DateTime.Now;
 
       public WebSocketInstance(string url, MyExtensions.Logging.Logger logger)
       {
          this.logger = logger;
          instanceLock = new object();
-         backlog = new List<string>();
+         backlog = new List<Tuple<string,DateTime>>();
          connected = true;
          connection = new WebSocketSharp.WebSocket(url);
          connection.OnMessage += OnMessage;
@@ -324,25 +422,32 @@ namespace ChatServer
          logger.LogGeneral(message, level, "WebSocketInstance");
       }
 
-      public List<string> FlushInboundBacklog()
+      public List<Tuple<string,DateTime>> GetInboundBacklogSince(DateTime lastCheck)
       {
-         List<string> returnList;
-         lastFlush = DateTime.Now;
+         List<Tuple<string,DateTime>> returnList;
+         lastRequest = DateTime.Now;
 
          lock (instanceLock)
          {
-            returnList = new List<string>(backlog);
-            backlog.Clear();
+            returnList = backlog.Where(x => x.Item2 > lastCheck).ToList(); 
          }
 
          return returnList;
+      }
+
+      public void FlushInboundBacklogBefore(DateTime endTime)
+      {
+         lock (instanceLock)
+         {
+            backlog = backlog.Where(x => x.Item2 > endTime).ToList();
+         }
       }
 
       public void OnMessage(object sender, WebSocketSharp.MessageEventArgs messageEvent)
       {
          lock(instanceLock)
          {
-            backlog.Add(messageEvent.Data);
+            backlog.Add(Tuple.Create(messageEvent.Data, DateTime.Now));
          }
       }
 

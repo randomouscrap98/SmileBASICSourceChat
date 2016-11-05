@@ -551,7 +551,7 @@ the actions of any user within the chat.".Replace("\n", " ");
             {
                rooms[room].Users.Remove(user);
 
-               if (rooms[room].Users.Count < 2)
+               if (rooms[room].Users.Count < 1)
                   rooms.Remove(room);
 
                result = true;
@@ -575,7 +575,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          {
             Log("Enter createpmroom lock", MyExtensions.Logging.LogLevel.Locks);
 
-            if (newUsers.Count < 2)
+            if (newUsers.Count < 1)
             {
                error = "There's not enough people to make the room";
             }
@@ -943,7 +943,10 @@ the actions of any user within the chat.".Replace("\n", " ");
          foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x).Except(exclude))
          {
             parameters.UpdateUser(chatter.ThisUser);  //Update the message to reflect user preferences
-            chatter.MySend(parameters, container);    //Send a tag message by filling the container with the tag parameters
+
+            //Send a tag message by filling the container with the tag parameters
+            if(!parameters.RawSendingUser.ShadowBanned || parameters.RawSendingUser.UID == chatter.ThisUser.UID)
+               chatter.MySend(parameters, container);    
          }
          Log("Just after tag broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
       }

@@ -716,20 +716,16 @@ namespace ChatEssentials
          {
             using (TimedWebClient client = new TimedWebClient())
             {
+               client.Headers.Add("CF-Connecting-IP", "127.0.0.1");
                client.Timeout = QueryUserTimeout; 
                htmlCode = client.DownloadString(url);
                json = JsonConvert.DeserializeObject(htmlCode);
 
                lock(Lock)
                {
-                  /*Console.WriteLine("Website: " + url);
-                  Console.WriteLine("RNG: " + json.result.rng);
-                  Console.WriteLine("RNG type: " +
-                  json.result.rng.GetType());*/
                   username = json.result.username;
                   avatar = json.result.computed.avatar;
                   avatarStatic = json.result.computed.avatarstatic;
-                  animatedAvatars = json.result.computed.options.animatedAvatars.value;
                   stars = json.result.computed.leveltitle;
                   level = json.result.computed.level;
                   staffChat = json.result.permissions.staffchat;
@@ -740,10 +736,22 @@ namespace ChatEssentials
                   joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
                   language = json.result.computed.language;
                   banReason = json.result.computed.banreason;
-                  shadowBanned = json.result.computed.shadowbanned; //((int)json.result.rng % 3) == 0;
                   badges = json.result.computed.displayedbadges.ToObject<List<Badge>>();
+                  try
+                  {
+                     shadowBanned = json.result.computed.shadowbanned; //((int)json.result.rng % 3) == 0;
+                     animatedAvatars = json.result.computed.options.animatedAvatars.value;
+                  }
+                  catch
+                  {
+                     shadowBanned = false;
+                     animatedAvatars = true;
+                     Log("Missing chatrequest GUID. Hidden user info not pulled", LogLevel.Warning);
+                  }
                }
             }
+
+            return true;
          }
          catch(WebException ex)
          {
@@ -765,11 +773,9 @@ namespace ChatEssentials
                warnings.Add("Website is producing garbage. The query backend is failing!");
                Log("Completely malformed json: " + htmlCode + " (" + ex2 + ")", LogLevel.Warning);
             }
-
-            return false;
          }
 
-         return true;
+         return false;
       }
 
       public ChatTags JoinSpam()

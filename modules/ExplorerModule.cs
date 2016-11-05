@@ -210,13 +210,27 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
 
 		public override bool LoadFiles()
 		{
-         return MySerialize.LoadObject<List<WorldInstance>>(WorldFile, out worlds) && 
+         try
+         {
+            worlds = MySerialize2.LoadObject<List<WorldInstance>>(WorldFile);
+            allPlayers = MySerialize2.LoadObject<Dictionary<int, ExplorerPlayer>>(PlayerFile);
+            WorldInstance.nextWorldID = MySerialize2.LoadObject<int>(WorldIDFile);
+            return true;
+         }
+         catch(Exception Ex)
+         {
+            return false;
+         }
+         /*return MySerialize.LoadObject<List<WorldInstance>>(WorldFile, out worlds) && 
 				MySerialize.LoadObject<Dictionary<int, ExplorerPlayer>>(PlayerFile, out allPlayers) &&
-				MySerialize.LoadObject<int>(WorldIDFile, out WorldInstance.nextWorldID);
+				MySerialize.LoadObject<int>(WorldIDFile, out WorldInstance.nextWorldID);*/
 		}
 		public override bool SaveFiles()
 		{
 			bool success = false;
+         var exFiles = new List<string>{ WorldFile, PlayerFile, WorldIDFile };
+         var backupFiles = exFiles.Select(x => x + ".bak").ToList();
+
 			Stopwatch totalTimer = new Stopwatch();
 			totalTimer.Start();
 
@@ -242,13 +256,53 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
 				});
 
 				//Next, start on the serialization
-				Thread thread = new Thread(x =>
+				Thread thread = new Thread(() =>
 				{
 					Stopwatch fileTimer = new Stopwatch();
 					fileTimer.Start();
-					success = MySerialize.SaveObject<List<WorldInstance>>(WorldFile, worlds) &&
+
+               //Copy original files to backup files.
+               try
+               {
+                  for(int i = 0; i < exFiles.Count; i++)
+                  {
+                     if(File.Exists(exFiles[i]))
+                        File.Copy(exFiles[i], backupFiles[i], true);
+                  }
+
+                  //Now attempt to serialize everything.
+                  MySerialize2.SaveObject<List<WorldInstance>>(WorldFile, worlds);
+                  MySerialize2.SaveObject<Dictionary<int, ExplorerPlayer>>(PlayerFile, allPlayers);
+                  MySerialize2.SaveObject<int>(WorldIDFile, WorldInstance.nextWorldID);
+
+                  //After serializing, MAKE SURE WE CAN STILL LOAD IT~!
+                  var tempworlds = MySerialize2.LoadObject<List<WorldInstance>>(WorldFile);
+                  var tempallPlayers = MySerialize2.LoadObject<Dictionary<int, ExplorerPlayer>>(PlayerFile);
+                  var tempWorldID = MySerialize2.LoadObject<int>(WorldIDFile);
+                  /*success = MySerialize.SaveObject<List<WorldInstance>>(WorldFile, worlds) &&
                   MySerialize.SaveObject<Dictionary<int, ExplorerPlayer>>(PlayerFile, allPlayers) &&
-                  MySerialize.SaveObject<int>(WorldIDFile, WorldInstance.nextWorldID);
+                  MySerialize.SaveObject<int>(WorldIDFile, WorldInstance.nextWorldID);*/
+               }
+               catch(Exception ex)
+               {
+                  try
+                  {
+                     //Restore the backups (since we're assuming those worked)
+                     for(int i = 0; i < backupFiles.Count; i++)
+                     {
+                        if(File.Exists(backupFiles[i]))
+                           File.Copy(backupFiles[i], exFiles[i], true);
+                     }
+                  }
+                  catch(Exception ex2)
+                  {
+                     //DO SOMETHING WITH THE EXCEPTION HERE!
+                     Console.WriteLine("EXTREME EXGAME ERROR! COULD NOT RESTORE BACKUPS AFTER FAILED WRITES!");
+                  }
+
+                  success = false;
+               }
+
 					fileTimer.Stop();
 
 					lock (ProfileLocker)
@@ -258,8 +312,8 @@ torch beforehand.").Replace("\n", " ").Replace("@^", "\n");
 				});
 
 				thread.Start();
-
             Directory.CreateDirectory(GetOption<string>("mapFolder"));
+
 				//While we're serializing, we can also produce the images
 				Parallel.ForEach(worlds.Where(x => x.CanPlay), world =>
 				{

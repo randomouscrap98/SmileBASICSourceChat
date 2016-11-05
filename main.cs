@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.6.1";
+      public const string Version = "2.6.2";
 
       private static AuthServer authServer;
       private static ConnectionCacheServer proxyServer = null;
