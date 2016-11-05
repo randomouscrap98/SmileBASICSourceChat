@@ -1,6 +1,7 @@
 *
 !.gitignore
 !*.cs
+!*.csproj
 !*.dll
 !modules/
 !ChatServer/
