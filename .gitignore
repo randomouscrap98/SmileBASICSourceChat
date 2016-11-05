@@ -4,5 +4,6 @@
 !*.dll
 !modules/
 !ChatServer/
+!ChatServer/makefile
 !old/
 *.mdb
