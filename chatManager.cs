@@ -522,6 +522,23 @@ the actions of any user within the chat.".Replace("\n", " ");
          }
       }
 
+      public List<UserInfo> UsersInPMRoom(string room)
+      {
+         lock(managerLock)
+         {
+            List<UserInfo> pmUsers = new List<UserInfo>();
+
+            if(rooms.ContainsKey(room))
+            {
+               var loggedInUsers = LoggedInUsers();
+               pmUsers = rooms[room].Users.Select(x => 
+                     new UserInfo(users[x], loggedInUsers.ContainsKey(x))).ToList();
+            }
+
+            return pmUsers;
+         }
+      }
+
       public bool LeavePMRoom(int user, string room, out string error)
       {
          error = "";
@@ -860,7 +877,7 @@ the actions of any user within the chat.".Replace("\n", " ");
       }
 
       //Get a JSON string representing a list of users currently in chat.
-      public string ChatUserList(int caller)
+      public string ChatUserList(int caller, bool minimalData = true)
       {
          UserListJSONObject userList = new UserListJSONObject();
 
@@ -887,13 +904,25 @@ the actions of any user within the chat.".Replace("\n", " ");
                foreach(RoomUserJSONObject user in userList.rooms.SelectMany(x => x.users))
                   user.avatar = GetUser(user.uid).AvatarStatic;
             }
+
+            if(minimalData)
+            {
+               foreach(UserJSONObject user in userList.users)
+                  user.badges = new List<Badge>();
+            }
          }
          return userList.ToString();
       }
 
       //Get a JSON string representing a list of the last X messages
-      public string ChatMessageList(int user, int messageCount = 2)
+      public string ChatMessageList(int user, int messageCount = 2,
+            IEnumerable<string> desiredTags = null, bool minimalData = true)
       {
+         if(desiredTags == null)
+            desiredTags = AllAcceptedTagsForUser(user);
+         else
+            desiredTags = desiredTags.Intersect(AllAcceptedTagsForUser(user));
+
          MessageListJSONObject jsonMessages = new MessageListJSONObject();
 
          //This may change to a legacy number, like 10
@@ -903,7 +932,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          lock (managerLock)
          {
             jsonMessages.messages = history
-               .Where(x => AllAcceptedTagsForUser(user).Contains(x.Key))
+               .Where(x => desiredTags.Contains(x.Key))
                .SelectMany(x => x.Value.Take(messageCount))
                .Where(x => users.ContainsKey(x.uid) && 
                   (!users[x.uid].ShadowBanned || x.uid == user))
@@ -913,8 +942,14 @@ the actions of any user within the chat.".Replace("\n", " ");
 
             //A HORRIBLE hack! This will make the avatars bounce back and forth!
             foreach(UserMessageJSONObject message in jsonMessages.messages)
+            {
                message.avatar = animatedAvatars ? GetUser(message.uid).Avatar : GetUser(message.uid).AvatarStatic;
+               if(minimalData) message.badges = new List<Badge>();
+            }
          }
+
+         if(jsonMessages.messages.Count == 0)
+            return null;
 
          return jsonMessages.ToString();
       }
@@ -960,15 +995,15 @@ the actions of any user within the chat.".Replace("\n", " ");
       {
          Log("Just before userlist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
          foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x))
-            chatter.MySend(ChatUserList(chatter.UID));
+            chatter.MySend(ChatUserList(chatter.UID, chatter.MinimalData));
          Log("Just after userlist broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
       }
 
-      public void BroadcastMessageList()
+      public void BroadcastMessageList(IEnumerable<string> desiredTags = null)
       {
          Log("Just before messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
          foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x))
-            chatter.MySend(ChatMessageList(chatter.UID));
+            chatter.MySend(ChatMessageList(chatter.UID, 2, desiredTags, chatter.MinimalData));
          Log("Just after messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
       }
 

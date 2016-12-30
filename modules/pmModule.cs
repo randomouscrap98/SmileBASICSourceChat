@@ -20,7 +20,10 @@ namespace ChatServer
             }, "Create a room for the given users (you're always included)", true),
             new ModuleCommand("pmleaveroom", new List<CommandArgument>{
                /*new CommandArgument("room", ArgumentType.User, RepeatType.OneOrMore)*/
-            }, "Leave a room (you must be in the room to leave it)")
+            }, "Leave a room (you must be in the room to leave it)"),
+            new ModuleCommand("pmuserlist", new List<CommandArgument>{
+               /*new CommandArgument("room", ArgumentType.User, RepeatType.OneOrMore)*/
+            }, "List users in the current room")
          });
       }
 
@@ -95,6 +98,22 @@ namespace ChatServer
                   output.message = "You left this PM room";
                   outputs.Add(output);
                }
+               break;
+
+            case "pmuserlist":
+               List<UserInfo> pmUsers = ChatRunner.Server.UsersInPMRoom(command.tag);
+
+               if(pmUsers.Count == 0)
+               {
+                  output.message = "You're not in a PM room!";
+               }
+               else
+               {
+                  output.message = "Users in " + command.tag + ": " + 
+                     String.Join(", ", pmUsers.Select(x => x.Username));
+               }
+
+               outputs.Add(output);
                break;
          }
 

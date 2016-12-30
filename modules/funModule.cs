@@ -14,6 +14,9 @@ namespace ModulePackage1
          Commands.Add(new ModuleCommand("me", new List<CommandArgument> { 
             new CommandArgument("message", ArgumentType.FullString)
          }, "be silly", true));
+         Commands.Add(new ModuleCommand("code", new List<CommandArgument> { 
+            new CommandArgument("message", ArgumentType.FullString)
+         }, "output formatted code", true));
          Commands.Add(new ModuleCommand("emotes", new List<CommandArgument>(), "See all available emotes"));
 
          AddOptions(new Dictionary<string, object>{{"emoteLink", "http://development.smilebasicsource.com/emotes.json"}});
@@ -32,6 +35,13 @@ namespace ModulePackage1
                moduleOutput.message = user.Username + " " + command.Arguments[0]; //System.Security.SecurityElement.Escape(command.Arguments[0]);
                moduleOutput.tag = command.tag;
                outputs.Add(moduleOutput);
+               break;
+
+            case "code":
+               UserMessageJSONObject codeMesssage = new UserMessageJSONObject(user, 
+                     System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
+               codeMesssage.encoding = "code";
+               outputs.Add(codeMesssage);
                break;
 
             case "emotes":

@@ -72,6 +72,9 @@ namespace ChatServer
       public AdminModule()
       {
          Commands.Add(new ModuleCommand("showhiding", new List<CommandArgument>(), "See sneaks"));
+         Commands.Add(new ModuleCommand("badmin", new List<CommandArgument>() {
+            new CommandArgument("message", ArgumentType.FullString) 
+         }, "Output direct messages with no safety precautions"));
          Commands.Add(new ModuleCommand("expose", new List<CommandArgument>() { 
             new CommandArgument("user", ArgumentType.User) }, "Kick a user out from hiding"));
          //Commands.Add(new ModuleCommand("expose", new List<CommandArgument>(), "See sneaks", true));
@@ -128,6 +131,16 @@ namespace ChatServer
 
             SneakyModule.UnhideUser(parsedUser.UID);
             return FastMessage("You forced " + parsedUser.Username + " out of hiding!");
+         }
+         else if (command.Command == "badmin")
+         {
+            if (!user.ChatControlExtended)
+               return FastMessage("This command doesn't *AHEM* exist");
+
+            UserMessageJSONObject directMessage = 
+               new UserMessageJSONObject(user, command.Arguments[0], command.tag);
+
+            return new List<JSONObject>() {directMessage};
          }
 
          return new List<JSONObject>();

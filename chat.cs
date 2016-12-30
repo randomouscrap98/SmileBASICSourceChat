@@ -25,6 +25,7 @@ namespace ChatServer
       private int queryFailures = 0;
       private long sessionID = 0;
       private string lastAvatar = "";
+      private bool minimalData = true;
       private DateTime lastBan = new DateTime(0);
 
       public readonly DateTime Startup = DateTime.Now;
@@ -111,6 +112,11 @@ namespace ChatServer
          {
             return ThisUser.Username + " (" + ThisUser.UID + ")";
          }
+      }
+
+      public bool MinimalData
+      {
+         get { return minimalData; }
       }
 
       public void MySend(string message, bool forceSend = false)
@@ -332,6 +338,9 @@ namespace ChatServer
                   //the json is invalid, it will fail as soon as possible
                   string key = (string)json.key;
                   int newUser = (int)json.uid;
+
+                  try { minimalData = (bool)json.lessData; }
+                  catch { minimalData = true; }
 
                   //Oops, username was invalid
                   if (newUser <= 0)
@@ -656,7 +665,7 @@ namespace ChatServer
 
                   //Since we added a new message, we need to broadcast.
                   if (response.result && userMessage.Display)
-                     manager.BroadcastMessageList(); 
+                     manager.BroadcastMessageList(new string[] {userMessage.tag}); 
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
                   ProcessMessage(userMessage, currentUsers);

@@ -1,6 +1,7 @@
 using System;
 using System.Web;
 using System.Net;
+using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -714,40 +715,62 @@ namespace ChatEssentials
 
          try
          {
+            /*using (HttpClient client = new HttpClient())
+            {
+               //client.BaseAddress = new Uri(url);
+               client.Timeout = QueryUserTimeout;
+               client.DefaultRequestHeaders.Add("CF-Connecting-IP", "127.0.0.1");
+               
+               var getTask = client.GetAsync(new Uri(url));
+               getTask.Wait();
+
+               using (HttpResponseMessage response = getTask.Result)
+               {
+                  using (HttpContent content = response.Content)
+                  {
+                     var stringTask = content.ReadAsStringAsync();
+                     stringTask.Wait();
+                     htmlCode = stringTask.Result;
+                     json = JsonConvert.DeserializeObject(htmlCode);
+                  }
+               }
+            }*/
+               
             using (TimedWebClient client = new TimedWebClient())
             {
+               //Console.WriteLine("REQUESTING URL: " + url);
                client.Headers.Add("CF-Connecting-IP", "127.0.0.1");
                client.Timeout = QueryUserTimeout; 
                htmlCode = client.DownloadString(url);
                json = JsonConvert.DeserializeObject(htmlCode);
+            }
 
-               lock(Lock)
+            lock(Lock)
+            {
+               username = json.result.username;
+               avatar = json.result.computed.avatar;
+               avatarStatic = json.result.computed.avatarstatic;
+               stars = json.result.computed.leveltitle;
+               level = json.result.computed.level;
+               staffChat = json.result.permissions.staffchat;
+               globalChat = json.result.permissions.chatany;
+               chatControl = json.result.permissions.chatcontrol;
+               chatControlExtended = json.result.permissions.chatcontrolextended;
+               bannedUntil = DateExtensions.FromUnixTime((double)json.result.computed.banneduntil);
+               joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
+               language = json.result.computed.language;
+               banReason = json.result.computed.banreason;
+               badges = json.result.computed.displayedbadges.ToObject<List<Badge>>();
+               try
                {
-                  username = json.result.username;
-                  avatar = json.result.computed.avatar;
-                  avatarStatic = json.result.computed.avatarstatic;
-                  stars = json.result.computed.leveltitle;
-                  level = json.result.computed.level;
-                  staffChat = json.result.permissions.staffchat;
-                  globalChat = json.result.permissions.chatany;
-                  chatControl = json.result.permissions.chatcontrol;
-                  chatControlExtended = json.result.permissions.chatcontrolextended;
-                  bannedUntil = DateExtensions.FromUnixTime((double)json.result.computed.banneduntil);
-                  joinDate = DateExtensions.FromUnixTime((double)json.result.joined);
-                  language = json.result.computed.language;
-                  banReason = json.result.computed.banreason;
-                  badges = json.result.computed.displayedbadges.ToObject<List<Badge>>();
-                  try
-                  {
-                     shadowBanned = json.result.computed.shadowbanned; //((int)json.result.rng % 3) == 0;
-                     animatedAvatars = json.result.computed.options.animatedAvatars.value;
-                  }
-                  catch
-                  {
-                     shadowBanned = false;
-                     animatedAvatars = true;
-                     Log("Missing chatrequest GUID. Hidden user info not pulled", LogLevel.Warning);
-                  }
+                  shadowBanned = json.result.computed.shadowbanned; //((int)json.result.rng % 3) == 0;
+                  animatedAvatars = json.result.computed.options.animatedAvatars.value;
+               }
+               catch
+               {
+                  shadowBanned = false;
+                  animatedAvatars = true;
+                  Log("Missing chatrequest GUID. Hidden user info not pulled", LogLevel.Warning);
                }
             }
 
