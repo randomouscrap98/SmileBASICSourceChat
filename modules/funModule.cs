@@ -41,6 +41,8 @@ namespace ModulePackage1
                UserMessageJSONObject codeMesssage = new UserMessageJSONObject(user, 
                      System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
                codeMesssage.encoding = "code";
+               codeMesssage.spamValue = 0.30;
+               codeMesssage.SetUnspammable();
                outputs.Add(codeMesssage);
                break;
 
