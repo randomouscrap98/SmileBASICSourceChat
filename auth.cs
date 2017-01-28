@@ -25,6 +25,11 @@ namespace ChatServer
       public AuthServer(int port, MyExtensions.Logging.Logger logger = null) : 
          base(IPAddress.Parse(LocalAddress), port, logger) {} 
 
+      public override int ThreadSleepMilliseconds
+      {
+         get { return 100; }
+      }
+
       protected override List<Action<byte[], NetworkStream>> MessageActions
       {
          get

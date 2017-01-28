@@ -12,6 +12,7 @@ namespace ChatEssentials
       public string tag;
       public string encoding;
       public readonly string type;
+      public readonly Guid id = Guid.NewGuid();
 
       public JSONObject(string type)
       {

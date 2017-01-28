@@ -24,6 +24,11 @@ namespace ChatServer
          get { return "ChatProxy"; }
       }
 
+      public override int ThreadSleepMilliseconds
+      {
+         get { return 100; }
+      }
+
       /// <summary>
       /// Initializes a new instance of the <see cref="ChatServer.ConnectionCacheServer"/> class.
       /// </summary>
@@ -247,7 +252,7 @@ namespace ChatServer
                   }
                   else if (type == "proxyReceive")
                   {
-                     long lastRetrieveTicks = -1;
+                     /*long lastRetrieveTicks = -1;
 
                      try 
                      { 
@@ -257,8 +262,36 @@ namespace ChatServer
                      { 
                         lastRetrieveTicks = -1; 
                         Log("proxyReceive did not pass a lastretrieve. Assuming -1 (get all + flush)", LogLevel.SuperDebug);
+                     }*/
+
+                     //bool flush;
+                     TimeSpan desiredBacklogRange; //= TimeSpan.FromMinutes(1);
+
+                     try 
+                     { 
+                        desiredBacklogRange = TimeSpan.FromMilliseconds((int)json.backlog); 
+                     }
+                     catch 
+                     { 
+                        desiredBacklogRange = TimeSpan.FromMinutes(1); 
+                        Log("proxyReceive did not pass a desired backlog. Assuming 60000 (1 minute)", 
+                              LogLevel.SuperDebug);
                      }
 
+                     try
+                     {
+                        flush = (bool)json.flush;
+                     }
+                     catch
+                     {
+
+                     }
+
+                     List<Tuple<string,DateTime>> backlog = AtomicAction<List<Tuple<string,DateTime>>>(() =>
+                        {
+                           connections[id].FlushInboundBacklogBefore(DateTime.Now.AddMinutes(-10));
+                           return connections[id].GetInboundBacklogSince(DateTime.Now.Subtract(desiredBacklogRange));
+                        });
                      //If they're using the new system where you can give the
                      //tick count of the last message retrieved, do so.
                      //Otherwise, do the old flushing system.
@@ -317,7 +350,7 @@ namespace ChatServer
                            return connections[id].GetInboundBacklogSince(DateTime.Now.Subtract(desiredBacklogRange));
                         });
 
-                     StringBuilder output = new StringBuilder("retry: 200\n");
+                     StringBuilder output = new StringBuilder("retry: 2000\n");
 
                      foreach(Tuple<string,DateTime> messageData in backlog)
                      {

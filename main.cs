@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.6.4";
+      public const string Version = "2.6.6";
 
       private static AuthServer authServer;
       private static ConnectionCacheServer proxyServer = null;
@@ -118,7 +118,7 @@ namespace ChatServer
          settings.GlobalTag = GetOption<string>("globalTag");
          settings.SaveInterval = TimeSpan.FromSeconds(GetOption<int>("saveInterval"));
          settings.PingInterval = TimeSpan.FromSeconds(GetOption<int>("chatTimeout"));
-         settings.MonitorThreads = true;
+         settings.MonitorThreads = GetOption<bool>("monitorThreads");
          settings.AcceptedTags = GetOption<string>("acceptedTags").Split(",".ToCharArray(), 
             StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
 
@@ -200,6 +200,7 @@ namespace ChatServer
                { "moduleWaitSeconds", 5 },
                { "maxQueryWaitSeconds", 1.0 },
                { "maxUserQueryFailures", 3 },
+               { "monitorThreads", false },
                { "fakeAuthentication", false },
                { "consoleLogLevel", "Normal" },
                { "fileLogLevel", "Debug" },
@@ -366,7 +367,7 @@ namespace ChatServer
                      throw new Exception("Server got an internal death signal");
                   }
 
-                  Thread.Sleep(AuthServer.ThreadSleepMilliseconds);
+                  Thread.Sleep(authServer.ThreadSleepMilliseconds);
                }
             }
             catch(Exception e)

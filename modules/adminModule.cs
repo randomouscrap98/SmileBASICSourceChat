@@ -139,6 +139,7 @@ namespace ChatServer
 
             UserMessageJSONObject directMessage = 
                new UserMessageJSONObject(user, command.Arguments[0], command.tag);
+            directMessage.encoding = "raw";
 
             return new List<JSONObject>() {directMessage};
          }

@@ -17,6 +17,12 @@ namespace ModulePackage1
          Commands.Add(new ModuleCommand("code", new List<CommandArgument> { 
             new CommandArgument("message", ArgumentType.FullString)
          }, "output formatted code", true));
+         Commands.Add(new ModuleCommand("img", new List<CommandArgument> { 
+            new CommandArgument("link", ArgumentType.FullString)
+         }, "output image directly (only users with the proper settings will see it", true));
+         Commands.Add(new ModuleCommand("md", new List<CommandArgument> {
+            new CommandArgument("text", ArgumentType.FullString)
+         }, "output a markdown-formatted message", true));
          Commands.Add(new ModuleCommand("emotes", new List<CommandArgument>(), "See all available emotes"));
 
          AddOptions(new Dictionary<string, object>{{"emoteLink", "http://development.smilebasicsource.com/emotes.json"}});
@@ -41,9 +47,27 @@ namespace ModulePackage1
                UserMessageJSONObject codeMesssage = new UserMessageJSONObject(user, 
                      System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
                codeMesssage.encoding = "code";
-               codeMesssage.spamValue = 0.30;
+               codeMesssage.spamValue = 0.20;
                codeMesssage.SetUnspammable();
                outputs.Add(codeMesssage);
+               break;
+
+            case "img":
+               UserMessageJSONObject imageMessage = new UserMessageJSONObject(user, 
+                     System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
+               imageMessage.encoding = "image";
+               imageMessage.spamValue = 0.20;
+               imageMessage.SetUnspammable();
+               outputs.Add(imageMessage);
+               break;
+
+            case "md":
+               UserMessageJSONObject mdMessage = new UserMessageJSONObject(user, 
+                     System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
+               mdMessage.encoding = "markdown";
+               mdMessage.spamValue = 0.20;
+               mdMessage.SetUnspammable();
+               outputs.Add(mdMessage);
                break;
 
             case "emotes":
