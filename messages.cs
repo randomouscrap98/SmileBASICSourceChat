@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace ChatEssentials
 {
-   //[Serializable]
 
    /// <summary>
    /// A generic object sent from the server. All things sent from the server must have at 
    /// least an ID and a type. 
    /// </summary>
+   [Serializable]
    public abstract class JSONObject
    {
       private static long LastID = DateTime.Now.Ticks;
@@ -119,6 +119,7 @@ namespace ChatEssentials
       public string time
       {
          get { return rawtime.ToString() + " UTC"; }
+         set { }
       }
 
       public DateTime GetCreationTime()
@@ -184,6 +185,7 @@ namespace ChatEssentials
          return DateTime.Now > expiration;
       }
 
+      public MessageBaseJSONObject() : this("none") {} 
       public MessageBaseJSONObject(string type, string message = "", UserInfo user = null) : base(type)
       {
          this.encoding = DefaultEncoding;
@@ -293,8 +295,12 @@ namespace ChatEssentials
       public bool banned = false;
       public List<Badge> badges = new List<Badge>();
 
+      //This stupid thing is JUST for dumb libraries that require a default
+      //constructor (even though... nevermind)
+      public UserJSONObject() : this((UserInfo)null) {}
+
       //public UserJSONObject
-      public UserJSONObject(UserInfo user = null)
+      public UserJSONObject(UserInfo user)
       {
          if (user != null)
          {
@@ -312,15 +318,18 @@ namespace ChatEssentials
 
       public UserJSONObject(UserJSONObject copy)
       {
-         uid = copy.uid;
-         username = copy.username;
-         avatar = copy.avatar;
-         stars = copy.stars;
-         level = copy.level;
-         active = copy.active;
-         joined = copy.joined;
-         banned = copy.banned;
-         badges = copy.badges;
+         if(copy != null)
+         {
+            uid = copy.uid;
+            username = copy.username;
+            avatar = copy.avatar;
+            stars = copy.stars;
+            level = copy.level;
+            active = copy.active;
+            joined = copy.joined;
+            banned = copy.banned;
+            badges = copy.badges;
+         }
       }
 
 //      public void StripUnimportantData()

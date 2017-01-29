@@ -238,6 +238,20 @@ the actions of any user within the chat.".Replace("\n", " ");
          #region HistoryLoad
          Dictionary<string, List<MessageBaseJSONObject>> tempHistory;
 
+         /*try
+         {
+            tempHistory = MySerialize2.LoadObject<Dictionary<string, List<MessageBaseJSONObject>>>(
+                  SavePath(HistoryFile));
+            PMRoom.FindNextID(tempHistory.SelectMany(x => x.Value.Select(y => y.tag)).ToList());
+            history = tempHistory;
+            Log("Loaded history from file", MyExtensions.Logging.LogLevel.Debug);
+         }
+         catch(Exception ex)
+         {
+            Log("Couldn't load history! Defaulting to empty history. Reason: " + ex.ToString(), 
+                  MyExtensions.Logging.LogLevel.Error);
+         }*/
+
          if (MySerialize.LoadObject<Dictionary<string, List<MessageBaseJSONObject>>>
                (SavePath(HistoryFile), out tempHistory) && tempHistory != null)
          {
@@ -370,6 +384,17 @@ the actions of any user within the chat.".Replace("\n", " ");
                      //Save only messages which are real user messages into the file
                      var onlyMessagesHistory = history.ToDictionary(x => x.Key, y => y.Value.Where(z => z is MessageJSONObject).ToList());
 
+                     /*try
+                     {
+                        MySerialize2.SaveObject<Dictionary<string, List<MessageBaseJSONObject>>>(
+                              SavePath(HistoryFile), onlyMessagesHistory);
+                        Log("Saved history to file", MyExtensions.Logging.LogLevel.Debug);
+                     }
+                     catch(Exception ex)
+                     {
+                        Log("Couldn't save history to file! Reason: " + ex.ToString(), 
+                              MyExtensions.Logging.LogLevel.Error);
+                     }*/
                      //Save history
                      if(MySerialize.SaveObject<Dictionary<string, List<MessageBaseJSONObject>>>(SavePath(HistoryFile), onlyMessagesHistory))
                         Log("Saved history to file", MyExtensions.Logging.LogLevel.Debug);
