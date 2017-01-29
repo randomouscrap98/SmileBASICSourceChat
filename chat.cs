@@ -220,14 +220,16 @@ namespace ChatServer
       {
          return new LanguageConvertibleWarningJSONObject(
             new WarningMessageJSONObject(manager.ConvertTag(parameters), parameters.SendingUser) 
-            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType});
+            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType})
+         { Parameters = parameters };
       }
 
       public LanguageConvertibleSystemJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
          return new LanguageConvertibleSystemJSONObject(
             new SystemMessageJSONObject(manager.ConvertTag(parameters), parameters.SendingUser) 
-            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType});
+            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType})
+         { Parameters = parameters };
 //         return new SystemMessageJSONObject(manager.ConvertTag(parameters)) 
 //         { subtype = parameters.Tag.ToString().ToLower(), sender = parameters.SendingUser };
       }
@@ -673,7 +675,7 @@ namespace ChatServer
                      }
                   }
 
-                  if (ThisUser.Hiding && !userMessage.IsSendable() && !manager.IsPMTag(userMessage.tag))
+                  if (ThisUser.Hiding && userMessage.IsSendable() && !manager.IsPMTag(userMessage.tag))
                   {
                      MySend((new WarningMessageJSONObject("You're hiding! Don't send messages!")).ToString());
                   }
@@ -938,7 +940,7 @@ namespace ChatServer
          UserCommand tempUserCommand = null;
          List<Module> modules = manager.GetModuleListCopy(UID);
 
-         string realMessage = message.message; //System.Net.WebUtility.HtmlDecode(message.message);
+         string realMessage = message.GetRawMessage(); //message; //System.Net.WebUtility.HtmlDecode(message.message);
 
          //Check through all modules for possible command match
          foreach(Module module in modules)

@@ -29,7 +29,7 @@ namespace ChatServer
          thisRealUser.Hiding = false;
          thisRealUser.LastJoin = DateTime.Now;
          ChatRunner.Server.BroadcastUserList();
-         ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Join, thisRealUser)}, uid);
+         ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Join, thisRealUser), sendtype = MessageBaseSendType.Broadcast }, uid);
 
 //         ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), 
 //               new SystemMessageJSONObject());
@@ -49,7 +49,7 @@ namespace ChatServer
             if (thisRealUser.Hiding)
             {
                ChatRunner.Server.BroadcastUserList();
-               ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser)}, user.UID);
+               ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser), sendtype = MessageBaseSendType.Broadcast}, user.UID);
                //ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Leave, thisRealUser), new SystemMessageJSONObject());
 
                return FastMessage("You're now hiding. Hiding persists across reloads. Be careful, you can still use commands!");

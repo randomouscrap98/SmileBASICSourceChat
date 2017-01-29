@@ -198,15 +198,18 @@ namespace ChatEssentials
 
       public MessageBaseJSONObject(MessageBaseJSONObject copy) : base(copy)
       {
-         tag = copy.tag;
-         encoding = copy.encoding;
-         subtype = copy.subtype;
-         rawmessage = copy.rawmessage;
-         safe = copy.safe;
-         sender = new UserJSONObject(copy.sender);
-         sendtype = copy.sendtype;
-         recipients = new List<int>(copy.recipients);
-         rawtime = copy.rawtime;
+         if(copy != null)
+         {
+            tag = copy.tag;
+            encoding = copy.encoding;
+            subtype = copy.subtype;
+            rawmessage = copy.rawmessage;
+            safe = copy.safe;
+            sender = new UserJSONObject(copy.sender);
+            sendtype = copy.sendtype;
+            recipients = new List<int>(copy.recipients);
+            rawtime = copy.rawtime;
+         }
       }
    }
 

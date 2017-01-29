@@ -987,15 +987,20 @@ the actions of any user within the chat.".Replace("\n", " ");
                   .Take(messageCount))
                .OrderBy(x => x.id).ToList();
 
+            //Log("Messages: " + jsonMessages.messages.Count);
             //Convert language tags. This alters the REAL language object, but mmmm that probably shouldn't be an issue, right?
             //No, because I ONLY save user messages in history to the disk, so in memory, these guys will always be typed correctly.
             foreach(MessageBaseJSONObject message in jsonMessages.messages)
             {
                if (message is ILanguageConvertibleBaseJSONObject)
                {
+                  Log("Getting parameters");
                   var parameters = ((ILanguageConvertibleBaseJSONObject)message).Parameters;
+                  Log("Parameters: " + parameters);
                   parameters.UpdateUser(actualUser);
+                  Log("Updated parameter user");
                   message.message = ConvertTag(parameters);
+                  Log("Converted tag to: " + message.message);
                }
             }
 
