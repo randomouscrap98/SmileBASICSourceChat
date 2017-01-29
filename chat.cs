@@ -11,6 +11,7 @@ using ChatEssentials;
 using ModuleSystem;
 using MyWebSocket;
 using MyExtensions.Logging;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace ChatServer
 {
@@ -479,9 +480,14 @@ namespace ChatServer
                      }
                   }
                }
-               catch
+               catch(RuntimeBinderException)
                {
                   response.errors.Add("BIND message was missing fields");
+               }
+               catch(Exception ex)
+               {
+                  response.errors.Add("Internal server error while binding: " + ex.Message);
+                  Log("Exception while binding: " + ex.ToString(), LogLevel.Error);
                }
             }
          }
