@@ -790,7 +790,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          BroadcastMessageList();
       }*/
 
-      private ChatTags AddMessage(MessageJSONObject message)
+      public ChatTags AddMessage(MessageJSONObject message)
       {
          ChatTags warning = ChatTags.None, warning2 = ChatTags.None;
          User user = null;
@@ -813,28 +813,27 @@ the actions of any user within the chat.".Replace("\n", " ");
             //Update spam score directly. If warning2 actually is something, update the real warning.
             lock (managerLock)
             {
-               warning2 = user.DirectSpam(message.spamvalue);
-               if (warning2 != ChatTags.None)
-                  warning = warning2;
+               if(message.spamvalue > 0)
+               {
+                  warning2 = user.DirectSpam(message.spamvalue);
+                  if (warning2 != ChatTags.None)
+                     warning = warning2;
+               }
             }
          }
 
          if (user.BlockedUntil < DateTime.Now)
          {
-            //warning2 = 
             AddMessageBase(message);
 
             if(message.HasSender())
                user.PerformOnPost();
-
-//            if (warning2 != ChatTags.None)
-//               warning = warning;
          }
 
          return warning;
       }
 
-      private void AddMessageBase(MessageBaseJSONObject message)
+      public void AddMessageBase(MessageBaseJSONObject message)
       {
          lock(managerLock)
          {
@@ -1088,6 +1087,24 @@ the actions of any user within the chat.".Replace("\n", " ");
 //               message.tag = tag;
 //      }
 
+      public LanguageConvertibleWarningJSONObject NewWarningFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
+      {
+         return new LanguageConvertibleWarningJSONObject(
+            new WarningMessageJSONObject(ConvertTag(parameters), parameters.SendingUser) 
+            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType,
+              tag = ChatSettings.GlobalTag}){ Parameters = parameters };
+      }
+
+      public LanguageConvertibleSystemJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
+      {
+         return new LanguageConvertibleSystemJSONObject(
+            new SystemMessageJSONObject(ConvertTag(parameters), parameters.SendingUser) 
+            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType, 
+              tag = ChatSettings.GlobalTag}){ Parameters = parameters };
+//         return new SystemMessageJSONObject(manager.ConvertTag(parameters)) 
+//         { subtype = parameters.Tag.ToString().ToLower(), sender = parameters.SendingUser };
+      }
+
       /// <summary>
       /// Perform full processing on message, including adding it to history and sending it to the appropriate people
       /// </summary>
@@ -1105,18 +1122,17 @@ the actions of any user within the chat.".Replace("\n", " ");
          {
             var warning = AddMessage((MessageJSONObject)message);
             if (warning != ChatTags.None)
-               HandleMessage(new LanguageConvertibleWarningJSONObject() { Parameters = new LanguageTagParameters(warning, realUser, realUser) }, user);
+            {
+               HandleMessage(NewWarningFromTag(new LanguageTagParameters(warning, realUser), 
+                        MessageBaseSendType.IncludeSender), user);
+            }
+            //new LanguageConvertibleWarningJSONObject() { Parameters = 
+            //new LanguageTagParameters(warning, realUser, realUser), tag = ChatSettings.GlobalTag}, user);
          }
          else
          {
             AddMessageBase(message);
          }
-
-         //Take ownership of the message if the person handling it exists and there's not already a sender.
-         //This is done because we WANT most messages to be owned. If a message specifically does not need 
-         //to be owned, you should send a bad user for the handler (which is a bad design decision on my part)
-//         if (user > 0 && !message.HasSender())
-//            message.sender = new UserJSONObject(new UserInfo(realUser));
 
          var recipients = message.RealRecipientList(LoggedInUsers().Keys.ToList());
 
@@ -1125,9 +1141,7 @@ the actions of any user within the chat.".Replace("\n", " ");
 
          //Send the message out to all the proper recipients.
          foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x).Where(x => recipients.Contains(x.UID)))
-         {
             chatter.MySend(ChatMessageList(chatter.UID, 1, new[] { message.tag }, true));
-         }
       }
 
       public string ConvertTag(LanguageTagParameters parameters)

@@ -225,20 +225,11 @@ namespace ChatServer
 
       public LanguageConvertibleWarningJSONObject NewWarningFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
-         return new LanguageConvertibleWarningJSONObject(
-            new WarningMessageJSONObject(manager.ConvertTag(parameters), parameters.SendingUser) 
-            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType})
-         { Parameters = parameters };
+         return manager.NewWarningFromTag(parameters, sendType);
       }
-
       public LanguageConvertibleSystemJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
-         return new LanguageConvertibleSystemJSONObject(
-            new SystemMessageJSONObject(manager.ConvertTag(parameters), parameters.SendingUser) 
-            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType})
-         { Parameters = parameters };
-//         return new SystemMessageJSONObject(manager.ConvertTag(parameters)) 
-//         { subtype = parameters.Tag.ToString().ToLower(), sender = parameters.SendingUser };
+         return manager.NewSystemMessageFromTag(parameters, sendType);
       }
 
       public LanguageTagParameters QuickParams(ChatTags tag)
@@ -415,7 +406,8 @@ namespace ChatServer
 //                              manager.Broadcast(QuickParams(ChatTags.Join), new SystemMessageJSONObject(),
 //                                    new List<Chat> { this });
 
-                           SendFromMe(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome), MessageBaseSendType.IncludeSender));
+                           manager.AddMessageBase(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome), MessageBaseSendType.IncludeSender));
+                           //SendFromMe(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome), MessageBaseSendType.IncludeSender));
                            //MySend(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome)).ToString());
                            ChatTags enterSpamWarning = ThisUser.JoinSpam();
 
@@ -624,7 +616,6 @@ namespace ChatServer
                else
                {
                   Dictionary<int, UserInfo> currentUsers = manager.UsersForModules();
-                  //List<JSONObject> outputs = new List<JSONObject>();
                   MessageJSONObject userMessage = new MessageJSONObject(message, new UserInfo(ThisUser,true), tag);
                   UserCommand userCommand;
                   Module commandModule;
@@ -642,10 +633,6 @@ namespace ChatServer
                         try
                         {
                            SendModuleMessagesFromMe(commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers), commandModule);
-//                           outputs.AddRange(AddModuleTags(
-//                              commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers), 
-//                              commandModule
-//                           ));
                         }
                         finally
                         {
@@ -655,8 +642,6 @@ namespace ChatServer
                      else
                      {
                         response.errors.Add("The chat server is busy and can't process your command right now");
-                        //userMessage.SetHidden(true);
-                        //userMessage.SetNoRecipients();
                         userMessage.SetSpammable(false);
                      }
 
@@ -666,8 +651,6 @@ namespace ChatServer
 
                      //For now, simply capture all commands no matter what.
                      userMessage.SetNoRecipients();
-                     //userMessage.SetHidden(true);
-                     //userMessage.SetCommand();
 
                      Log("Module " + commandModule.ModuleName + " processed command from " + UserLogString, 
                         MyExtensions.Logging.LogLevel.Debug);
@@ -678,7 +661,6 @@ namespace ChatServer
                      if (!string.IsNullOrWhiteSpace(commandError))
                      {
                         response.errors.Add("Command error: " + commandError);
-                        //userMessage.SetHidden(true);
                         userMessage.SetNoRecipients();
                         userMessage.SetSpammable(false);
                      }
@@ -687,15 +669,10 @@ namespace ChatServer
                   if (ThisUser.Hiding && userMessage.IsSendable() && !manager.IsPMTag(userMessage.tag))
                   {
                      SendFromMe(new WarningMessageJSONObject("You're hiding! Don't send messages!"));
-                     //MySend((new WarningMessageJSONObject("You're hiding! Don't send messages!")).ToString());
                   }
                   else
                   {
                      SendFromMe(userMessage);
-//                     ChatTags warning = manager.AddMessage(userMessage);
-//
-//                     if (warning != ChatTags.None)
-//                        outputs.Add(NewWarningFromTag(QuickParams(warning)));
                   }
 
                   //Send off on relay

@@ -16,13 +16,13 @@ namespace ModulePackage1
          }, "be silly", true));
          Commands.Add(new ModuleCommand("code", new List<CommandArgument> { 
             new CommandArgument("message", ArgumentType.FullString)
-         }, "output formatted code", true));
+         }, "output formatted code", false));
          Commands.Add(new ModuleCommand("img", new List<CommandArgument> { 
             new CommandArgument("link", ArgumentType.FullString)
-         }, "output image directly (only users with the proper settings will see it", true));
+         }, "output image directly (only users with the proper settings will see it", false));
          Commands.Add(new ModuleCommand("md", new List<CommandArgument> {
             new CommandArgument("text", ArgumentType.FullString)
-         }, "output a markdown-formatted message", true));
+         }, "output a markdown-formatted message", false));
          Commands.Add(new ModuleCommand("emotes", new List<CommandArgument>(), "See all available emotes"));
 
          AddOptions(new Dictionary<string, object>{{"emoteLink", "http://development.smilebasicsource.com/emotes.json"}});
