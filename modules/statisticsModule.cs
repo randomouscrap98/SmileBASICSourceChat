@@ -83,9 +83,9 @@ namespace ModulePackage1
          //user. It will also perform the ? and ?? completion for you, so you do not need to worry about any of that. Assume
          //that if an argument is of type ArgumentType.User, you will be getting a real user. If you need a special format
          //for your argument, you can specify ArgumentType.Custom and include your custom regex.
-         Commands.Add(new ModuleCommand("mystatistics", new List<CommandArgument> (), "view personal chat statistics", false));
-         Commands.Add(new ModuleCommand("statistics", new List<CommandArgument> (), "view global chat statistics", false));
-         Commands.Add(new ModuleCommand("statistics", new List<CommandArgument> { 
+         Commands.Add(new ModuleCommand("mystats", new List<CommandArgument> (), "view personal chat statistics", false));
+         Commands.Add(new ModuleCommand("stats", new List<CommandArgument> (), "view global chat statistics", false));
+         Commands.Add(new ModuleCommand("stats", new List<CommandArgument> { 
             new CommandArgument("user", ArgumentType.User) }, "view user chat statistics", false));
       }
 
@@ -116,7 +116,7 @@ namespace ModulePackage1
       //by Module which lets you write to the chat server log. There's a whole system in place for creating your own logs,
       //but you probably just want to write to the main log. You can also specify the level of the message, which defaults
       //to "Normal". If the message is unimportant, you probably want "Debug".
-      public override void ProcessMessage(UserMessageJSONObject message, UserInfo user, Dictionary<int, UserInfo> users)
+      public override void ProcessMessage(MessageJSONObject message, UserInfo user, Dictionary<int, UserInfo> users)
       {
          //Add user to statistics dictionary if they don't already exist.
          if (!userStatistics.ContainsKey(user.UID))
@@ -125,7 +125,7 @@ namespace ModulePackage1
             Log("Added new user: " + user.Username);
          }
             
-         if (message.Display)
+         if (message.IsSendable())
          {
             userStatistics[user.UID].AddMessage(message.message);
             userStatistics[user.UID].AddUsers(users.Where(x => x.Value.LoggedIn).Select(x => x.Value.UID).ToList());
@@ -147,10 +147,10 @@ namespace ModulePackage1
       //field. If you do not specify any recipients, it defaults to the sender (this is usually what you want). If you
       //want to broadcast a message to everyone (please don't do this for every command), you can set the "broadcast" field
       //to true.
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
          //This is what we're returning from our function
-         List<JSONObject> outputs = new List<JSONObject>();
+         List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
 
          //Our commands (and probably yours too) usually returns just one message, so that's what this is.
          //It gets added to the above "outputs" list.
@@ -161,7 +161,7 @@ namespace ModulePackage1
          //Run different code depending on the command (duh)
          switch(command.Command)
          {
-            case "mystatistics":
+            case "mystats":
                //Always use the UID, NOT the username to identifiy users. Usernames can change.
                if (!userStatistics.ContainsKey(user.UID))
                {
@@ -177,7 +177,7 @@ namespace ModulePackage1
                outputs.Add(moduleOutput);
                break;
 
-            case "statistics":
+            case "stats":
                if (command.Arguments.Count == 0)
                {
                   moduleOutput.message = "---Global Chat Statistics---\n";

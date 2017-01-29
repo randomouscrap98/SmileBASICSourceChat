@@ -124,6 +124,11 @@ namespace ChatEssentials
          return rawtime;
       }
 
+      public string GetRawMessage()
+      {
+         return rawmessage;
+      }
+
       public List<int> RealRecipientList(List<int> allUsers)
       {
          if (sendtype == MessageBaseSendType.Broadcast)

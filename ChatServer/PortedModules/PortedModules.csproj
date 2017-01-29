@@ -47,12 +47,6 @@
     <Compile Include="..\..\modules\MessageModule.cs">
       <Link>MessageModule.cs</Link>
     </Compile>
-    <Compile Include="..\..\modules\ExplorerClasses.cs">
-      <Link>ExplorerClasses.cs</Link>
-    </Compile>
-    <Compile Include="..\..\modules\ExplorerModule.cs">
-      <Link>ExplorerModule.cs</Link>
-    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

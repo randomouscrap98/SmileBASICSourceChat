@@ -196,7 +196,7 @@ namespace WikiaChatLogger
 		private void chanceSimulator_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 		{
          Tuple<string, int> result = (Tuple<string, int>)e.Result;
-         ExtraCommandOutput(new List<JSONObject> { new ModuleJSONObject() { message = result.Item1 } }, result.Item2);
+         ExtraCommandOutput(new List<MessageBaseJSONObject> { new ModuleJSONObject() { message = result.Item1 } }, result.Item2);
 		}
 
 		public override bool LoadFiles()
@@ -246,20 +246,20 @@ namespace WikiaChatLogger
 			return false;
 		}
 
-      public List<JSONObject> QuickQuit(string message, bool warning = false, bool safe = true)
+      public List<MessageBaseJSONObject> QuickQuit(string message, bool warning = false, bool safe = true)
       {
          if (warning)
          {
-            WarningJSONObject output = new WarningJSONObject();
+            WarningMessageJSONObject output = new WarningMessageJSONObject();
             output.message = message;
-            return new List<JSONObject> { output };
+            return new List<MessageBaseJSONObject> { output };
          }
          else
          {
             ModuleJSONObject output = new ModuleJSONObject();
             output.message = message;
             output.safe = safe;
-            return new List<JSONObject> { output };
+            return new List<MessageBaseJSONObject> { output };
          }
       }
 
@@ -273,7 +273,7 @@ namespace WikiaChatLogger
          return user.Username + " isn't a player yet. You should ask them to play!";
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
          try
          {
@@ -283,7 +283,7 @@ namespace WikiaChatLogger
 
             UserInfo player;
             ModuleJSONObject mainOutput = new ModuleJSONObject();
-            List<JSONObject> outputs = new List<JSONObject>();
+            List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
 
             TryRegister(user.UID);
 
@@ -346,7 +346,7 @@ namespace WikiaChatLogger
    //                    if (!StandardCalls_RequestCoinUpdate(RankupCoins, username))
    //                        output += Module.SendMessageBreak + "Unfortunately, the ChatCoin module seems to be malfunctioning, so you will not receive coins";
 
-                  mainOutput.broadcast = true;
+                  mainOutput.sendtype = MessageBaseSendType.Broadcast; //broadcast = true;
                   mainOutput.message = "Hey, " + user.Username + " has become rank " + collectors[myUID].Stars + "(" + collectors[myUID].StarString() + ") in the cgame!";
 
                   outputs = QuickQuit(output);
@@ -479,7 +479,7 @@ namespace WikiaChatLogger
    				else
    					chanceSimulator.RunWorkerAsync(Tuple.Create(myUID, multiplier));
 
-               return new List<JSONObject>();
+               return new List<MessageBaseJSONObject>();
    			}
    			#endregion
 
@@ -585,6 +585,7 @@ namespace WikiaChatLogger
 
                ModuleJSONObject playerOutput = new ModuleJSONObject();
                playerOutput.recipients.Add(player.UID);
+               playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                playerOutput.message = user.Username + " wants to perform a quick-trade with you.\nOffered item".Pluralify(myUnique.Count) + ": "
                   + PrintPointList(myUnique) + "\nDesired item".Pluralify(theirUnique.Count) + ": " + PrintPointList(theirUnique) + "\nYou have " + offer.OfferTimeout
                   + " seconds to decide (/cgameaccept or /cgamedecline). Note that you two will get the items in your journal, but the item is used up in the process."
@@ -649,6 +650,7 @@ namespace WikiaChatLogger
 
                ModuleJSONObject playerOutput = new ModuleJSONObject();
                playerOutput.recipients.Add(player.UID);
+               playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                playerOutput.message = user.Username + " has offered to sell you " + PrintPointList(offer.SellerItems) + " for " + offer.BuyerCoins + " coin".Pluralify(offer.BuyerCoins) + ".\nYou have " +
                   offer.OfferTimeout + " seconds to decide (/cgameaccept or /cgamedecline). Note that you will get the item in your journal, but NOT your inventory.";
 
@@ -707,6 +709,7 @@ namespace WikiaChatLogger
 
                ModuleJSONObject playerOutput = new ModuleJSONObject();
                playerOutput.recipients.Add(player.UID);
+               playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                playerOutput.message = user.Username + " has offered to buy " + PrintPointList(offer.SellerItems) + " from you for " + offer.BuyerCoins + " coin".Pluralify(offer.BuyerCoins) + ".\nYou have " +
                   offer.OfferTimeout + " seconds to decide (/cgameaccept or /cgamedecline). ";
 
@@ -752,6 +755,7 @@ namespace WikiaChatLogger
 
                ModuleJSONObject playerMessage = new ModuleJSONObject();
                playerMessage.recipients.Add(player.UID);
+               playerMessage.sendtype = MessageBaseSendType.OnlyRecipients;
                playerMessage.message = user.Username + " has given you " + PrintPointList(points) + " for free! How nice!";
                outputs.Add(playerMessage);
 
@@ -803,6 +807,7 @@ namespace WikiaChatLogger
 
                ModuleJSONObject playerOutput = new ModuleJSONObject();
                playerOutput.recipients.Add(player.UID);
+               playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                playerOutput.message = user.Username + " wants to perform a trade with you.\nOffered item".Pluralify(myPoints.Count) + ": "
                   + PrintPointList(myPoints) + "\nDesired item".Pluralify(theirPoints.Count) + ": " + PrintPointList(theirPoints) + "\nYou have " + offer.OfferTimeout
                   + " seconds to decide (/cgameaccept or /cgamedecline). Note that you two will get the items in your journal, but the item is used up in the process."
@@ -957,6 +962,7 @@ namespace WikiaChatLogger
 
                ModuleJSONObject playerOutput = new ModuleJSONObject();
                playerOutput.message = user.Username + " has declined the offer";
+               playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                playerOutput.recipients.Add(offer.Offerer);
                outputs.Add(playerOutput);
 
@@ -1163,6 +1169,7 @@ namespace WikiaChatLogger
                {
                   ModuleJSONObject userOutput = new ModuleJSONObject();
                   int itemCount = gonnaSteal.Count(x => x.Value == userID);
+                  userOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                   userOutput.message = user.Username + " took " + itemCount + " item".Pluralify(itemCount) + " from you!";
                   userOutput.recipients.Add(userID);
                   outputs.Add(userOutput);
@@ -1175,7 +1182,8 @@ namespace WikiaChatLogger
                mainOutput.message = "In a fit of jealousy, " + user.Username + " used the darkness in their twisted heart to " +
                   "generate " + getCoins + " coins and steal " + gonnaSteal.Count + " item".Pluralify(gonnaSteal.Count) + 
                   " from unsuspecting users. 8(>_<)8";
-               mainOutput.broadcast = true;
+               //mainOutput.broadcast = true;
+               mainOutput.sendtype = MessageBaseSendType.Broadcast;
                outputs.Add(mainOutput);
 
                return outputs;
@@ -1203,6 +1211,7 @@ namespace WikiaChatLogger
                {
                   ModuleJSONObject playerOutput = new ModuleJSONObject();
                   playerOutput.recipients.Add(player.UID);
+                  playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                   playerOutput.message = "You were hugged by " + user.Username + ". The darkness in your heart receded a bit!";
                   mainOutput.message = "You gave " + player.Username + " a hug and cheered them up a bit!";
                   outputs.Add(mainOutput);
@@ -1213,6 +1222,7 @@ namespace WikiaChatLogger
                {
                   ModuleJSONObject playerOutput = new ModuleJSONObject();
                   playerOutput.recipients.Add(player.UID);
+                  playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
                   playerOutput.message = "You were hugged by " + user.Username + ". " + HugSayings[localRandom.Next(HugSayings.Count)];
                   mainOutput.message = "You gave " + player.Username + " a hug. What a nice person!";
                   outputs.Add(mainOutput);
@@ -1224,14 +1234,15 @@ namespace WikiaChatLogger
          catch(Exception e)
          {
             ModuleJSONObject error = new ModuleJSONObject();
-            error.broadcast = true;
+            //error.broadcast = true;
+            error.sendtype = MessageBaseSendType.Broadcast;
             error.message = "The CGAME module has encountered an unknown error. Please tell staff\n\n" +
             "Error message: " + e.ToString();
 
-            return new List<JSONObject> { error };
+            return new List<MessageBaseJSONObject> { error };
          }
 
-         return new List<JSONObject>();
+         return new List<MessageBaseJSONObject>();
 		}
 
       public string GetQuery(List<SpecialPoint> points, Dictionary<int, UserInfo> users)
@@ -1283,9 +1294,9 @@ namespace WikiaChatLogger
          return gonnaSteal;
       }
 
-      public bool CheckIfJealous(int uid, out List<JSONObject> outputs)
+      public bool CheckIfJealous(int uid, out List<MessageBaseJSONObject> outputs)
       {
-         outputs = new List<JSONObject>();
+         outputs = new List<MessageBaseJSONObject>();
 
          if (!collectors.ContainsKey(uid))
             return false;
@@ -1298,9 +1309,9 @@ namespace WikiaChatLogger
          return true;
       }
 
-      public List<JSONObject> PerformLove(UserInfo user, UserInfo player)
+      public List<MessageBaseJSONObject> PerformLove(UserInfo user, UserInfo player)
       {
-         List<JSONObject> outputs = new List<JSONObject>();
+         List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
 
          if (CheckIfJealous(player.UID, out outputs))
             return QuickQuit("The intense dark aura surrounding " + player.Username + " prevents you from loving them :'(");
@@ -1320,6 +1331,7 @@ namespace WikiaChatLogger
          collectors[player.UID].GotLoved(myUnique.Count);
 
          ModuleJSONObject playerOutput = new ModuleJSONObject();
+         playerOutput.sendtype = MessageBaseSendType.OnlyRecipients;
          playerOutput.recipients.Add(player.UID);
          playerOutput.message = user.Username + " generously gave you " + myUnique.Count + " item".Pluralify(myUnique.Count) + 
             " - " + PrintPointList(myUnique);

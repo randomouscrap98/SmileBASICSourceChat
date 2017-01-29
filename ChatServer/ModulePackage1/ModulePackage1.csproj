@@ -49,9 +49,6 @@
     <Compile Include="..\..\modules\statisticsModule.cs">
       <Link>statisticsModule.cs</Link>
     </Compile>
-    <Compile Include="..\..\modules\VoteModule.cs">
-      <Link>VoteModule.cs</Link>
-    </Compile>
     <Compile Include="..\..\modules\LoggerModule.cs">
       <Link>LoggerModule.cs</Link>
     </Compile>

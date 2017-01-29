@@ -10,7 +10,7 @@ namespace ModulePackage1
 {
    public class LoggerModule : Module
    {
-      private List<UserMessageJSONObject> unsavedMessages = new List<UserMessageJSONObject>();
+      private List<MessageJSONObject> unsavedMessages = new List<MessageJSONObject>();
 
       public LoggerModule()
       {
@@ -33,13 +33,13 @@ namespace ModulePackage1
       public override bool SaveFiles()
       {
          bool result = true;
-         Dictionary<string, List<UserMessageJSONObject>> messageByDate = new Dictionary<string, List<UserMessageJSONObject>>();
+         Dictionary<string, List<MessageJSONObject>> messageByDate = new Dictionary<string, List<MessageJSONObject>>();
 
-         foreach (UserMessageJSONObject message in unsavedMessages)
+         foreach (MessageJSONObject message in unsavedMessages)
          {
-            string date = message.PostTime().ToString("yy-MM-dd");
+            string date = message.GetCreationTime().ToString("yy-MM-dd");
             if (!messageByDate.ContainsKey(date))
-               messageByDate.Add(date, new List<UserMessageJSONObject>());
+               messageByDate.Add(date, new List<MessageJSONObject>());
             messageByDate[date].Add(message);
          }
 
@@ -48,7 +48,7 @@ namespace ModulePackage1
             foreach(string date in messageByDate.Keys)
             {
                File.AppendAllLines(date + ".txt", messageByDate[date].Select(x => 
-                  x.username.PadLeft(20) + x.PostTime().ToString("[HH:mm]") + StringExtensions.Truncate(x.tag, 1) + ": " + System.Net.WebUtility.HtmlDecode(x.message)));
+                  x.sender.username.PadLeft(20) + x.GetCreationTime().ToString("[HH:mm]") + StringExtensions.Truncate(x.tag, 1) + ": " + x.GetRawMessage()));
             }
          }
          catch(Exception e)
@@ -64,9 +64,9 @@ namespace ModulePackage1
          return result;
       }
 
-      public override void ProcessMessage(UserMessageJSONObject message, UserInfo user, Dictionary<int, UserInfo> users)
+      public override void ProcessMessage(MessageJSONObject message, UserInfo user, Dictionary<int, UserInfo> users)
       {
-         if(message.Display)
+         if(message.IsSendable())
             unsavedMessages.Add(message);
       }
    }

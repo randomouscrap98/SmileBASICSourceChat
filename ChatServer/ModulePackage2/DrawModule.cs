@@ -33,17 +33,17 @@ namespace ModulePackage2
 //         if(MyExtensions.MySerialize.SaveObject<List
 //      }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
-         List<JSONObject> outputs = new List<JSONObject>();
+         List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
 
          if (command.Command == "drawsubmit")
          {
             //unsavedMessages.Add(new DrawingInfo() { Drawing = command.Arguments[0], User = user, postTime = DateTime.Now });
-            UserMessageJSONObject drawingMessage = new UserMessageJSONObject(user, command.Arguments[0], command.tag);
+            MessageJSONObject drawingMessage = new MessageJSONObject(command.Arguments[0], user, command.tag);
             drawingMessage.encoding = Nickname;
-            drawingMessage.spamValue = 0.50;
-            drawingMessage.SetUnspammable();
+            drawingMessage.spamvalue = 0.50;
+            drawingMessage.SetSpammable(false);
             outputs.Add(drawingMessage);
          }
 

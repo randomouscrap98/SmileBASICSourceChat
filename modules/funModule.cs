@@ -28,45 +28,43 @@ namespace ModulePackage1
          AddOptions(new Dictionary<string, object>{{"emoteLink", "http://development.smilebasicsource.com/emotes.json"}});
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
-         List<JSONObject> outputs = new List<JSONObject>();
+         List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
          ModuleJSONObject moduleOutput;
 
          switch(command.Command)
          {
             case "me":
                moduleOutput = new ModuleJSONObject();
-               moduleOutput.broadcast = true;
+               //moduleOutput.broadcast = true;
+               moduleOutput.sendtype = MessageBaseSendType.Broadcast;
                moduleOutput.message = user.Username + " " + command.Arguments[0]; //System.Security.SecurityElement.Escape(command.Arguments[0]);
                moduleOutput.tag = command.tag;
                outputs.Add(moduleOutput);
                break;
 
             case "code":
-               UserMessageJSONObject codeMesssage = new UserMessageJSONObject(user, 
-                     System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
+               MessageJSONObject codeMesssage = new MessageJSONObject(command.Arguments[0], user, command.tag);
                codeMesssage.encoding = "code";
-               codeMesssage.spamValue = 0.20;
-               codeMesssage.SetUnspammable();
+               codeMesssage.spamvalue = 0.20;
+               codeMesssage.SetSpammable(false);
                outputs.Add(codeMesssage);
                break;
 
             case "img":
-               UserMessageJSONObject imageMessage = new UserMessageJSONObject(user, 
-                     System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
+               MessageJSONObject imageMessage = new MessageJSONObject(command.Arguments[0], user, command.tag);
                imageMessage.encoding = "image";
-               imageMessage.spamValue = 0.20;
-               imageMessage.SetUnspammable();
+               imageMessage.spamvalue = 0.20;
+               imageMessage.SetSpammable(false);
                outputs.Add(imageMessage);
                break;
 
             case "md":
-               UserMessageJSONObject mdMessage = new UserMessageJSONObject(user, 
-                     System.Security.SecurityElement.Escape(command.Arguments[0]), command.tag);
+               MessageJSONObject mdMessage = new MessageJSONObject(command.Arguments[0], user, command.tag);
                mdMessage.encoding = "markdown";
-               mdMessage.spamValue = 0.20;
-               mdMessage.SetUnspammable();
+               mdMessage.spamvalue = 0.20;
+               mdMessage.SetSpammable(false);
                outputs.Add(mdMessage);
                break;
 
