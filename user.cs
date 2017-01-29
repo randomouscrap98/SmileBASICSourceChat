@@ -825,11 +825,12 @@ namespace ChatEssentials
          return UpdateSpam(percentage * BanSpamScore);
       }
 
-      public ChatTags MessageSpam(List<UserMessageJSONObject> messages, string current)
+      public ChatTags MessageSpam(IEnumerable<MessageBaseJSONObject> messages, string current)
       {
          //Get all messages from the last 10 minutes (hopefully we still have them)
-         List<UserMessageJSONObject> myMessages = messages.Where(x => (DateTime.Now - x.PostTime()).TotalMinutes < 10 && 
-            x.uid == uid && x.Spammable).ToList();
+         List<MessageJSONObject> myMessages = messages.Where(x => x is MessageJSONObject).Select(
+            x => (MessageJSONObject)x).Where(x => (DateTime.Now - x.GetCreationTime()).TotalMinutes < 10 && 
+            x.sender.uid == uid && x.IsSpammable()).ToList();
 
          double lastPostTimePenalty = (5 - (DateTime.Now - LastPost).TotalSeconds) / 5.0;
 
@@ -837,10 +838,10 @@ namespace ChatEssentials
          double tempSpamScore = 5 + (lastPostTimePenalty > 0 ? 20 * Math.Pow(lastPostTimePenalty, 1.2) : 0) +
             current.Length / 100.0 + 5 * current.Split("\n".ToCharArray()).Count(x => string.IsNullOrWhiteSpace(x));   //empty line
 
-         foreach(UserMessageJSONObject message in myMessages)
+         foreach(MessageJSONObject message in myMessages)
          {
             double messageDifference = 1 - StringExtensions.StringDifference(message.message, current, 0.5);
-            double timeDifference = 1 - (DateTime.Now - message.PostTime()).TotalMinutes / 10.0;
+            double timeDifference = 1 - (DateTime.Now - message.GetCreationTime()).TotalMinutes / 10.0;
 
             //First is the "time-ignoring" long spamathon penalty, then the "level headed" fast spamming
             tempSpamScore += 6.0 * (Math.Pow(timeDifference, 0.1) * Math.Pow(messageDifference, 6.0));

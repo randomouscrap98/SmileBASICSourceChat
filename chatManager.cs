@@ -22,8 +22,8 @@ namespace ChatServer
       public TimeSpan MaxModuleWait = TimeSpan.FromSeconds(5);
       public TimeSpan MaxFileWait = TimeSpan.FromSeconds(10);
       public TimeSpan SaveInterval = TimeSpan.FromSeconds(30);
-      public int MaxMessageKeep = 100;
-      public int MaxMessageSend = 5;
+      //public int MaxMessageKeep = 100;
+      public int MaxMessageSend = 30;
       public int MaxUserQueryFailures = 3;
       public string GlobalTag = "";
       public bool MonitorThreads = false;
@@ -107,8 +107,8 @@ namespace ChatServer
       public readonly string IrcTag = "";*/
 
       private List<Module> modules = new List<Module>();
-      private List<UserMessageJSONObject> messages = new List<UserMessageJSONObject>();
-      private Dictionary<string, List<UserMessageJSONObject>> history = new Dictionary<string, List<UserMessageJSONObject>>();
+      //private List<MessageBaseJSONObject> messages = new List<MessageBaseJSONObject>();
+      private Dictionary<string, List<MessageBaseJSONObject>> history = new Dictionary<string, List<MessageBaseJSONObject>>();
 
       private readonly ModuleLoader loader;
       private readonly AuthServer authServer;
@@ -122,23 +122,28 @@ namespace ChatServer
       public readonly Object managerLock = new Object();
       public readonly Object fileLock = new Object();
 
-      public List<UserMessageJSONObject> GetMessages()
-      {
-         lock (managerLock)
-         {
-            return messages.Select(x => new UserMessageJSONObject(x)).ToList();
-         }
-      }
+//      public List<MessageBaseJSONObject> GetMessages()
+//      {
+//         lock (managerLock)
+//         {
+//            return messages.Select(x => new MessageBaseJSONObject(x)).ToList();
+//         }
+//      }
 
-      public Dictionary<string, List<UserMessageJSONObject>> GetHistory()
+      /// <summary>
+      /// Return a COPY of the message history. Note that this COMPLETELY REMOVES any higher 
+      /// types; all messages get converted to the base type MessageBaseJSONObject
+      /// </summary>
+      /// <returns>The history.</returns>
+      public Dictionary<string, List<MessageBaseJSONObject>> GetHistory()
       {
          lock (managerLock)
          {
-            Dictionary<string, List<UserMessageJSONObject>> historyCopy = new Dictionary<string, List<UserMessageJSONObject>>();
+            Dictionary<string, List<MessageBaseJSONObject>> historyCopy = new Dictionary<string, List<MessageBaseJSONObject>>();
 
             foreach (string key in history.Keys)
             {
-               historyCopy.Add(key, history[key].Select(x => new UserMessageJSONObject(x)).ToList());
+               historyCopy.Add(key, history[key].Select(x => new MessageBaseJSONObject(x)).ToList());
             }
 
             return historyCopy;
@@ -172,6 +177,9 @@ the actions of any user within the chat.".Replace("\n", " ");
          this.authServer = authServer;
          this.loader = loader;
          this.languageTags = languageTags;
+
+         foreach (Module module in modules)
+            module.OnExtraCommandOutput += DefaultOutputMessages;
 
          #region BandwidthLoad
          //Attempt to load the bandwidth monitor in the constructor. It's not a big deal if it doesn't load
@@ -208,27 +216,29 @@ the actions of any user within the chat.".Replace("\n", " ");
          }
          #endregion
 
-         #region MessageLoad
-         //Attempt to load the messages in the constructor. Again, not a big deal if it doesn't load.
-         List<UserMessageJSONObject> tempMessages;
-
-         if (MySerialize.LoadObject<List<UserMessageJSONObject>>(SavePath(MessageFile), out tempMessages))
-         {
-            messages = tempMessages;
-            UserMessageJSONObject.FindNextID(messages);
-            PMRoom.FindNextID(messages.Select(x => x.tag).ToList());
-            Log("Loaded messages from file", MyExtensions.Logging.LogLevel.Debug);
-         }
-         else
-         {
-            Log("Couldn't load messages! Defaulting to empty message list", MyExtensions.Logging.LogLevel.Error);
-         }
-         #endregion
+//         #region MessageLoad
+//         //Attempt to load the messages in the constructor. Again, not a big deal if it doesn't load.
+//         List<MessageBaseJSONObject> tempMessages;
+//
+//         //Note that loading/saving the history in this way loses all information about what kind of message
+//         //it is. If this becomes a problem in the future, you can change the serializer to store types.
+//         if (MySerialize.LoadObject<List<MessageBaseJSONObject>>(SavePath(MessageFile), out tempMessages))
+//         {
+//            messages = tempMessages;
+//            //MessageBaseJSONObject.FindNextID(messages);
+//            PMRoom.FindNextID(messages.Select(x => x.tag).ToList());
+//            Log("Loaded messages from file", MyExtensions.Logging.LogLevel.Debug);
+//         }
+//         else
+//         {
+//            Log("Couldn't load messages! Defaulting to empty message list", MyExtensions.Logging.LogLevel.Error);
+//         }
+//         #endregion
 
          #region HistoryLoad
-         Dictionary<string, List<UserMessageJSONObject>> tempHistory;
+         Dictionary<string, List<MessageBaseJSONObject>> tempHistory;
 
-         if (MySerialize.LoadObject<Dictionary<string, List<UserMessageJSONObject>>>
+         if (MySerialize.LoadObject<Dictionary<string, List<MessageBaseJSONObject>>>
                (SavePath(HistoryFile), out tempHistory) && tempHistory != null)
          {
             history = tempHistory;
@@ -269,6 +279,15 @@ the actions of any user within the chat.".Replace("\n", " ");
          }
       }
          
+      private void DefaultOutputMessages(List<MessageBaseJSONObject> outputs, int receiverUID)
+      {
+         //ApplyTagIfDefault(outputs, manager.ChatSettings.GlobalTag);
+
+         foreach (var message in outputs)
+            HandleMessage(message, receiverUID);
+         //OutputMessages(outputs, receiverUID);
+      }
+
       public void SafeStop()
       {
          Stop();
@@ -342,14 +361,17 @@ the actions of any user within the chat.".Replace("\n", " ");
                      else
                         Log("Couldn't save user data to file!", MyExtensions.Logging.LogLevel.Error);
 
-                     //Save messages
-                     if (MySerialize.SaveObject<List<UserMessageJSONObject>>(SavePath(MessageFile), messages))
-                        Log("Saved messages to file", MyExtensions.Logging.LogLevel.Debug);
-                     else
-                        Log("Couldn't save messages to file!", MyExtensions.Logging.LogLevel.Error);
+//                     //Save messages
+//                     if (MySerialize.SaveObject<List<UserMessageJSONObject>>(SavePath(MessageFile), messages))
+//                        Log("Saved messages to file", MyExtensions.Logging.LogLevel.Debug);
+//                     else
+//                        Log("Couldn't save messages to file!", MyExtensions.Logging.LogLevel.Error);
+
+                     //Save only messages which are real user messages into the file
+                     var onlyMessagesHistory = history.ToDictionary(x => x.Key, y => y.Value.Where(z => z is MessageJSONObject).ToList());
 
                      //Save history
-                     if(MySerialize.SaveObject<Dictionary<string, List<UserMessageJSONObject>>>(SavePath(HistoryFile), history))
+                     if(MySerialize.SaveObject<Dictionary<string, List<MessageBaseJSONObject>>>(SavePath(HistoryFile), onlyMessagesHistory))
                         Log("Saved history to file", MyExtensions.Logging.LogLevel.Debug);
                      else
                         Log("Couldn't save history to file!", MyExtensions.Logging.LogLevel.Error);
@@ -411,41 +433,41 @@ the actions of any user within the chat.".Replace("\n", " ");
          return ChatSettings.SaveFolder + filename;
       }
 
-      /*public int RegisterIrcUser(string username)
-      {
-         //Do NOT register relay users!
-         if (IrcSkipUsers().Contains(username))
-            return -1;
-         
-         lock (userLock)
-         {
-            int lookupID = UserLookup(username);
-
-            if (lookupID < 0)
-            {
-               int ID = users.Max(x => x.Key);
-
-               if (ID < 1000000000)
-                  ID = 1000000000;
-               
-               User newUser = new User(++ID);
-               newUser.SetIRC(username, true);
-               users.Add(newUser.UID, newUser);
-
-               Log("Registered new IRC user #" + newUser.UID + ": " + newUser.Username);
-
-               return newUser.UID;
-            }
-            else if (lookupID < 1000000000)
-            {
-               Log("Tried to register a real user as an IRC user!", MyExtensions.Logging.LogLevel.Error);
-            }
-            else
-               return lookupID;
-         }
-
-         return -1;
-      }*/
+//      public int RegisterIrcUser(string username)
+//      {
+//         //Do NOT register relay users!
+//         if (IrcSkipUsers().Contains(username))
+//            return -1;
+//         
+//         lock (userLock)
+//         {
+//            int lookupID = UserLookup(username);
+//
+//            if (lookupID < 0)
+//            {
+//               int ID = users.Max(x => x.Key);
+//
+//               if (ID < 1000000000)
+//                  ID = 1000000000;
+//               
+//               User newUser = new User(++ID);
+//               newUser.SetIRC(username, true);
+//               users.Add(newUser.UID, newUser);
+//
+//               Log("Registered new IRC user #" + newUser.UID + ": " + newUser.Username);
+//
+//               return newUser.UID;
+//            }
+//            else if (lookupID < 1000000000)
+//            {
+//               Log("Tried to register a real user as an IRC user!", MyExtensions.Logging.LogLevel.Error);
+//            }
+//            else
+//               return lookupID;
+//         }
+//
+//         return -1;
+//      }
 
       public User GetUser(int uid)
       {
@@ -504,6 +526,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          {
             Log("Enter allacceptedtagsforuser lock", MyExtensions.Logging.LogLevel.Locks);
             allTags = ChatSettings.AcceptedTags.Union(rooms.Where(x => x.Value.Users.Contains(user)).Select(x => x.Key)).ToList();
+            //allTags.Add(MessageBaseJSONObject.DefaultTag);
             Log("Exit allacceptedtagsforuser lock", MyExtensions.Logging.LogLevel.Locks);
          }
          return allTags;
@@ -741,69 +764,85 @@ the actions of any user within the chat.".Replace("\n", " ");
          BroadcastMessageList();
       }*/
 
-      public ChatTags AddMessage(UserMessageJSONObject message)
+      private ChatTags AddMessage(MessageJSONObject message)
       {
          ChatTags warning = ChatTags.None, warning2 = ChatTags.None;
+         User user = null;
 
-         User user = GetUser(message.uid);
-
-         //Update spam score
-         if(message.Spammable)
+         if(message.HasSender())
          {
-            lock(managerLock)
+            user = GetUser(message.sender.uid);
+
+            //Update spam score
+            if(message.IsSpammable())
             {
-               Log("Enter messagespam lock", MyExtensions.Logging.LogLevel.Locks);
-               warning = user.MessageSpam(messages, message.message);
-               Log("Exit messagespam lock", MyExtensions.Logging.LogLevel.Locks);
+               lock(managerLock)
+               {
+                  Log("Enter messagespam lock", MyExtensions.Logging.LogLevel.Locks);
+                  warning = user.MessageSpam(history.SelectMany(x => x.Value).Where(x => x is MessageJSONObject).Take(1000), message.message);
+                  Log("Exit messagespam lock", MyExtensions.Logging.LogLevel.Locks);
+               }
+            }
+
+            //Update spam score directly. If warning2 actually is something, update the real warning.
+            lock (managerLock)
+            {
+               warning2 = user.DirectSpam(message.spamvalue);
+               if (warning2 != ChatTags.None)
+                  warning = warning2;
             }
          }
 
-         //Update spam score directly. If warning2 actually is something, update the real warning.
-         lock (managerLock)
+         if (user.BlockedUntil < DateTime.Now)
          {
-            warning2 = user.DirectSpam(message.spamValue);
-            if (warning2 != ChatTags.None)
-               warning = warning2;
-         }
+            //warning2 = 
+            AddMessageBase(message);
 
-         //Only add message to message list if we previously set that we should.
-         if(user.BlockedUntil < DateTime.Now)
-         {
-            lock(managerLock)
-            {
-               //First add to history
-               if (!history.ContainsKey(message.tag))
-                  history.Add(message.tag, new List<UserMessageJSONObject>());
-               if(message.Display)
-                  history[message.tag].Add(message);
+            if(message.HasSender())
+               user.PerformOnPost();
 
-               //Then, get rid of history we don't need anymore
-               foreach(string key in history.Keys.ToList())
-                  history[key] = history[key].Where(x => (DateTime.Now - x.PostTime()).TotalDays <= 1).OrderByDescending(x => x.PostTime()).Take(ChatSettings.MaxMessageSend).ToList();
-               history = history.Where(x => ChatSettings.AcceptedTags.Contains(x.Key) || rooms.ContainsKey(x.Key)).ToDictionary(x => x.Key, y => y.Value);
-
-               Log("Enter message add lock", MyExtensions.Logging.LogLevel.Locks);
-               messages.Add(message);
-               messages = messages.Skip(Math.Max(0, messages.Count() - ChatSettings.MaxMessageKeep)).ToList();
-
-               if (rooms.ContainsKey(message.tag))
-                  rooms[message.tag].OnMessage();
-               
-               Log("Exit message add lock", MyExtensions.Logging.LogLevel.Locks);
-            }
-            user.PerformOnPost();
+//            if (warning2 != ChatTags.None)
+//               warning = warning;
          }
 
          return warning;
       }
 
-      public void SendMessage(ModuleJSONObject message)
+      private void AddMessageBase(MessageBaseJSONObject message)
       {
-         List<Chat> recipients = ConnectedUsers().Select(x => (Chat)x).Where(x => message.recipients.Contains(x.UID)).ToList();
+         lock(managerLock)
+         {
+            //First add to history
+            if (!history.ContainsKey(message.tag))
+               history.Add(message.tag, new List<MessageBaseJSONObject>());
+            //if(message.IsSendable())
+            history[message.tag].Add(message);
 
-         foreach(Chat recipient in recipients)
-            recipient.MySend(message.ToString());
+            //Then, get rid of history we don't need anymore
+            foreach(string key in history.Keys.ToList())
+               history[key] = history[key].Where(x => !x.HasExpired()).OrderByDescending(x => x.GetCreationTime()).Take(ChatSettings.MaxMessageSend).ToList();
+
+            //Remove messages from expired rooms
+            history = history.Where(x => ChatSettings.AcceptedTags.Contains(x.Key) || rooms.ContainsKey(x.Key)/* || x.Key == MessageBaseJSONObject.DefaultTag*/).ToDictionary(x => x.Key, y => y.Value);
+
+            Log("Enter message add lock", MyExtensions.Logging.LogLevel.Locks);
+            //messages.Add(message);
+            //messages = messages.Skip(Math.Max(0, messages.Count() - ChatSettings.MaxMessageKeep)).ToList();
+
+            if (rooms.ContainsKey(message.tag))
+               rooms[message.tag].OnMessage();
+
+            Log("Exit message add lock", MyExtensions.Logging.LogLevel.Locks);
+         }
       }
+
+//      public void SendMessage(ModuleJSONObject message)
+//      {
+//         List<Chat> recipients = ConnectedUsers().Select(x => (Chat)x).Where(x => message.recipients.Contains(x.UID)).ToList();
+//
+//         foreach(Chat recipient in recipients)
+//            recipient.MySend(message.ToString());
+//      }
          
       /*public List<string> IrcSkipUsers()
       {
@@ -885,24 +924,25 @@ the actions of any user within the chat.".Replace("\n", " ");
          {
             //First, let's get rid of old rooms
             rooms = rooms.Where(x => !x.Value.HasExpired).ToDictionary(x => x.Key, y => y.Value);
+            var loggedInUsers = LoggedInUsers();
 
             //Now we can finally do the user thing
-            userList.users = LoggedInUsers()
+            userList.users = loggedInUsers
                .Where(x => !x.Value.ShadowBanned || x.Value.UID == caller)
                .OrderBy(x => x.Value.LastJoin)
-               .Select(x => new UserJSONObject(x.Value)).ToList();
+               .Select(x => new UserJSONObject(new UserInfo(x.Value, true))).ToList();
             userList.rooms = rooms
                .Where(x => x.Value.Users.Contains(caller) && 
                      users.ContainsKey(x.Value.Creator) &&
                      (!users[x.Value.Creator].ShadowBanned || x.Value.Creator == caller))
-               .Select(x => new RoomJSONObject(x.Value, users)).ToList();
+               .Select(x => new RoomJSONObject(x.Value, UsersForModules())).ToList();
 
             if(!GetUser(caller).AnimatedAvatars)
             {
-               foreach(UserJSONObject user in userList.users)
+               foreach(UserJSONObject user in userList.users.Union(userList.rooms.SelectMany(x => x.users)))
                   user.avatar = GetUser(user.uid).AvatarStatic;
-               foreach(RoomUserJSONObject user in userList.rooms.SelectMany(x => x.users))
-                  user.avatar = GetUser(user.uid).AvatarStatic;
+//               foreach(UserJSONObject user in userList.rooms.SelectMany(x => x.users))
+//                  user.avatar = GetUser(user.uid).AvatarStatic;
             }
 
             if(minimalData)
@@ -914,7 +954,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          return userList.ToString();
       }
 
-      //Get a JSON string representing a list of the last X messages
+      //Get a JSON string representing a list of the last X messages from ALL history.
       public string ChatMessageList(int user, int messageCount = 2,
             IEnumerable<string> desiredTags = null, bool minimalData = true)
       {
@@ -931,20 +971,41 @@ the actions of any user within the chat.".Replace("\n", " ");
 
          lock (managerLock)
          {
+            var loggedInUserKeys = LoggedInUsers().Keys.ToList();
+            var actualUser = GetUser(user);
+
             jsonMessages.messages = history
+               //Only get messages in the tags that we want
                .Where(x => desiredTags.Contains(x.Key))
-               .SelectMany(x => x.Value.Take(messageCount))
-               .Where(x => users.ContainsKey(x.uid) && 
-                  (!users[x.uid].ShadowBanned || x.uid == user))
+               //Glop them all together. 
+               .SelectMany(x => x.Value.Where(
+                  //Oh, but we only want to glop stuff that we're allowed to receive!
+                  y => y.IsSendable() && y.RealRecipientList(loggedInUserKeys).Contains(user)) //&&
+                     //(!y.HasSender() || (users.ContainsKey(y.sender.uid) && 
+                     //(!users[y.sender.uid].ShadowBanned || y.sender.uid == user))))
+                  //Only take the amount that the user wants
+                  .Take(messageCount))
                .OrderBy(x => x.id).ToList();
 
-            bool animatedAvatars = GetUser(user).AnimatedAvatars;
+            //Convert language tags. This alters the REAL language object, but mmmm that probably shouldn't be an issue, right?
+            //No, because I ONLY save user messages in history to the disk, so in memory, these guys will always be typed correctly.
+            foreach(MessageJSONObject message in jsonMessages.messages)
+            {
+               if (message is ILanguageConvertibleBaseJSONObject)
+               {
+                  var parameters = ((ILanguageConvertibleBaseJSONObject)message).Parameters;
+                  parameters.UpdateUser(actualUser);
+                  message.message = ConvertTag(parameters);
+               }
+            }
+
+            bool animatedAvatars = actualUser.AnimatedAvatars;
 
             //A HORRIBLE hack! This will make the avatars bounce back and forth!
-            foreach(UserMessageJSONObject message in jsonMessages.messages)
+            foreach(MessageBaseJSONObject message in jsonMessages.messages.Where(x => x.HasSender()))
             {
-               message.avatar = animatedAvatars ? GetUser(message.uid).Avatar : GetUser(message.uid).AvatarStatic;
-               if(minimalData) message.badges = new List<Badge>();
+               message.sender.avatar = animatedAvatars ? GetUser(message.sender.uid).Avatar : GetUser(message.sender.uid).AvatarStatic;
+               if(minimalData) message.sender.badges = new List<Badge>();
             }
          }
 
@@ -954,36 +1015,88 @@ the actions of any user within the chat.".Replace("\n", " ");
          return jsonMessages.ToString();
       }
          
-      public void BroadcastExclude(string message, string tag = "", List<Chat> exclude = null)
-      {
-         if (string.IsNullOrEmpty(message))
-            return;
+//      public void BroadcastExclude(string message, string tag = "", List<Chat> exclude = null)
+//      {
+//         if (string.IsNullOrEmpty(message))
+//            return;
+//
+//         if (exclude == null)
+//            exclude = new List<Chat>();
+//         
+//         foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x)
+//            .Where(x => string.IsNullOrWhiteSpace(tag) || AllAcceptedTagsForUser(x.UID).Contains(tag)).Except(exclude))
+//         {
+//            chatter.MySend(message);
+//         }
+//      }
+//
+//      public void Broadcast(LanguageTagParameters parameters, JSONObject container, List<Chat> exclude = null)
+//      {
+//         if (exclude == null)
+//            exclude = new List<Chat>();
+//
+//         Log("Just before tag broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+//         foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x).Except(exclude))
+//         {
+//            parameters.UpdateUser(chatter.ThisUser);  //Update the message to reflect user preferences
+//
+//            //Send a tag message by filling the container with the tag parameters
+//            if(!parameters.RawSendingUser.ShadowBanned || parameters.RawSendingUser.UID == chatter.ThisUser.UID)
+//               chatter.MySend(parameters, container);    
+//         }
+//         Log("Just after tag broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
+//      }
 
-         if (exclude == null)
-            exclude = new List<Chat>();
+//      private void ApplyTagIfDefault(List<MessageBaseJSONObject> messages, string tag)
+//      {
+//         if (!ChatSettings.AcceptedTags.Contains(tag))
+//            tag = ChatSettings.GlobalTag;
+//
+//         foreach (MessageBaseJSONObject message in messages)
+//            if (message.tag == MessageBaseJSONObject.DefaultTag)
+//               message.tag = tag;
+//      }
+
+      /// <summary>
+      /// Perform full processing on message, including adding it to history and sending it to the appropriate people
+      /// </summary>
+      /// <param name="message">Message.</param>
+      /// <param name="user">User.</param>
+      public void HandleMessage(MessageBaseJSONObject message, int user)
+      {
+         var realUser = GetUser(user);
+
+         //Make sure that any messages without a tag at least have a valid tag (the global)
+         if (message.tag == MessageBaseJSONObject.DefaultTag)
+            message.tag = ChatSettings.GlobalTag;
          
-         foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x)
-            .Where(x => string.IsNullOrWhiteSpace(tag) || AllAcceptedTagsForUser(x.UID).Contains(tag)).Except(exclude))
+         if (message is MessageJSONObject)
          {
-            chatter.MySend(message);
+            var warning = AddMessage((MessageJSONObject)message);
+            if (warning != ChatTags.None)
+               HandleMessage(new LanguageConvertibleWarningJSONObject() { Parameters = new LanguageTagParameters(warning, realUser, realUser) }, user);
          }
-      }
-
-      public void Broadcast(LanguageTagParameters parameters, JSONObject container, List<Chat> exclude = null)
-      {
-         if (exclude == null)
-            exclude = new List<Chat>();
-
-         Log("Just before tag broadast", MyExtensions.Logging.LogLevel.SuperDebug);
-         foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x).Except(exclude))
+         else
          {
-            parameters.UpdateUser(chatter.ThisUser);  //Update the message to reflect user preferences
-
-            //Send a tag message by filling the container with the tag parameters
-            if(!parameters.RawSendingUser.ShadowBanned || parameters.RawSendingUser.UID == chatter.ThisUser.UID)
-               chatter.MySend(parameters, container);    
+            AddMessageBase(message);
          }
-         Log("Just after tag broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
+
+         //Take ownership of the message if the person handling it exists and there's not already a sender.
+         //This is done because we WANT most messages to be owned. If a message specifically does not need 
+         //to be owned, you should send a bad user for the handler (which is a bad design decision on my part)
+//         if (user > 0 && !message.HasSender())
+//            message.sender = new UserJSONObject(new UserInfo(realUser));
+
+         var recipients = message.RealRecipientList(LoggedInUsers().Keys.ToList());
+
+         if (realUser.ShadowBanned)
+            recipients.RemoveAll(x => x != user);
+
+         //Send the message out to all the proper recipients.
+         foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x).Where(x => recipients.Contains(x.UID)))
+         {
+            chatter.MySend(ChatMessageList(chatter.UID, 1, new[] { message.tag }, true));
+         }
       }
 
       public string ConvertTag(LanguageTagParameters parameters)
@@ -999,13 +1112,13 @@ the actions of any user within the chat.".Replace("\n", " ");
          Log("Just after userlist broadcast", MyExtensions.Logging.LogLevel.SuperDebug);
       }
 
-      public void BroadcastMessageList(IEnumerable<string> desiredTags = null)
-      {
-         Log("Just before messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
-         foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x))
-            chatter.MySend(ChatMessageList(chatter.UID, 2, desiredTags, chatter.MinimalData));
-         Log("Just after messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
-      }
+//      public void BroadcastMessageList(IEnumerable<string> desiredTags = null)
+//      {
+//         Log("Just before messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+//         foreach (Chat chatter in ConnectedUsers().Select(x => (Chat)x))
+//            chatter.MySend(ChatMessageList(chatter.UID, 3, desiredTags, chatter.MinimalData));
+//         Log("Just after messagelist broadast", MyExtensions.Logging.LogLevel.SuperDebug);
+//      }
 
       public bool CheckKey(int uid, string key)
       {

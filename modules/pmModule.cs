@@ -15,21 +15,21 @@ namespace ChatServer
                new CommandArgument("user", ArgumentType.User),
                new CommandArgument("message", ArgumentType.FullString)},
                "Send a personal message to user", true),
-            new ModuleCommand("pmcreateroom", new List<CommandArgument>{
+            new ModuleCommand("pmcreate", new List<CommandArgument>{
                new CommandArgument("userlist", ArgumentType.User, RepeatType.OneOrMore)
             }, "Create a room for the given users (you're always included)", true),
-            new ModuleCommand("pmleaveroom", new List<CommandArgument>{
+            new ModuleCommand("pmleave", new List<CommandArgument>{
                /*new CommandArgument("room", ArgumentType.User, RepeatType.OneOrMore)*/
             }, "Leave a room (you must be in the room to leave it)"),
-            new ModuleCommand("pmuserlist", new List<CommandArgument>{
+            new ModuleCommand("pmlist", new List<CommandArgument>{
                /*new CommandArgument("room", ArgumentType.User, RepeatType.OneOrMore)*/
             }, "List users in the current room")
          });
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
-         List<JSONObject> outputs = new List<JSONObject>();
+         List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
          ModuleJSONObject output = new ModuleJSONObject();
          string error = "";
 
@@ -50,11 +50,12 @@ namespace ChatServer
                output.tag = "any";
                output.message = user.Username + " -> " + command.Arguments[0] + ":\n" + command.Arguments[1];
                   //System.Security.SecurityElement.Escape(command.Arguments[1]);
+               output.sendtype = MessageBaseSendType.OnlyRecipients;
                output.recipients.Add(recipient.UID);
-               output.recipients.Add(command.uid);
+               output.recipients.Add(command.sender.uid);
                outputs.Add(output);
                break;
-            case "pmcreateroom":
+            case "pmcreate":
                HashSet<int> roomUsers = new HashSet<int>();
 
                foreach (string roomUser in command.ArgumentParts[0])
@@ -76,7 +77,7 @@ namespace ChatServer
 
                if (!string.IsNullOrWhiteSpace(error) || !ChatRunner.Server.CreatePMRoom(roomUsers, user.UID, out error))
                {
-                  WarningJSONObject warning = new WarningJSONObject(error);
+                  WarningMessageJSONObject warning = new WarningMessageJSONObject(error);
                   outputs.Add(warning);
                }
                else
@@ -87,10 +88,10 @@ namespace ChatServer
 
                break;
 
-            case "pmleaveroom":
+            case "pmleave":
                if (!ChatRunner.Server.LeavePMRoom(user.UID, command.tag, out error))
                {
-                  WarningJSONObject warning = new WarningJSONObject(error);
+                  WarningMessageJSONObject warning = new WarningMessageJSONObject(error);
                   outputs.Add(warning);
                }
                else
@@ -100,7 +101,7 @@ namespace ChatServer
                }
                break;
 
-            case "pmuserlist":
+            case "pmlist":
                List<UserInfo> pmUsers = ChatRunner.Server.UsersInPMRoom(command.tag);
 
                if(pmUsers.Count == 0)

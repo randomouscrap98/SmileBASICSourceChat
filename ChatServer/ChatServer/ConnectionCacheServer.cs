@@ -252,7 +252,7 @@ namespace ChatServer
                   }
                   else if (type == "proxyReceive")
                   {
-                     /*long lastRetrieveTicks = -1;
+                     long lastRetrieveTicks = -1;
 
                      try 
                      { 
@@ -262,10 +262,10 @@ namespace ChatServer
                      { 
                         lastRetrieveTicks = -1; 
                         Log("proxyReceive did not pass a lastretrieve. Assuming -1 (get all + flush)", LogLevel.SuperDebug);
-                     }*/
+                     }
 
                      //bool flush;
-                     TimeSpan desiredBacklogRange; //= TimeSpan.FromMinutes(1);
+                     /*TimeSpan desiredBacklogRange; //= TimeSpan.FromMinutes(1);
 
                      try 
                      { 
@@ -274,24 +274,17 @@ namespace ChatServer
                      catch 
                      { 
                         desiredBacklogRange = TimeSpan.FromMinutes(1); 
-                        Log("proxyReceive did not pass a desired backlog. Assuming 60000 (1 minute)", 
-                              LogLevel.SuperDebug);
-                     }
+                        Log("proxyReceive did not pass a desired backlog. Assuming 60000 (1 minute)", LogLevel.SuperDebug);
+                     }*/
 
-                     try
-                     {
-                        flush = (bool)json.flush;
-                     }
-                     catch
-                     {
-
-                     }
-
-                     List<Tuple<string,DateTime>> backlog = AtomicAction<List<Tuple<string,DateTime>>>(() =>
+                     /*List<Tuple<string,DateTime>> backlog = AtomicAction<List<Tuple<string,DateTime>>>(() =>
                         {
+                           //We NEVER want messages older than 10 minutes, so flush ALL that stuff.
                            connections[id].FlushInboundBacklogBefore(DateTime.Now.AddMinutes(-10));
+                           //Then just get the messages within the desired range.
                            return connections[id].GetInboundBacklogSince(DateTime.Now.Subtract(desiredBacklogRange));
-                        });
+                        });*/
+
                      //If they're using the new system where you can give the
                      //tick count of the last message retrieved, do so.
                      //Otherwise, do the old flushing system.
@@ -330,7 +323,7 @@ namespace ChatServer
                      }
 
                   }
-                  else if (type == "proxyEventStream")
+                  /*else if (type == "proxyEventStream")
                   {
                      TimeSpan desiredBacklogRange; //= TimeSpan.FromMinutes(1);
 
@@ -360,7 +353,7 @@ namespace ChatServer
                      }
 
                      WriteToStream(output.ToString(), ref stream);
-                  }
+                  }*/
                   else if (type == "proxyEnd")
                   {
                      CloseConnection(id);

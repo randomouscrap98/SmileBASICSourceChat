@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace ModuleSystem
 {
-   public delegate void CommandCallback(List<JSONObject> output, int callerUID);
+   public delegate void CommandCallback(List<MessageBaseJSONObject> output, int callerUID);
 
    public abstract class Module
    {
@@ -138,34 +138,39 @@ namespace ModuleSystem
          }
       }
 
-      public List<JSONObject> FastMessage(string message, bool warning = false)
+      public List<MessageBaseJSONObject> FastMessage(string message, bool warning = false)
       {
          if (warning)
          {
-            WarningJSONObject output = new WarningJSONObject();
-            output.message = message;
-            return new List<JSONObject> { output };
+            WarningMessageJSONObject output = new WarningMessageJSONObject(message);
+            //output.message = message;
+            return new List<MessageBaseJSONObject> { output };
          }
          else
          {
-            ModuleJSONObject output = new ModuleJSONObject();
-            output.message = message;
-            return new List<JSONObject> { output };
+            ModuleJSONObject output = new ModuleJSONObject(message);
+            //output.message = message;
+            return new List<MessageBaseJSONObject> { output };
          }
       }
+
+//      public ModuleJSONObject CreateMessage(string message, UserInfo user)
+//      {
+//         return new ModuleJSONObject(Nickname, message, user);
+//      }
 
       /// <summary>
       /// Modules can use this to add a generic error to their return from ProccessCommand.
       /// </summary>
       /// <param name="output">The data you'll be returning from ProcessCommand</param>
-      protected void AddError(List<JSONObject> output)
+      protected void AddError(List<MessageBaseJSONObject> output)
       {
-         ModuleJSONObject error = new ModuleJSONObject();
-         error.message = "An internal error occurred for the " + Nickname + " module";
+         ModuleJSONObject error = new ModuleJSONObject("An internal error occurred for the " + Nickname + " module");
+         //error.message = ";
          output.Add(error);
       }
 
-      protected void ExtraCommandOutput(List<JSONObject> outputs, int callerUID)
+      protected void ExtraCommandOutput(List<MessageBaseJSONObject> outputs, int callerUID)
       {
          OnExtraCommandOutput(outputs, callerUID);
       }
@@ -204,7 +209,7 @@ namespace ModuleSystem
       /// <param name="message">Message.</param>
       /// <param name="user">User.</param>
       /// <param name="users">Users.</param>
-      public virtual void ProcessMessage(UserMessageJSONObject message, UserInfo user, Dictionary<int, UserInfo> users)
+      public virtual void ProcessMessage(MessageJSONObject message, UserInfo user, Dictionary<int, UserInfo> users)
       {
          //this function does nothing right now.
       }
@@ -220,9 +225,9 @@ namespace ModuleSystem
       /// <param name="command">Command.</param>
       /// <param name="user">User.</param>
       /// <param name="users">Users.</param>
-      public virtual List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public virtual List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
-         List<JSONObject> output = new List<JSONObject>();
+         List<MessageBaseJSONObject> output = new List<MessageBaseJSONObject>();
 
          return output;
       }
@@ -233,9 +238,9 @@ namespace ModuleSystem
       /// </summary>
       /// <param name="user">User joining the chat</param>
       /// <param name="users">User session.</param>
-      public virtual List<JSONObject> OnUserJoin(UserInfo user, Dictionary<int, UserInfo> users)
+      public virtual List<MessageBaseJSONObject> OnUserJoin(UserInfo user, Dictionary<int, UserInfo> users)
       {
-         return new List<JSONObject>();
+         return new List<MessageBaseJSONObject>();
       }
 
       /// <summary>
@@ -671,7 +676,7 @@ namespace ModuleSystem
       }
    }
 
-   public class UserCommand : UserMessageJSONObject
+   public class UserCommand : MessageJSONObject
    {
       public readonly string Command;
       public readonly List<string> Arguments;
@@ -679,7 +684,7 @@ namespace ModuleSystem
       public readonly List<string> OriginalArguments;
       public readonly ModuleCommand MatchedCommand;
 
-      public UserCommand(string command, List<string> parts, UserMessageJSONObject originalMessage, ModuleCommand matched) : base(originalMessage)
+      public UserCommand(string command, List<string> parts, MessageJSONObject originalMessage, ModuleCommand matched) : base(originalMessage)
       {
          Command = command;
          Arguments = parts;

@@ -50,9 +50,9 @@ namespace ChatServer
 
          //Assume the manager that was given was good
          this.manager = manager;
-
-         foreach (Module module in manager.GetModuleListCopy())
-            module.OnExtraCommandOutput += DefaultOutputMessages;
+//
+//         foreach (Module module in manager.GetModuleListCopy())
+//            module.OnExtraCommandOutput += DefaultOutputMessages;
       }
 
       public void Log(string message, LogLevel level = LogLevel.Normal)
@@ -188,43 +188,47 @@ namespace ChatServer
          }
       }
 
-      public void MySend(LanguageTagParameters parameters, JSONObject container)
+//      public void MySend(LanguageTagParameters parameters, JSONObject container)
+//      {
+//         string message = manager.ConvertTag(parameters);
+//         //string subtype = parameters.Tag.ToString().ToLower();
+//
+//         if (container is WarningJSONObject)
+//         {
+//            container = NewWarningFromTag(parameters);
+//            /*   (WarningJSONObject)container;
+//            warning.message = message;
+//            warning.subtype = subtype;*/
+//         }
+//         else if (container is SystemMessageJSONObject)
+//         {
+//            container = NewSystemMessageFromTag(parameters);
+//            /*((SystemMessageJSONObject)container).message = message;
+//            ((SystemMessageJSONObject)container).subtype = subtype;*/
+//         }
+//         else
+//         {
+//            Log("Didn't get a proper container for a language tag. Using system message as default", LogLevel.Warning);
+//            ((SystemMessageJSONObject)container).message = message;
+//         }
+//
+//         MySend(container.ToString());
+//      }
+
+      public LanguageConvertibleWarningJSONObject NewWarningFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
-         string message = manager.ConvertTag(parameters);
-         //string subtype = parameters.Tag.ToString().ToLower();
-
-         if (container is WarningJSONObject)
-         {
-            container = NewWarningFromTag(parameters);
-            /*   (WarningJSONObject)container;
-            warning.message = message;
-            warning.subtype = subtype;*/
-         }
-         else if (container is SystemMessageJSONObject)
-         {
-            container = NewSystemMessageFromTag(parameters);
-            /*((SystemMessageJSONObject)container).message = message;
-            ((SystemMessageJSONObject)container).subtype = subtype;*/
-         }
-         else
-         {
-            Log("Didn't get a proper container for a language tag. Using system message as default", LogLevel.Warning);
-            ((SystemMessageJSONObject)container).message = message;
-         }
-
-         MySend(container.ToString());
+         return new LanguageConvertibleWarningJSONObject(
+            new WarningMessageJSONObject(manager.ConvertTag(parameters), parameters.SendingUser) 
+            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType});
       }
 
-      public WarningJSONObject NewWarningFromTag(LanguageTagParameters parameters)
+      public LanguageConvertibleSystemJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
-         return new WarningJSONObject(manager.ConvertTag(parameters)) 
-         { subtype = parameters.Tag.ToString().ToLower(), uid = parameters.SendingUser.UID };
-      }
-
-      public SystemMessageJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters)
-      {
-         return new SystemMessageJSONObject(manager.ConvertTag(parameters)) 
-         { subtype = parameters.Tag.ToString().ToLower(), uid = parameters.SendingUser.UID };
+         return new LanguageConvertibleSystemJSONObject(
+            new SystemMessageJSONObject(manager.ConvertTag(parameters), parameters.SendingUser) 
+            { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType});
+//         return new SystemMessageJSONObject(manager.ConvertTag(parameters)) 
+//         { subtype = parameters.Tag.ToString().ToLower(), sender = parameters.SendingUser };
       }
 
       public LanguageTagParameters QuickParams(ChatTags tag)
@@ -232,11 +236,11 @@ namespace ChatServer
          return new LanguageTagParameters(tag, ThisUser);
       }
 
-      public List<JSONObject> AddModuleTags(List<JSONObject> outputs, Module module)
+      public List<MessageBaseJSONObject> AddModuleTags(List<MessageBaseJSONObject> outputs, Module module)
       {
          //List<JSONObject> commandOutput = commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers);
 
-         foreach(JSONObject jsonMessage in outputs)
+         foreach(MessageBaseJSONObject jsonMessage in outputs)
             if(jsonMessage is ModuleJSONObject)
                ((ModuleJSONObject)jsonMessage).module = module.Nickname;
 
@@ -255,7 +259,8 @@ namespace ChatServer
             ThisUser.PerformOnChatLeave(sessionID);
 
             if (ThisUser.ShowMessages && !ThisUser.ShadowBanned)
-               manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
+               SendFromMe(NewSystemMessageFromTag(QuickParams(ChatTags.Leave), MessageBaseSendType.BroadcastExceptSender));
+               //manager.Broadcast(new LanguageTagParameters(ChatTags.Leave, ThisUser), new SystemMessageJSONObject());
          }
 
          //Now "technically" remove the user from lists
@@ -270,8 +275,6 @@ namespace ChatServer
          //Now get rid of events
          userUpdateTimer.Elapsed -= UpdateActiveUserList;
 
-         foreach (Module module in manager.GetModuleListCopy())
-            module.OnExtraCommandOutput -= DefaultOutputMessages;
          
 //         manager.LeaveChat(this);
 //
@@ -280,6 +283,22 @@ namespace ChatServer
 
          //relay.Disconnect();
          //relay.Dispose();
+      }
+
+      public void SendFromMe(MessageBaseJSONObject message)
+      {
+         SetFromMeIfNothing(new List<MessageBaseJSONObject>() { message });
+         manager.HandleMessage(message, this.UID);
+      }
+
+      public void SendModuleMessagesFromMe(List<MessageBaseJSONObject> messages, Module module) //, string tag = MessageBaseJSONObject.DefaultTag)
+      {
+//         foreach (MessageBaseJSONObject message in messages)
+//            if (message.tag == MessageBaseJSONObject.DefaultTag)
+//               message.tag = tag;
+//         
+         foreach (MessageBaseJSONObject message in AddModuleTags(messages, module))
+            SendFromMe(message);
       }
 
 //      protected override void OnError(ErrorEventArgs e)
@@ -378,16 +397,19 @@ namespace ChatServer
                         {
                            //BEFORE adding, broadcast the "whatever has entered the chat" message
                            if (ThisUser.ShowMessages && !ThisUser.ShadowBanned)
-                           {
-                              manager.Broadcast(QuickParams(ChatTags.Join), new SystemMessageJSONObject(),
-                                    new List<Chat> { this });
-                           }
+                              SendFromMe(NewSystemMessageFromTag(QuickParams(ChatTags.Join), MessageBaseSendType.BroadcastExceptSender));
+                              //enterMessage.sendtype = MessageBaseSendType.BroadcastExceptSender;
+                              //manager.HandleMessage(enterMessage);
+//                              manager.Broadcast(QuickParams(ChatTags.Join), new SystemMessageJSONObject(),
+//                                    new List<Chat> { this });
 
-                           MySend(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome)).ToString());
+                           SendFromMe(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome), MessageBaseSendType.IncludeSender));
+                           //MySend(NewSystemMessageFromTag(QuickParams(ChatTags.Welcome)).ToString());
                            ChatTags enterSpamWarning = ThisUser.JoinSpam();
 
                            if (enterSpamWarning != ChatTags.None)
-                              MySend(NewWarningFromTag(QuickParams(enterSpamWarning)).ToString());
+                              SendFromMe(NewWarningFromTag(QuickParams(enterSpamWarning), MessageBaseSendType.IncludeSender));
+                              //MySend(NewWarningFromTag(QuickParams(enterSpamWarning)).ToString());
 
                            //BEFORE sending out the user list, we need to perform onPing so that it looks like this user is active
                            sessionID = ThisUser.PerformOnChatEnter();
@@ -400,7 +422,7 @@ namespace ChatServer
                            response.result = true;
                            response.extras.Add("modules", manager.GetModuleListCopy(uid).Select(x => x.Nickname).ToList());
 
-                           List<JSONObject> outputs = new List<JSONObject>();
+                           //List<JSONObject> outputs = new List<JSONObject>();
                            Dictionary<int, UserInfo> currentUsers = manager.UsersForModules();
 
                            //Also do some other crap
@@ -410,7 +432,10 @@ namespace ChatServer
                               {
                                  try
                                  {
-                                    outputs.AddRange(AddModuleTags(module.OnUserJoin(currentUsers[ThisUser.UID], currentUsers), module));
+                                    SendModuleMessagesFromMe(module.OnUserJoin(currentUsers[ThisUser.UID], currentUsers), module);
+//                                    var messages = AddModuleTags(module.OnUserJoin(currentUsers[ThisUser.UID], currentUsers), module);
+//                                    SetFromMeIfNothing(messages);
+//                                    outputs.AddRange();
                                  }
                                  finally
                                  {
@@ -424,7 +449,7 @@ namespace ChatServer
                               }
                            }
 
-                           OutputMessages(outputs, ThisUser.UID);
+                           //OutputMessages(outputs, ThisUser.UID);
 
                            //Finally, output the "Yo accept dis" thing if they haven't already.
                            if(!ThisUser.AcceptedPolicy)
@@ -486,7 +511,7 @@ namespace ChatServer
                //First, gather information from the JSON. This is so that if
                //the json is invalid, it will fail as soon as possible
                string key = json.key;
-               string message = System.Security.SecurityElement.Escape((string)json.text);
+               string message = (string)json.text; //System.Security.SecurityElement.Escape((string)json.text);
                string tag = json.tag;
 
                //You HAVE to do this, even though it seems pointless. Users need to show up as banned immediately.
@@ -526,7 +551,7 @@ namespace ChatServer
                         queryFailures + " failure(s)", LogLevel.Warning);
 
                   foreach (string warning in warnings)
-                     MySend((new WarningJSONObject("Chat Warning: " + warning)).ToString());
+                     SendFromMe(new WarningMessageJSONObject("Chat Warning: " + warning));
                }
                else if (string.IsNullOrWhiteSpace(message))
                {
@@ -550,19 +575,20 @@ namespace ChatServer
                                                    "subjects!");
                      MySend(acceptSuccess.ToString(), true);
 
-                     Thread.Sleep(2000);
+                     //Thread.Sleep(2000);
                      ThisUser.AcceptPolicy();
                      ThisUser.PerformOnReminder();
                      response.result = true;
 
                      //Send these ONLY to the user.
+                     //manager.BroadcastUserList()
                      MySend(manager.ChatUserList(UID));
-                     MySend(manager.ChatMessageList(UID));
+                     MySend(manager.ChatMessageList(UID, 10));
                   }
                }
                else if (ThisUser.Blocked)
                {
-                  response.errors.Add(NewWarningFromTag(QuickParams(ChatTags.Blocked)).message);
+                  response.errors.Add(manager.ConvertTag(QuickParams(ChatTags.Blocked))); //NewWarningFromTag(QuickParams(ChatTags.Blocked), MessageBaseSendType.IncludeSender).message);
                }
                else if (ThisUser.Banned)
                {
@@ -581,8 +607,8 @@ namespace ChatServer
                else
                {
                   Dictionary<int, UserInfo> currentUsers = manager.UsersForModules();
-                  List<JSONObject> outputs = new List<JSONObject>();
-                  UserMessageJSONObject userMessage = new UserMessageJSONObject(new UserInfo(ThisUser,true), message, tag);
+                  //List<JSONObject> outputs = new List<JSONObject>();
+                  MessageJSONObject userMessage = new MessageJSONObject(message, new UserInfo(ThisUser,true), tag);
                   UserCommand userCommand;
                   Module commandModule;
                   string commandError = "";
@@ -598,10 +624,11 @@ namespace ChatServer
                      {
                         try
                         {
-                           outputs.AddRange(AddModuleTags(
-                              commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers), 
-                              commandModule
-                           ));
+                           SendModuleMessagesFromMe(commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers), commandModule);
+//                           outputs.AddRange(AddModuleTags(
+//                              commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers), 
+//                              commandModule
+//                           ));
                         }
                         finally
                         {
@@ -611,16 +638,18 @@ namespace ChatServer
                      else
                      {
                         response.errors.Add("The chat server is busy and can't process your command right now");
-                        userMessage.SetHidden();
-                        userMessage.SetUnspammable();
+                        //userMessage.SetHidden(true);
+                        //userMessage.SetNoRecipients();
+                        userMessage.SetSpammable(false);
                      }
 
                      //do not update spam score if command module doesn't want it
                      if (!userCommand.MatchedCommand.ShouldUpdateSpamScore)
-                        userMessage.SetUnspammable();
+                        userMessage.SetSpammable(false);
 
                      //For now, simply capture all commands no matter what.
-                     userMessage.SetHidden();
+                     userMessage.SetNoRecipients();
+                     //userMessage.SetHidden(true);
                      //userMessage.SetCommand();
 
                      Log("Module " + commandModule.ModuleName + " processed command from " + UserLogString, 
@@ -632,21 +661,23 @@ namespace ChatServer
                      if (!string.IsNullOrWhiteSpace(commandError))
                      {
                         response.errors.Add("Command error: " + commandError);
-                        userMessage.SetHidden();
-                        userMessage.SetUnspammable();
+                        //userMessage.SetHidden(true);
+                        userMessage.SetNoRecipients();
+                        userMessage.SetSpammable(false);
                      }
                   }
 
-                  if (ThisUser.Hiding && userMessage.Display && !manager.IsPMTag(userMessage.tag))
+                  if (ThisUser.Hiding && !userMessage.IsSendable() && !manager.IsPMTag(userMessage.tag))
                   {
-                     MySend((new WarningJSONObject("You're hiding! Don't send messages!")).ToString());
+                     MySend((new WarningMessageJSONObject("You're hiding! Don't send messages!")).ToString());
                   }
                   else
                   {
-                     ChatTags warning = manager.AddMessage(userMessage);
-
-                     if (warning != ChatTags.None)
-                        outputs.Add(NewWarningFromTag(QuickParams(warning)));
+                     SendFromMe(userMessage);
+//                     ChatTags warning = manager.AddMessage(userMessage);
+//
+//                     if (warning != ChatTags.None)
+//                        outputs.Add(NewWarningFromTag(QuickParams(warning)));
                   }
 
                   //Send off on relay
@@ -664,8 +695,8 @@ namespace ChatServer
                   UpdateActiveUserList(null, null);
 
                   //Since we added a new message, we need to broadcast.
-                  if (response.result && userMessage.Display)
-                     manager.BroadcastMessageList(new string[] {userMessage.tag}); 
+//                  if (response.result && !userMessage.IsHidden())
+//                     manager.BroadcastMessageList(new string[] {userMessage.tag}); 
 
                   //Step 2: run regular message through all modules' regular message processor (probably no output?)
                   ProcessMessage(userMessage, currentUsers);
@@ -675,7 +706,7 @@ namespace ChatServer
                   //each module can just specify that it wants to do things at random points with its own timer.
 
                   //Step 4: iterate over returned messages and send them out appropriately
-                  OutputMessages(outputs, ThisUser.UID, tag);
+                  //OutputMessages(outputs, ThisUser.UID, tag);
                   //end of regular message processing
                }
             }
@@ -698,7 +729,7 @@ namespace ChatServer
                else if (wanted == "messageList")
                {
                   //Again, send only to the user. Pump up the number so it's nice (eventually will pull number from request)
-                  MySend(manager.ChatMessageList(UID, 10));
+                  MySend(manager.ChatMessageList(UID, 20));
                   response.result = true;
                }
                else
@@ -716,7 +747,7 @@ namespace ChatServer
          MySend(response.ToString(), true);
       }
          
-      private void ProcessMessage(UserMessageJSONObject message, Dictionary<int, UserInfo> currentUsers)
+      private void ProcessMessage(MessageJSONObject message, Dictionary<int, UserInfo> currentUsers)
       {
          //Step 2: run regular message through all modules' regular message processor (probably no output?)
          if (manager.ChatSettings.AcceptedTags.Contains(message.tag))
@@ -743,96 +774,117 @@ namespace ChatServer
          }
       }
 
-      private void OutputMessages(List<JSONObject> outputs, int receiverUID, string defaultTag = "")
+//      private void ApplyTagIfDefault(List<MessageBaseJSONObject> messages, string tag)
+//      {
+//         if (!manager.ChatSettings.AcceptedTags.Contains(tag))
+//            tag = manager.ChatSettings.GlobalTag;
+//
+//         foreach (MessageBaseJSONObject message in messages)
+//            if (message.tag == MessageBaseJSONObject.DefaultTag)
+//               message.tag = tag;
+//      }
+
+      private void SetFromMeIfNothing(List<MessageBaseJSONObject> messages)
       {
-         //We're not the ones you're looking for...
-         if (ThisUser.UID != receiverUID)
-            return;
-         
-         if (!manager.ChatSettings.AcceptedTags.Contains(defaultTag))
-            defaultTag = manager.ChatSettings.GlobalTag;
-         
-         foreach(JSONObject jsonMessage in outputs)
-         {
-            //System messages are easy: just send to user.
-            if (jsonMessage is SystemMessageJSONObject)
-            {
-               MySend(jsonMessage.ToString());
-            }
-            else if (jsonMessage is WarningJSONObject)
-            {
-               MySend(jsonMessage.ToString());
-            }
-            else if (jsonMessage is UserMessageJSONObject)
-            {
-               UserMessageJSONObject userMessage = jsonMessage as UserMessageJSONObject;
+         foreach (MessageBaseJSONObject message in messages)
+            if (!message.HasSender())
+               message.sender = new UserJSONObject(new UserInfo(ThisUser, true));
+      }
+
+//      private void OutputMessages(List<MessageBaseJSONObject> outputs, int receiverUID, string defaultTag = "")
+//      {
+//         //We're not the ones you're looking for...
+//         if (ThisUser.UID != receiverUID)
+//            return;
+//         
+//         if (!manager.ChatSettings.AcceptedTags.Contains(defaultTag))
+//            defaultTag = manager.ChatSettings.GlobalTag;
+//         
+//         foreach(JSONObject jsonMessage in outputs)
+//         {
+//            //System messages are easy: just send to user.
+//            if (jsonMessage is SystemMessageJSONObject)
+//            {
+//               MySend(jsonMessage.ToString());
+//            }
+//            else if (jsonMessage is WarningJSONObject)
+//            {
+//               MySend(jsonMessage.ToString());
+//            }
+//            else if (jsonMessage is UserMessageJSONObject)
+//            {
+//               UserMessageJSONObject userMessage = jsonMessage as UserMessageJSONObject;
+////
+////               if(string.IsNullOrWhiteSpace(tempJSON.tag))
+////                  tempJSON.tag = defaultTag;
+//               Log("A module is sending a user message output!");
+//
+//               ChatTags warning = manager.AddMessage(userMessage);
+//
+//               if (warning != ChatTags.None)
+//                  MySend(NewWarningFromTag(QuickParams(warning)).ToString());
+//                  //outputs.Add(NewWarningFromTag(QuickParams(warning)));
+//
+//               //Since we added a new message, we need to broadcast.
+//               if (userMessage.Display)
+//                  manager.BroadcastMessageList(); 
+//
+//               ProcessMessage(userMessage, manager.UsersForModules());
+//               //MySend(jsonMessage.ToString());
+//            }
+////            else if (jsonMessage is SystemRequest)
+////            {
+////               //System requests made by modules are passed to the manager. I don't handle that crap.
+////               manager.OnRequest((SystemRequest)jsonMessage);
+////            }
+//            else if (jsonMessage is ModuleJSONObject)
+//            {
+//               ModuleJSONObject tempJSON = jsonMessage as ModuleJSONObject;
+//               tempJSON.uid = uid;
 //
 //               if(string.IsNullOrWhiteSpace(tempJSON.tag))
-//                  tempJSON.tag = defaultTag;
-               Log("A module is sending a user message output!");
-
-               ChatTags warning = manager.AddMessage(userMessage);
-
-               if (warning != ChatTags.None)
-                  MySend(NewWarningFromTag(QuickParams(warning)).ToString());
-                  //outputs.Add(NewWarningFromTag(QuickParams(warning)));
-
-               //Since we added a new message, we need to broadcast.
-               if (userMessage.Display)
-                  manager.BroadcastMessageList(); 
-
-               ProcessMessage(userMessage, manager.UsersForModules());
-               //MySend(jsonMessage.ToString());
-            }
-//            else if (jsonMessage is SystemRequest)
-//            {
-//               //System requests made by modules are passed to the manager. I don't handle that crap.
-//               manager.OnRequest((SystemRequest)jsonMessage);
+//                  tempJSON.tag = manager.ChatSettings.GlobalTag;
+//
+//               if(tempJSON.broadcast)
+//               {
+//                  if(ThisUser.ShadowBanned)
+//                     MySend(tempJSON.ToString());
+//                  else
+//                     manager.BroadcastExclude(tempJSON.ToString(), tempJSON.tag);
+//                  //manager.Broadcast(tempJSON.ToString());
+//                  Log("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
+//               }
+//               else
+//               {
+//                  //No recipients? You probably meant to send it to the current user.
+//                  if(tempJSON.recipients.Count == 0)
+//                  {
+//                     MySend(tempJSON.ToString());
+//                  }
+//                  else
+//                  {
+//                     //Only includ the shadowbanned user in the recipients (remove
+//                     //all others)
+//                     if(ThisUser.ShadowBanned)
+//                     {
+//                        tempJSON.recipients = tempJSON.recipients.Where(x => x ==
+//                              ThisUser.UID).ToList();
+//                     }
+//                     manager.SendMessage(tempJSON);
+//                  }
+//               }
 //            }
-            else if (jsonMessage is ModuleJSONObject)
-            {
-               ModuleJSONObject tempJSON = jsonMessage as ModuleJSONObject;
-               tempJSON.uid = uid;
+//         }
+//      }
 
-               if(string.IsNullOrWhiteSpace(tempJSON.tag))
-                  tempJSON.tag = manager.ChatSettings.GlobalTag;
-
-               if(tempJSON.broadcast)
-               {
-                  if(ThisUser.ShadowBanned)
-                     MySend(tempJSON.ToString());
-                  else
-                     manager.BroadcastExclude(tempJSON.ToString(), tempJSON.tag);
-                  //manager.Broadcast(tempJSON.ToString());
-                  Log("Broadcast a module message", MyExtensions.Logging.LogLevel.Debug);
-               }
-               else
-               {
-                  //No recipients? You probably meant to send it to the current user.
-                  if(tempJSON.recipients.Count == 0)
-                  {
-                     MySend(tempJSON.ToString());
-                  }
-                  else
-                  {
-                     //Only includ the shadowbanned user in the recipients (remove
-                     //all others)
-                     if(ThisUser.ShadowBanned)
-                     {
-                        tempJSON.recipients = tempJSON.recipients.Where(x => x ==
-                              ThisUser.UID).ToList();
-                     }
-                     manager.SendMessage(tempJSON);
-                  }
-               }
-            }
-         }
-      }
-
-      private void DefaultOutputMessages(List<JSONObject> outputs, int receiverUID)
-      {
-         OutputMessages(outputs, receiverUID);
-      }
+//      private void DefaultOutputMessages(List<MessageBaseJSONObject> outputs, int receiverUID)
+//      {
+//         //ApplyTagIfDefault(outputs, manager.ChatSettings.GlobalTag);
+//
+//         foreach (var message in outputs)
+//            manager.HandleMessage(message, receiverUID);
+//         //OutputMessages(outputs, receiverUID);
+//      }
 
       private string ParseUser(string user)
       {
@@ -871,7 +923,7 @@ namespace ChatServer
       /// <param name="message">Message.</param>
       /// <param name="commandModule">Command module.</param>
       /// <param name="userCommand">User command.</param>
-      private bool TryCommandParse(UserMessageJSONObject message, out Module commandModule, out UserCommand userCommand, out string error)
+      private bool TryCommandParse(MessageJSONObject message, out Module commandModule, out UserCommand userCommand, out string error)
       {
          userCommand = null;
          commandModule = null;
@@ -880,7 +932,7 @@ namespace ChatServer
          UserCommand tempUserCommand = null;
          List<Module> modules = manager.GetModuleListCopy(UID);
 
-         string realMessage = System.Net.WebUtility.HtmlDecode(message.message);
+         string realMessage = message.message; //System.Net.WebUtility.HtmlDecode(message.message);
 
          //Check through all modules for possible command match
          foreach(Module module in modules)
@@ -978,9 +1030,9 @@ namespace ChatServer
          });
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
-         List<JSONObject> outputs = new List<JSONObject>();
+         List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
 
          ModuleJSONObject output = new ModuleJSONObject();
 

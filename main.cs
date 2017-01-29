@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "2.6.6";
+      public const string Version = "3.0";
 
       private static AuthServer authServer;
       private static ConnectionCacheServer proxyServer = null;
@@ -111,7 +111,7 @@ namespace ChatServer
             logger.Warning("Couldn't load language tags! Hopefully the default will suffice");
 
          settings.MaxUserQueryFailures = GetOption<int>("maxUserQueryFailures");
-         settings.MaxMessageKeep = GetOption<int>("messageBacklog");
+         //settings.MaxMessageKeep = GetOption<int>("messageBacklog");
          settings.MaxMessageSend = GetOption<int>("messageSend");
          settings.MaxModuleWait = TimeSpan.FromSeconds(GetOption<int>("moduleWaitSeconds"));
          settings.SaveFolder = GetOption<string>("saveFolder");
@@ -183,8 +183,8 @@ namespace ChatServer
                { "authServerPort", 45696 },
                { "chatServerPort", 45695 },
                { "chatTimeout", 15 },
-               { "messageBacklog", 1000 },
-               { "messageSend", 10 },
+               //{ "messageBacklog", 1000 },
+               { "messageSend", 30 },
                { "acceptedTags", "general, admin, offtopic" },
                { "globalTag", "any" },
                { "userUpdateInterval", 60 },

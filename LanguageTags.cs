@@ -216,6 +216,25 @@ namespace ChatEssentials
       }
    }
 
+   public interface ILanguageConvertibleBaseJSONObject //: MessageBaseJSONObject
+   {
+      LanguageTagParameters Parameters{ get; set;}
+   }
+
+   public class LanguageConvertibleSystemJSONObject : SystemMessageJSONObject, ILanguageConvertibleBaseJSONObject
+   {
+      public LanguageTagParameters Parameters { get; set; }
+      public LanguageConvertibleSystemJSONObject() : base() {}
+      public LanguageConvertibleSystemJSONObject(SystemMessageJSONObject copy) : base(copy) {}
+   }
+
+   public class LanguageConvertibleWarningJSONObject : WarningMessageJSONObject
+   {
+      public LanguageTagParameters Parameters { get; set; }
+      public LanguageConvertibleWarningJSONObject() : base() {}
+      public LanguageConvertibleWarningJSONObject(WarningMessageJSONObject copy) : base(copy) {}
+   }
+
    public class LanguageTagParameters
    {
       public readonly ChatTags Tag;

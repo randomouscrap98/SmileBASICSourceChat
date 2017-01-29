@@ -29,11 +29,13 @@ namespace ChatServer
          thisRealUser.Hiding = false;
          thisRealUser.LastJoin = DateTime.Now;
          ChatRunner.Server.BroadcastUserList();
-         ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), 
-               new SystemMessageJSONObject());
+         ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Join, thisRealUser)}, uid);
+
+//         ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), 
+//               new SystemMessageJSONObject());
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
          User thisRealUser = ChatRunner.Server.GetUser(user.UID);
 
@@ -47,7 +49,8 @@ namespace ChatServer
             if (thisRealUser.Hiding)
             {
                ChatRunner.Server.BroadcastUserList();
-               ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Leave, thisRealUser), new SystemMessageJSONObject());
+               ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser)}, user.UID);
+               //ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Leave, thisRealUser), new SystemMessageJSONObject());
 
                return FastMessage("You're now hiding. Hiding persists across reloads. Be careful, you can still use commands!");
             }
@@ -62,7 +65,7 @@ namespace ChatServer
             }
          }
 
-         return new List<JSONObject>();
+         return new List<MessageBaseJSONObject>();
       }
    }
 
@@ -104,7 +107,7 @@ namespace ChatServer
          return hidingUsers;
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
          string output = "";
          UserInfo parsedUser = null;
@@ -137,14 +140,14 @@ namespace ChatServer
             if (!user.ChatControlExtended)
                return FastMessage("This command doesn't *AHEM* exist");
 
-            UserMessageJSONObject directMessage = 
-               new UserMessageJSONObject(user, command.Arguments[0], command.tag);
+            MessageJSONObject directMessage = new MessageJSONObject(command.Arguments[0], user, command.tag);
             directMessage.encoding = "raw";
+            directMessage.safe = false;
 
-            return new List<JSONObject>() {directMessage};
+            return new List<MessageBaseJSONObject>() {directMessage};
          }
 
-         return new List<JSONObject>();
+         return new List<MessageBaseJSONObject>();
       }
    }
    /*public class AdminModule : Module

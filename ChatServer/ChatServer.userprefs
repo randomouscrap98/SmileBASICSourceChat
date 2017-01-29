@@ -16,8 +16,8 @@
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <DisabledProjects>
     <String>MyExtensions/MyExtensions.csproj</String>
-    <String>PortedModules/PortedModules.csproj</String>
-    <String>ModulePackage2/ModulePackage2.csproj</String>
     <String>ModulePackage1/ModulePackage1.csproj</String>
+    <String>ModulePackage2/ModulePackage2.csproj</String>
+    <String>PortedModules/PortedModules.csproj</String>
   </DisabledProjects>
 </Properties>

@@ -30,9 +30,9 @@ namespace ChatServer
          //commands.Add(new ModuleCommand("myrooms", new List<CommandArgument>(), "show pm rooms you're currently in"));
       }
 
-      public override List<JSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
+      public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
       {
-         List<JSONObject> outputs = new List<JSONObject>();
+         List<MessageBaseJSONObject> outputs = new List<MessageBaseJSONObject>();
          ModuleJSONObject moduleOutput = new ModuleJSONObject();
 
          string message = "";
@@ -64,7 +64,8 @@ namespace ChatServer
                   ChatRunner.PerformRequest(new SystemRequest(SystemRequests.Reset, realTimeout));
 
                   moduleOutput.message = user.Username + " is resetting the server in " + StringExtensions.LargestTime(realTimeout);
-                  moduleOutput.broadcast = true;
+                  moduleOutput.sendtype = MessageBaseSendType.Broadcast;
+                  //moduleOutput.broadcast = true;
                   outputs.Add(moduleOutput);
 
                   break;
@@ -79,7 +80,8 @@ namespace ChatServer
                   ChatRunner.PerformRequest(new SystemRequest(SystemRequests.LockDeath, TimeSpan.FromSeconds(5)));
 
                   moduleOutput.message = user.Username + " is simulating a server crash. The server WILL be unresponsive if successful";
-                  moduleOutput.broadcast = true;
+                  moduleOutput.sendtype = MessageBaseSendType.Broadcast;
+                  //moduleOutput.broadcast = true;
                   outputs.Add(moduleOutput);
 
                   break;
@@ -93,7 +95,8 @@ namespace ChatServer
                   ChatRunner.PerformRequest(new SystemRequest(SystemRequests.SaveModules));
 
                   moduleOutput.message = user.Username + " is saving all module data. This may cause a small hiccup";
-                  moduleOutput.broadcast = true;
+                  moduleOutput.sendtype = MessageBaseSendType.Broadcast;
+                  //moduleOutput.broadcast = true;
                   outputs.Add(moduleOutput);
 
                   break;
@@ -106,8 +109,8 @@ namespace ChatServer
 
                   message = "Information about the chat server:\n\n";
 
-                  Dictionary<string, List<UserMessageJSONObject>> history = ChatRunner.Server.GetHistory();
-                  List<UserMessageJSONObject> messages = ChatRunner.Server.GetMessages();
+                  Dictionary<string, List<MessageBaseJSONObject>> history = ChatRunner.Server.GetHistory();
+                  //List<MessageBaseJSONObject> messages = ChatRunner.Server.GetMessages();
                   List<LogMessage> logMessages = ChatRunner.Server.Settings.LogProvider.GetMessages();
                   List<LogMessage> logFileBuffer = ChatRunner.Server.Settings.LogProvider.GetFileBuffer();
                   List<Module> modules = ChatRunner.Server.GetModuleListCopy();
@@ -116,7 +119,7 @@ namespace ChatServer
                   message += "History messages: " + history.Sum(x => x.Value.Count) + "\n";
                   message += "Registered users: " + users.Count + "\n";
                   message += "Total user sessions: " + users.Sum(x => (long)x.Value.SessionCount) + "\n";
-                  message += "Stored messages: " + messages.Count + "\n";
+                  //message += "Stored messages: " + messages.Count + "\n";
                   message += "Stored log: " + logMessages.Count + "\n";
                   message += "Log file buffer: " + logFileBuffer.Count + "\n";
                   message += "Modules loaded: " + string.Join(", ", modules.Select(x => x.GetType().Name)) + " (" + modules.Count + ")\n";
