@@ -82,6 +82,9 @@ namespace ChatEssentials
       public string subtype;
       public bool safe;
       public UserJSONObject sender;
+      protected string rawmessage;
+      protected DateTime rawtime;
+      protected DateTime expiration;
 
       /// <summary>
       /// Determines how the message will be sent. Defaults to recipients only
@@ -95,9 +98,8 @@ namespace ChatEssentials
       /// </summary>
       public List<int> recipients;
 
-      private string rawmessage;
-      private DateTime rawtime;
-      protected DateTime expiration;
+      //private string rawmessage;
+      //private DateTime rawtime;
 
       public string message
       {
