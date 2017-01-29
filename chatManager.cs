@@ -989,7 +989,7 @@ the actions of any user within the chat.".Replace("\n", " ");
 
             //Convert language tags. This alters the REAL language object, but mmmm that probably shouldn't be an issue, right?
             //No, because I ONLY save user messages in history to the disk, so in memory, these guys will always be typed correctly.
-            foreach(MessageJSONObject message in jsonMessages.messages)
+            foreach(MessageBaseJSONObject message in jsonMessages.messages)
             {
                if (message is ILanguageConvertibleBaseJSONObject)
                {
