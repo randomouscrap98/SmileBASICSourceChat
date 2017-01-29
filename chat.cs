@@ -357,7 +357,9 @@ namespace ChatServer
          {
             if (uid > 0)
             {
-               response.errors.Add("Received another bind message, but you've already been authenticated.");
+               response.result = true;
+               response.extras.Add("modules", manager.GetModuleListCopy(uid).Select(x => x.Nickname).ToList());
+               Log("Received another bind message from UID: " + uid, LogLevel.Debug);
             }
             else
             {
