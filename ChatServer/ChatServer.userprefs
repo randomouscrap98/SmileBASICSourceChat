@@ -3,8 +3,8 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="../chatManager.cs">
     <Files>
       <File FileName="../chat.cs" Line="1" Column="1" />
-      <File FileName="../chatManager.cs" Line="344" Column="22" />
-      <File FileName="../user.cs" Line="243" Column="58" />
+      <File FileName="../chatManager.cs" Line="1" Column="1" />
+      <File FileName="../user.cs" Line="1" Column="1" />
       <File FileName="../main.cs" Line="1" Column="1" />
       <File FileName="../messages.cs" Line="1" Column="1" />
       <File FileName="../modules/module.cs" Line="1" Column="1" />
