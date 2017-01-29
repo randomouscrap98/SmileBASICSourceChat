@@ -677,7 +677,8 @@ namespace ChatServer
 
                   if (ThisUser.Hiding && userMessage.IsSendable() && !manager.IsPMTag(userMessage.tag))
                   {
-                     MySend((new WarningMessageJSONObject("You're hiding! Don't send messages!")).ToString());
+                     SendFromMe(new WarningMessageJSONObject("You're hiding! Don't send messages!"));
+                     //MySend((new WarningMessageJSONObject("You're hiding! Don't send messages!")).ToString());
                   }
                   else
                   {

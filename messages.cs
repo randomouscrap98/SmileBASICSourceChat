@@ -455,6 +455,8 @@ namespace ChatEssentials
       //This may become private.
       public double spamvalue = 0;
 
+      public MessageJSONObject() : base("message") {}
+
       public MessageJSONObject(string message, UserInfo user, string tag = "") : base("message", message, user)
       {
 //         this.uid = user.UID;

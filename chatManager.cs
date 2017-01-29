@@ -236,7 +236,7 @@ the actions of any user within the chat.".Replace("\n", " ");
 //         #endregion
 
          #region HistoryLoad
-         Dictionary<string, List<MessageBaseJSONObject>> tempHistory;
+         Dictionary<string, List<MessageJSONObject>> tempHistory;
 
          /*try
          {
@@ -252,10 +252,11 @@ the actions of any user within the chat.".Replace("\n", " ");
                   MyExtensions.Logging.LogLevel.Error);
          }*/
 
-         if (MySerialize.LoadObject<Dictionary<string, List<MessageBaseJSONObject>>>
+         if (MySerialize.LoadObject<Dictionary<string, List<MessageJSONObject>>>
                (SavePath(HistoryFile), out tempHistory) && tempHistory != null)
          {
-            history = tempHistory;
+            history = tempHistory.ToDictionary(x => x.Key, y =>
+                  y.Value.Select(z => (MessageBaseJSONObject)z).ToList());
             PMRoom.FindNextID(history.SelectMany(x => x.Value.Select(y => y.tag)).ToList());
             Log("Loaded history from file", MyExtensions.Logging.LogLevel.Debug);
          }
@@ -382,7 +383,7 @@ the actions of any user within the chat.".Replace("\n", " ");
 //                        Log("Couldn't save messages to file!", MyExtensions.Logging.LogLevel.Error);
 
                      //Save only messages which are real user messages into the file
-                     var onlyMessagesHistory = history.ToDictionary(x => x.Key, y => y.Value.Where(z => z is MessageJSONObject).ToList());
+                     var onlyMessagesHistory = history.ToDictionary(x => x.Key, y => y.Value.Where(z => z is MessageJSONObject).Select(z => (MessageJSONObject)z).ToList());
 
                      /*try
                      {
@@ -396,7 +397,7 @@ the actions of any user within the chat.".Replace("\n", " ");
                               MyExtensions.Logging.LogLevel.Error);
                      }*/
                      //Save history
-                     if(MySerialize.SaveObject<Dictionary<string, List<MessageBaseJSONObject>>>(SavePath(HistoryFile), onlyMessagesHistory))
+                     if(MySerialize.SaveObject<Dictionary<string, List<MessageJSONObject>>>(SavePath(HistoryFile), onlyMessagesHistory))
                         Log("Saved history to file", MyExtensions.Logging.LogLevel.Debug);
                      else
                         Log("Couldn't save history to file!", MyExtensions.Logging.LogLevel.Error);
