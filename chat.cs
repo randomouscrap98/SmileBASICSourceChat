@@ -120,6 +120,13 @@ namespace ChatServer
          get { return minimalData; }
       }
 
+      public void MyHandle(MessageBaseJSONObject message, bool forceSend = false)
+      {
+         MessageListJSONObject list = new MessageListJSONObject();
+         list.messages = new List<MessageBaseJSONObject>() { message };
+         MySend(list.ToString(), forceSend);
+      }
+
       public void MySend(string message, bool forceSend = false)
       {
          if (string.IsNullOrEmpty(message))
@@ -464,13 +471,13 @@ namespace ChatServer
                                     "using the chat. Type /accept if you accept the chat policy\n");
                               MySend(emptyMessages.ToString(), true);
                               MySend(emptyUsers.ToString(), true);
-                              MySend(policy.ToString(), true);
-                              MySend(accept.ToString(), true);
+                              MyHandle(policy, true);
+                              MyHandle(accept, true);
                            }
                            else if(ThisUser.ShouldPolicyRemind)
                            {
                               ModuleJSONObject policy = new ModuleJSONObject(ChatServer.Policy);
-                              MySend(policy.ToString());
+                              MyHandle(policy);
                               ThisUser.PerformOnReminder();
                            }
 
@@ -581,7 +588,7 @@ namespace ChatServer
                      ModuleJSONObject acceptSuccess = new ModuleJSONObject("You have accepted the SmileBASIC Source " +
                                                    "chat policy. Please use the appropriate chat tab for discussion about SmileBASIC or off-topic " +
                                                    "subjects!");
-                     MySend(acceptSuccess.ToString(), true);
+                     MyHandle(acceptSuccess, true);
 
                      //Thread.Sleep(2000);
                      ThisUser.AcceptPolicy();
@@ -591,7 +598,7 @@ namespace ChatServer
                      //Send these ONLY to the user.
                      //manager.BroadcastUserList()
                      MySend(manager.ChatUserList(UID));
-                     MySend(manager.ChatMessageList(UID, 10));
+                     MySend(manager.ChatMessageList(UID, 20));
                   }
                }
                else if (ThisUser.Blocked)
