@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "3.0";
+      public const string Version = "3.0.6";
 
       private static AuthServer authServer;
       private static ConnectionCacheServer proxyServer = null;
@@ -112,6 +112,7 @@ namespace ChatServer
 
          settings.MaxUserQueryFailures = GetOption<int>("maxUserQueryFailures");
          //settings.MaxMessageKeep = GetOption<int>("messageBacklog");
+         settings.NormalMessageSend = GetOption<int>("normalMessageSend");
          settings.MaxMessageSend = GetOption<int>("messageSend");
          settings.MaxModuleWait = TimeSpan.FromSeconds(GetOption<int>("moduleWaitSeconds"));
          settings.SaveFolder = GetOption<string>("saveFolder");
@@ -184,6 +185,7 @@ namespace ChatServer
                { "chatServerPort", 45695 },
                { "chatTimeout", 15 },
                //{ "messageBacklog", 1000 },
+               { "normalMessageSend", 2 },
                { "messageSend", 30 },
                { "acceptedTags", "general, admin, offtopic" },
                { "globalTag", "any" },
@@ -193,6 +195,7 @@ namespace ChatServer
                { "buildHourModifier", -4 },
                { "website", "http://development.smilebasicsource.com" },
                { "chatrequest", "GUID" },
+               { "authtoken", "" },
                { "shutdownSeconds", 5 },
                { "saveFolder", "save" },
                { "saveInterval", 300 },
@@ -282,6 +285,8 @@ namespace ChatServer
             else
                authServer = new AuthServer(GetOption<int>("authServerPort"), logger);
 
+            authServer.AccessToken = GetOption<string>("authtoken");
+
             if (!authServer.Start())
             {
                logger.LogGeneral("Authorization server could not be started!", MyExtensions.Logging.LogLevel.FatalError, LogTag);
@@ -344,9 +349,13 @@ namespace ChatServer
                      {
                         Console.WriteLine();
                         Console.WriteLine("Stopping server in " + ShutdownSeconds + " seconds...");
-                        chatServer.GeneralBroadcast((new SystemMessageJSONObject() { 
+                        chatServer.HandleMessage(new SystemMessageJSONObject("System is shutting down in " +
+                                 ShutdownSeconds + " seconds for maintenance..."){
+                                 subtype = "shutdown", sendtype = MessageBaseSendType.Broadcast}, -1);
+                           /*GeneralBroadcast(
+                              (new SystemMessageJSONObject() { 
                            message = "System is shutting down in " + ShutdownSeconds + " seconds for maintenance..."
-                        }).ToString());
+                        }).ToString());*/
                         Thread.Sleep(ShutdownSeconds * 1000);
                         break;
                      }

@@ -21,6 +21,8 @@ namespace ChatServer
       private Dictionary<int, AuthData> authCodes = new Dictionary<int, AuthData>();
       private readonly Object authLock = new Object();
 
+      public string AccessToken = null;
+
       //Set up the auth server with the given logger. Otherwise, log to an internal logger
       public AuthServer(int port, MyExtensions.Logging.Logger logger = null) : 
          base(IPAddress.Parse(LocalAddress), port, logger) {} 
@@ -51,6 +53,13 @@ namespace ChatServer
          //If the client wants an auth code, send it.
          if(json.type == "auth")
          {
+            if(!String.IsNullOrWhiteSpace(AccessToken) && AccessToken != (string)json.token)
+            {
+               Log("Received auth request without access token! Not sending auth key", 
+                     MyExtensions.Logging.LogLevel.Warning);
+               return;
+            }
+
             string auth = RequestAuth((int)json.uid);
             byte[] response = System.Text.Encoding.ASCII.GetBytes(auth);
             stream.Write(response, 0, response.Length);
@@ -99,10 +108,6 @@ namespace ChatServer
 
          lock(authLock)
          {
-            //Oops, the user code expired. Just remove it
-//            if(authCodes.ContainsKey(username) && authCodes[username].Expired)
-//               authCodes.Remove(username);
-
             //We need to generate a new auth for this user if they're not in
             //the auth list OR their old key is expired.
             if(!authCodes.ContainsKey(uid))

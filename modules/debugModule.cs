@@ -115,7 +115,7 @@ namespace ChatServer
                   List<LogMessage> logFileBuffer = ChatRunner.Server.Settings.LogProvider.GetFileBuffer();
                   List<Module> modules = ChatRunner.Server.GetModuleListCopy();
 
-                  message += "Rooms: " + history.Keys.Count + "\n";
+                  message += "Rooms: " + history.Keys.Count + " (" + String.Join(", ", history.Keys) + ")\n";
                   message += "History messages: " + history.Sum(x => x.Value.Count) + "\n";
                   message += "Registered users: " + users.Count + "\n";
                   message += "Total user sessions: " + users.Sum(x => (long)x.Value.SessionCount) + "\n";

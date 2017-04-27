@@ -23,16 +23,18 @@ namespace ChatServer
          return !(user.ChatControl || user.ChatControlExtended);
       }*/
 
-      public static void UnhideUser(int uid)
+      public static void UnhideUser(UserInfo user)
       {
-         User thisRealUser = ChatRunner.Server.GetUser(uid);
+         User thisRealUser = ChatRunner.Server.GetUser(user.UID);
          thisRealUser.Hiding = false;
          thisRealUser.LastJoin = DateTime.Now;
          ChatRunner.Server.BroadcastUserList();
-         ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Join, thisRealUser), sendtype = MessageBaseSendType.Broadcast }, uid);
-
-//         ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), 
-//               new SystemMessageJSONObject());
+         ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(
+            new SystemMessageJSONObject("", user))
+            {
+               Parameters = new LanguageTagParameters(ChatTags.Join, thisRealUser), 
+               sendtype = MessageBaseSendType.Broadcast 
+            }, user.UID);
       }
 
       public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
@@ -41,26 +43,24 @@ namespace ChatServer
 
          if (command.Command == "uptonogood")
          {
-            /*if (!user.ChatControl)
-               return FastMessage("This command doesn't *AHEM* exist");*/
-
             thisRealUser.Hiding = !thisRealUser.Hiding;
 
             if (thisRealUser.Hiding)
             {
                ChatRunner.Server.BroadcastUserList();
-               ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser), sendtype = MessageBaseSendType.Broadcast}, user.UID);
-               //ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Leave, thisRealUser), new SystemMessageJSONObject());
+               //ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser), sendtype = MessageBaseSendType.Broadcast}, user.UID);
+               ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(
+                  new SystemMessageJSONObject("", user))
+                  {
+                     Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser), 
+                     sendtype = MessageBaseSendType.Broadcast 
+                  }, user.UID);
 
                return FastMessage("You're now hiding. Hiding persists across reloads. Be careful, you can still use commands!");
             }
             else
             {
-               UnhideUser(user.UID);
-               /*thisRealUser.LastJoin = DateTime.Now;
-               ChatRunner.Server.BroadcastUserList();
-               ChatRunner.Server.Broadcast(new LanguageTagParameters(ChatTags.Join, thisRealUser), new SystemMessageJSONObject());*/
-
+               UnhideUser(user);
                return FastMessage("You've come out of hiding.");
             }
          }
@@ -132,7 +132,7 @@ namespace ChatServer
             else if (!GetHidingUsers(users).Any(x => x.UID == parsedUser.UID))
                return FastMessage(parsedUser.Username + " isn't hiding!", true);
 
-            SneakyModule.UnhideUser(parsedUser.UID);
+            SneakyModule.UnhideUser(parsedUser);
             return FastMessage("You forced " + parsedUser.Username + " out of hiding!");
          }
          else if (command.Command == "badmin")

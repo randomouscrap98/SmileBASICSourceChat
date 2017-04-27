@@ -33,9 +33,9 @@ namespace ChatServer
       private readonly System.Timers.Timer userUpdateTimer = new System.Timers.Timer();
       private readonly ChatServer manager;
 
-      private readonly Queue<string> backlog = new Queue<string>();
-      private readonly Object backlock = new Object();
-      private readonly Object sendlock = new Object();
+      //private readonly Queue<string> backlog = new Queue<string>();
+      //private readonly Object backlock = new Object();
+      //private readonly Object sendlock = new Object();
       private DateTime lastPing = DateTime.Now;
 
       //private SimpleIRCRelay relay = SimpleIRCRelay.DefaultRelay;
@@ -141,87 +141,61 @@ namespace ChatServer
          }
             
          manager.Bandwidth.AddOutgoing(message.Length + HeaderSize);
+         Send(message);
 
          //All sends just enqueue their message no matter what
-         lock (backlock)
-         {
-            if (backlog.Count >= 30)
-               Log(ThisUser.Username + "'s backlog is too big (30). Message thrown away.", LogLevel.Warning);
-            else
-               backlog.Enqueue(message);
-         }
+         //lock (backlock)
+         //{
+         //   if (backlog.Count >= 30)
+         //      Log(ThisUser.Username + "'s backlog is too big (30). Message thrown away.", LogLevel.Warning);
+         //   else
+         //      backlog.Enqueue(message);
+         //}
 
          //Only try to send if we're not currently sending
-         if (Monitor.TryEnter(sendlock))
-         {
-            try
-            {
-               //Loop forever because I refuse to lock on the loop
-               while (true)
-               {
-                  string nextMessage = null;
+         //if (Monitor.TryEnter(sendlock))
+         //{
+         //   try
+         //   {
+         //      //Loop forever because I refuse to lock on the loop
+         //      while (true)
+         //      {
+         //         string nextMessage = null;
 
-                  //NOW we lock so we can pull the next message to send.
-                  lock (backlock)
-                  {
-                     if (backlog.Count > 0)
-                        nextMessage = backlog.Dequeue();
-                  }
+         //         //NOW we lock so we can pull the next message to send.
+         //         lock (backlock)
+         //         {
+         //            if (backlog.Count > 0)
+         //               nextMessage = backlog.Dequeue();
+         //         }
 
-                  //oops, no more messages. gtfo
-                  if (nextMessage == null)
-                     break;
+         //         //oops, no more messages. gtfo
+         //         if (nextMessage == null)
+         //            break;
 
-                  //OK, now we can send it off
-                  try
-                  {
-                     Log("Sending message: " + nextMessage.Truncate(100), MyExtensions.Logging.LogLevel.SuperDebug);
-                     Send(nextMessage);
-                     Log("Send success!", MyExtensions.Logging.LogLevel.SuperDebug);
-                  }
-                  catch (Exception e)
-                  {
-                     Log("Cannot send message: " + nextMessage + " to user: " + UserLogString + " because: " + e, LogLevel.Warning);
-                  }
-               }
-            }
-            finally
-            {
-               Monitor.Exit(sendlock);
-            }
-         }
-         else
-         {
-            Log("Queueing message for " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
-         }
+         //         //OK, now we can send it off
+         //         try
+         //         {
+         //            Log("Sending message: " + nextMessage.Truncate(100), MyExtensions.Logging.LogLevel.SuperDebug);
+         //            Send(nextMessage);
+         //            Log("Send success!", MyExtensions.Logging.LogLevel.SuperDebug);
+         //         }
+         //         catch (Exception e)
+         //         {
+         //            Log("Cannot send message: " + nextMessage + " to user: " + UserLogString + " because: " + e, LogLevel.Warning);
+         //         }
+         //      }
+         //   }
+         //   finally
+         //   {
+         //      Monitor.Exit(sendlock);
+         //   }
+         //}
+         //else
+         //{
+         //   Log("Queueing message for " + ThisUser.Username, MyExtensions.Logging.LogLevel.SuperDebug);
+         //}
       }
-
-//      public void MySend(LanguageTagParameters parameters, JSONObject container)
-//      {
-//         string message = manager.ConvertTag(parameters);
-//         //string subtype = parameters.Tag.ToString().ToLower();
-//
-//         if (container is WarningJSONObject)
-//         {
-//            container = NewWarningFromTag(parameters);
-//            /*   (WarningJSONObject)container;
-//            warning.message = message;
-//            warning.subtype = subtype;*/
-//         }
-//         else if (container is SystemMessageJSONObject)
-//         {
-//            container = NewSystemMessageFromTag(parameters);
-//            /*((SystemMessageJSONObject)container).message = message;
-//            ((SystemMessageJSONObject)container).subtype = subtype;*/
-//         }
-//         else
-//         {
-//            Log("Didn't get a proper container for a language tag. Using system message as default", LogLevel.Warning);
-//            ((SystemMessageJSONObject)container).message = message;
-//         }
-//
-//         MySend(container.ToString());
-//      }
 
       public LanguageConvertibleWarningJSONObject NewWarningFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
@@ -239,8 +213,6 @@ namespace ChatServer
 
       public List<MessageBaseJSONObject> AddModuleTags(List<MessageBaseJSONObject> outputs, Module module)
       {
-         //List<JSONObject> commandOutput = commandModule.ProcessCommand(userCommand, currentUsers[ThisUser.UID], currentUsers);
-
          foreach(MessageBaseJSONObject jsonMessage in outputs)
             if(jsonMessage is ModuleJSONObject)
                ((ModuleJSONObject)jsonMessage).module = module.Nickname;
@@ -647,10 +619,12 @@ namespace ChatServer
 
                      //do not update spam score if command module doesn't want it
                      if (!userCommand.MatchedCommand.ShouldUpdateSpamScore)
-                        userMessage.SetSpammable(false);
+                        userCommand.SetSpammable(false);
 
                      //For now, simply capture all commands no matter what.
-                     userMessage.SetNoRecipients();
+                     userCommand.SetNoRecipients();
+                     //Send the message as a command, since it was parsed.
+                     SendFromMe(userCommand);
 
                      Log("Module " + commandModule.ModuleName + " processed command from " + UserLogString, 
                         MyExtensions.Logging.LogLevel.Debug);
@@ -661,48 +635,32 @@ namespace ChatServer
                      if (!string.IsNullOrWhiteSpace(commandError))
                      {
                         response.errors.Add("Command error: " + commandError);
-                        userMessage.SetNoRecipients();
-                        userMessage.SetSpammable(false);
+                        //userMessage.SetNoRecipients();
+                        //userMessage.SetSpammable(false);
+                     }
+                     else
+                     {
+                        if (ThisUser.Hiding && !manager.IsPMTag(userMessage.tag))
+                        {
+                           SendFromMe(new WarningMessageJSONObject("You're hiding! Don't send messages!"));
+                        }
+                        else
+                        {
+                           //Process messages ONLY if they're not a command,
+                           //not a failed command, and if the user isn't hiding.
+                           SendFromMe(userMessage);
+
+                           if(!manager.IsPMTag(userMessage.tag))
+                              ProcessMessage(userMessage, currentUsers);
+                        }
                      }
                   }
-
-                  if (ThisUser.Hiding && userMessage.IsSendable() && !manager.IsPMTag(userMessage.tag))
-                  {
-                     SendFromMe(new WarningMessageJSONObject("You're hiding! Don't send messages!"));
-                  }
-                  else
-                  {
-                     SendFromMe(userMessage);
-                  }
-
-                  //Send off on relay
-                  /*if(userMessage.Display && userMessage.tag == manager.IrcTag)
-               {
-                  if(relay.SendMessage(userMessage.message))
-                     Logger.LogGeneral("Sent message on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
-                  else
-                     Logger.LogGeneral("Couldn't send on IRC relay!", MyExtensions.Logging.LogLevel.SuperDebug);
-               }*/
 
                   response.result = response.errors.Count == 0;
 
                   //Now send out userlist if active status changed
-                  UpdateActiveUserList(null, null);
-
-                  //Since we added a new message, we need to broadcast.
-//                  if (response.result && !userMessage.IsHidden())
-//                     manager.BroadcastMessageList(new string[] {userMessage.tag}); 
-
-                  //Step 2: run regular message through all modules' regular message processor (probably no output?)
-                  ProcessMessage(userMessage, currentUsers);
-
-                  //Step 3: run all modules' post processor (no message required)
-                  //Is this even necessary? It was necessary before because the bot ran on a timer. Without a timer,
-                  //each module can just specify that it wants to do things at random points with its own timer.
-
-                  //Step 4: iterate over returned messages and send them out appropriately
-                  //OutputMessages(outputs, ThisUser.UID, tag);
-                  //end of regular message processing
+                  if(!ThisUser.Hiding)
+                     UpdateActiveUserList(null, null);
                }
             }
             catch (Exception messageError)
