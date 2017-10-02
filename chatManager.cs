@@ -1017,7 +1017,7 @@ the actions of any user within the chat.".Replace("\n", " ");
             {
                if (message is ILanguageConvertibleBaseJSONObject)
                {
-                  var parameters = ((ILanguageConvertibleBaseJSONObject)message).Parameters;
+                  var parameters = ((ILanguageConvertibleBaseJSONObject)message).GetParameters();
                   parameters.UpdateUser(actualUser);
                   message.message = ConvertTag(parameters);
                }
@@ -1041,18 +1041,22 @@ the actions of any user within the chat.".Replace("\n", " ");
          
       public LanguageConvertibleWarningJSONObject NewWarningFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
-         return new LanguageConvertibleWarningJSONObject(
+         var lWarning = new LanguageConvertibleWarningJSONObject(
             new WarningMessageJSONObject(ConvertTag(parameters), parameters.SendingUser) 
             { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType,
-              tag = ChatSettings.GlobalTag}){ Parameters = parameters };
+              tag = ChatSettings.GlobalTag});
+         lWarning.SetParameters(parameters);
+         return lWarning;
       }
 
       public LanguageConvertibleSystemJSONObject NewSystemMessageFromTag(LanguageTagParameters parameters, MessageBaseSendType sendType)
       {
-         return new LanguageConvertibleSystemJSONObject(
+         var lSystem = new LanguageConvertibleSystemJSONObject(
             new SystemMessageJSONObject(ConvertTag(parameters), parameters.SendingUser) 
             { subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType, 
-              tag = ChatSettings.GlobalTag}){ Parameters = parameters };
+              tag = ChatSettings.GlobalTag});//{ Parameters = parameters };
+         lSystem.SetParameters(parameters);
+         return lSystem;
       }
 
       /// <summary>

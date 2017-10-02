@@ -48,7 +48,10 @@ namespace ModulePackage1
             foreach(string date in messageByDate.Keys)
             {
                File.AppendAllLines(date + ".txt", messageByDate[date].Select(x => 
-                  x.sender.username.PadLeft(20) + x.GetCreationTime().ToString("[HH:mm]") + StringExtensions.Truncate(x.tag, 1) + ": " + x.GetRawMessage()));
+                  x.sender.username.PadLeft(20) + x.GetCreationTime().ToString("[HH:mm]") + 
+                  StringExtensions.Truncate(x.tag, 1) + ": " + 
+                  String.Join("\n" + new String(' ', 30), x.GetRawMessage().Split("\n".ToCharArray()))
+                  ));
             }
          }
          catch(Exception e)

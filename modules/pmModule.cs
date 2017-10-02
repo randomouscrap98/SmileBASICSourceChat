@@ -40,12 +40,25 @@ namespace ChatServer
                UserInfo recipient;
                output = new ModuleJSONObject();
 
-               if (!GetUserFromArgument(command.Arguments[0], 
-                      users.Where(x => x.Value.LoggedIn).ToDictionary(x => x.Key, y => y.Value), out recipient))
+               if(!GetUserFromArgument(command.Arguments[0], users, out recipient))
                {
-                  AddError(outputs);
+                  outputs.Add(new ModuleJSONObject("That user doesn't exist!"));
                   break;
                }
+               else if(!users.Any(x => x.Value.LoggedIn && x.Key == recipient.UID))
+               {
+                  outputs.Add(new ModuleJSONObject("User " + recipient.Username + 
+                           " isn't in chat right now!"));
+                  break;
+               }
+
+               //if (!GetUserFromArgument(command.Arguments[0], 
+               //       users.Where(x => x.Value.LoggedIn).ToDictionary(x => x.Key, y => y.Value), out recipient))
+               //{
+               //   outputs.Add(new ModuleJSONObject("That user is not currently in chat!"));
+               //   //AddError(outputs);
+               //   break;
+               //}
                
                output.tag = "any";
                output.message = user.Username + " -> " + command.Arguments[0] + ":\n" + command.Arguments[1];

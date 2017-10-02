@@ -23,7 +23,7 @@ namespace ChatServer
 {
    public class ChatRunner 
    {
-      public const string Version = "3.0.6";
+      public const string Version = "3.1.1";
 
       private static AuthServer authServer;
       private static ConnectionCacheServer proxyServer = null;
@@ -303,6 +303,7 @@ namespace ChatServer
                GetOption<string>("website"), GetOption<bool>("automaticBlocking"), 
                GetOption<int>("policyReminderHours"), GetOption<double>("maxQueryWaitSeconds"),
                GetOption<string>("chatrequest"));
+            logger.Log("PHP Session ID: " + User.SessionID, LogTag);
 
             //This starts up the server!
             SetupChatManager();

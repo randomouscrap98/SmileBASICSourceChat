@@ -264,6 +264,22 @@ namespace ChatServer
          manager.HandleMessage(message, this.UID);
       }
 
+      //This blocks ALL commands that appear as regular messages if you're
+      //hiding. Ouch, some people will be upsettles.
+      public void SendAndProcessFromMe(MessageJSONObject message)
+      {
+         if(!manager.IsPMTag(message.tag) && ThisUser.Hiding)
+         {
+            SendFromMe(new WarningMessageJSONObject("You're hiding! Don't send messages!"));
+            return;
+         }
+
+         SendFromMe(message);
+
+         if(!manager.IsPMTag(message.tag))
+            ProcessMessage(message, manager.UsersForModules());
+      }
+
       public void SendModuleMessagesFromMe(List<MessageBaseJSONObject> messages, Module module) //, string tag = MessageBaseJSONObject.DefaultTag)
       {
 //         foreach (MessageBaseJSONObject message in messages)
@@ -271,7 +287,12 @@ namespace ChatServer
 //               message.tag = tag;
 //         
          foreach (MessageBaseJSONObject message in AddModuleTags(messages, module))
-            SendFromMe(message);
+         {
+            if(message is MessageJSONObject)
+               SendAndProcessFromMe((MessageJSONObject)message);
+            else
+               SendFromMe(message);
+         }
       }
 
 //      protected override void OnError(ErrorEventArgs e)
@@ -318,10 +339,12 @@ namespace ChatServer
          //If we got a bind message, let's try to authorize this channel.
          if (type == "bind")
          {
+            response.extras.Add("modules", manager.GetModuleListCopy(uid).Select(x => x.Nickname).ToList());
+            response.extras.Add("version", ChatRunner.AssemblyVersion());
+            response.extras.Add("basicTags", manager.ChatSettings.AcceptedTags);
             if (uid > 0)
             {
                response.result = true;
-               response.extras.Add("modules", manager.GetModuleListCopy(uid).Select(x => x.Nickname).ToList());
                Log("Received another bind message from UID: " + uid, LogLevel.Debug);
             }
             else
@@ -396,7 +419,7 @@ namespace ChatServer
                                  (ThisUser.CanStaffChat ? "(staff)" : ""));
 
                            response.result = true;
-                           response.extras.Add("modules", manager.GetModuleListCopy(uid).Select(x => x.Nickname).ToList());
+                           //response.extras.Add("modules", manager.GetModuleListCopy(uid).Select(x => x.Nickname).ToList());
 
                            //List<JSONObject> outputs = new List<JSONObject>();
                            Dictionary<int, UserInfo> currentUsers = manager.UsersForModules();
@@ -640,19 +663,20 @@ namespace ChatServer
                      }
                      else
                      {
-                        if (ThisUser.Hiding && !manager.IsPMTag(userMessage.tag))
+                        /*if (ThisUser.Hiding && !manager.IsPMTag(userMessage.tag))
                         {
                            SendFromMe(new WarningMessageJSONObject("You're hiding! Don't send messages!"));
                         }
                         else
-                        {
+                        {*/
+                           SendAndProcessFromMe(userMessage);
                            //Process messages ONLY if they're not a command,
                            //not a failed command, and if the user isn't hiding.
-                           SendFromMe(userMessage);
+                           /*SendFromMe(userMessage);
 
                            if(!manager.IsPMTag(userMessage.tag))
-                              ProcessMessage(userMessage, currentUsers);
-                        }
+                              ProcessMessage(userMessage, currentUsers);*/
+                        //}
                      }
                   }
 

@@ -118,7 +118,7 @@ namespace ChatEssentials
 
       public string time
       {
-         get { return rawtime.ToString() + " UTC"; }
+         get { return rawtime.ToString("o"); }// + " UTC"; }
          set { }
       }
 

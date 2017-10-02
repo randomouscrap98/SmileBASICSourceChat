@@ -218,19 +218,27 @@ namespace ChatEssentials
 
    public interface ILanguageConvertibleBaseJSONObject //: MessageBaseJSONObject
    {
-      LanguageTagParameters Parameters{ get; set;}
+      //LanguageTagParameters Parameters{ get; set;}
+      LanguageTagParameters GetParameters();
+      void SetParameters(LanguageTagParameters p);
    }
 
    public class LanguageConvertibleSystemJSONObject : SystemMessageJSONObject, ILanguageConvertibleBaseJSONObject
    {
-      public LanguageTagParameters Parameters { get; set; }
+      private LanguageTagParameters parameters;
+      //public LanguageTagParameters Parameters { get; set; }
+      public LanguageTagParameters GetParameters() { return parameters; }
+      public void SetParameters(LanguageTagParameters p) { parameters = p; }
       public LanguageConvertibleSystemJSONObject() : base() {}
       public LanguageConvertibleSystemJSONObject(SystemMessageJSONObject copy) : base(copy) {}
    }
 
-   public class LanguageConvertibleWarningJSONObject : WarningMessageJSONObject
+   public class LanguageConvertibleWarningJSONObject : WarningMessageJSONObject, ILanguageConvertibleBaseJSONObject
    {
-      public LanguageTagParameters Parameters { get; set; }
+      //public LanguageTagParameters Parameters { get; set; }
+      private LanguageTagParameters parameters;
+      public LanguageTagParameters GetParameters() { return parameters; }
+      public void SetParameters(LanguageTagParameters p) { parameters = p; }
       public LanguageConvertibleWarningJSONObject() : base() {}
       public LanguageConvertibleWarningJSONObject(WarningMessageJSONObject copy) : base(copy) {}
    }

@@ -206,6 +206,7 @@ namespace ChatEssentials
       private static Logger Logger = Logger.DefaultLogger;
       private static string Website = "";
       private static string ChatRequest = "";
+      public static string SessionID = Guid.NewGuid().ToString();
 
       private readonly int uid = 0;
       private string username = "default";
@@ -711,7 +712,7 @@ namespace ChatEssentials
          dynamic json = false;
          string htmlCode = "";
          string url = Website + "/query/request/user?small=1&chatrequest=" + 
-            ChatRequest + "&uid=" + uid;
+            ChatRequest + "&uid=" + uid + "&session=" + SessionID;
 
          try
          {

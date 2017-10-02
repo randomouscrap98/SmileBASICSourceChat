@@ -29,12 +29,16 @@ namespace ChatServer
          thisRealUser.Hiding = false;
          thisRealUser.LastJoin = DateTime.Now;
          ChatRunner.Server.BroadcastUserList();
-         ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(
+         var lMessage = new LanguageConvertibleSystemJSONObject(new SystemMessageJSONObject("", user))
+            { sendtype = MessageBaseSendType.Broadcast }; 
+         lMessage.SetParameters(new LanguageTagParameters(ChatTags.Join, thisRealUser));
+         ChatRunner.Server.HandleMessage(lMessage, user.UID);
+               /*new LanguageConvertibleSystemJSONObject(
             new SystemMessageJSONObject("", user))
             {
                Parameters = new LanguageTagParameters(ChatTags.Join, thisRealUser), 
                sendtype = MessageBaseSendType.Broadcast 
-            }, user.UID);
+            }, user.UID);*/
       }
 
       public override List<MessageBaseJSONObject> ProcessCommand(UserCommand command, UserInfo user, Dictionary<int, UserInfo> users)
@@ -49,12 +53,16 @@ namespace ChatServer
             {
                ChatRunner.Server.BroadcastUserList();
                //ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser), sendtype = MessageBaseSendType.Broadcast}, user.UID);
-               ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(
+               var lMessage = new LanguageConvertibleSystemJSONObject(new SystemMessageJSONObject("", user))
+                  { sendtype = MessageBaseSendType.Broadcast }; 
+               lMessage.SetParameters(new LanguageTagParameters(ChatTags.Leave, thisRealUser));
+               ChatRunner.Server.HandleMessage(lMessage, user.UID);
+               /*ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(
                   new SystemMessageJSONObject("", user))
                   {
                      Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser), 
                      sendtype = MessageBaseSendType.Broadcast 
-                  }, user.UID);
+                  }, user.UID);*/
 
                return FastMessage("You're now hiding. Hiding persists across reloads. Be careful, you can still use commands!");
             }
