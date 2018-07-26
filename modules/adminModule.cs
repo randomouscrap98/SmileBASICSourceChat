@@ -30,8 +30,10 @@ namespace ChatServer
          thisRealUser.LastJoin = DateTime.Now;
          ChatRunner.Server.BroadcastUserList();
          var lMessage = new LanguageConvertibleSystemJSONObject(new SystemMessageJSONObject("", user))
-            { sendtype = MessageBaseSendType.Broadcast }; 
+            { sendtype = MessageBaseSendType.Broadcast, subtype = ChatTags.Join.ToString().ToLower()}; 
+            //{ subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType, 
          lMessage.SetParameters(new LanguageTagParameters(ChatTags.Join, thisRealUser));
+            //{ subtype = parameters.Tag.ToString().ToLower(), sendtype = sendType, 
          ChatRunner.Server.HandleMessage(lMessage, user.UID);
                /*new LanguageConvertibleSystemJSONObject(
             new SystemMessageJSONObject("", user))
@@ -54,7 +56,7 @@ namespace ChatServer
                ChatRunner.Server.BroadcastUserList();
                //ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(){Parameters = new LanguageTagParameters(ChatTags.Leave, thisRealUser), sendtype = MessageBaseSendType.Broadcast}, user.UID);
                var lMessage = new LanguageConvertibleSystemJSONObject(new SystemMessageJSONObject("", user))
-                  { sendtype = MessageBaseSendType.Broadcast }; 
+                  { sendtype = MessageBaseSendType.Broadcast, subtype = ChatTags.Leave.ToString().ToLower() }; 
                lMessage.SetParameters(new LanguageTagParameters(ChatTags.Leave, thisRealUser));
                ChatRunner.Server.HandleMessage(lMessage, user.UID);
                /*ChatRunner.Server.HandleMessage(new LanguageConvertibleSystemJSONObject(

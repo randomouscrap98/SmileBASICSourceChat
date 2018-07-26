@@ -5,6 +5,6 @@
 
 .PHONY: all
 all: 
-	xbuild /p:Configuration=Release
+	msbuild /p:Configuration=Release
 	date +%s > ChatServer/bin/Release/build.txt
 

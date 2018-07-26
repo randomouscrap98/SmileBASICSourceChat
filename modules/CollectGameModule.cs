@@ -1871,7 +1871,7 @@ namespace WikiaChatLogger
 		public const double DotChanceCurveEase = 10.0;
 
 		//Star constants
-		public static readonly List<string> StarTypes = new List<string> { "☆", "★", "♚", "♛", "♆" };
+		public static readonly List<string> StarTypes = new List<string> { "☆", "★", "♚", "♛", "♆", "☠" };
 		public const int StarRollover = 3;
 
 		/// <summary>

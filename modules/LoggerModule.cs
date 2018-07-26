@@ -40,7 +40,9 @@ namespace ModulePackage1
             string date = message.GetCreationTime().ToString("yy-MM-dd");
             if (!messageByDate.ContainsKey(date))
                messageByDate.Add(date, new List<MessageJSONObject>());
-            messageByDate[date].Add(message);
+
+            if(!message.tag.Contains("room"))
+               messageByDate[date].Add(message);
          }
 
          try
@@ -71,6 +73,15 @@ namespace ModulePackage1
       {
          if(message.IsSendable())
             unsavedMessages.Add(message);
+      }
+
+      public override void ProcessModuleCommunication(MessageBaseJSONObject message, string sender)
+      {
+         if(sender == "fun" && message is ModuleJSONObject)
+         {
+            MessageJSONObject wrapper = new MessageJSONObject(message.GetRawMessage(), new UserInfo(new User(0, $"[{sender}module]"), false), message.tag);
+            unsavedMessages.Add(wrapper);
+         }
       }
    }
 }

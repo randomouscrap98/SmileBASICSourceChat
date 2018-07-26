@@ -98,15 +98,12 @@ namespace ChatEssentials
       /// </summary>
       public List<int> recipients;
 
-      //private string rawmessage;
-      //private DateTime rawtime;
-
       public string message
       {
          get
          {
             if (safe)
-               return System.Security.SecurityElement.Escape(rawmessage); //System.Net.WebUtility.HtmlDecode(rawMessage));
+               return System.Security.SecurityElement.Escape(rawmessage); 
             else
                return rawmessage;
          }
@@ -196,6 +193,7 @@ namespace ChatEssentials
          this.sendtype = MessageBaseSendType.IncludeSender;
          this.safe = true;
          this.recipients = new List<int>();
+         //this.moduleRecipients = new List<string>();
          this.rawtime = DateTime.Now;
          this.expiration = DateTime.Now.AddHours(23.9);
       }
@@ -436,20 +434,6 @@ namespace ChatEssentials
    [Serializable]
    public class MessageJSONObject : MessageBaseJSONObject
    {
-      //public readonly UserJSONObject user;
-//      public readonly int uid;
-//      public readonly string username;
-//      public string avatar;
-//      public readonly string stars;
-//      public List<Badge> badges = new List<Badge>();
-//      public readonly long id;
-//      public readonly int level;
-      //public readonly string message;
-
-      //private readonly DateTime postTime;
-      //private static long NextID = 0;
-
-      //private bool display;
       private bool spamupdate;
 
       //This may become private.
@@ -459,21 +443,10 @@ namespace ChatEssentials
 
       public MessageJSONObject(string message, UserInfo user, string tag = "") : base("message", message, user)
       {
-//         this.uid = user.UID;
-//         this.username = user.Username;
-//         this.avatar = user.Avatar;
-//         this.stars = user.StarString;
-//         this.badges = user.Badges;
-//         this.level = user.Level;
-         //this.user = new UserJSONObject(user);
-         //this.message = message;
          this.tag = tag;
-         //this.display = true;
          this.spamupdate = true;
          this.spamvalue = 0;
          this.sendtype = MessageBaseSendType.Broadcast;
-         //this.postTime = DateTime.Now;
-         //this.id = Interlocked.Increment(ref NextID);
       }
 
       public MessageJSONObject(MessageJSONObject copy) : base(copy)
@@ -481,108 +454,19 @@ namespace ChatEssentials
          if (copy != null)
          {
             tag = copy.tag;
-            //display = copy.display;
             spamupdate = copy.spamupdate;
             spamvalue = copy.spamvalue;
-//            username = copy.username;
-//            avatar = copy.avatar;
-//            stars = copy.stars;
-//            uid = copy.uid;
-//            user = new UserJSONObject(copy.user);
-//            message = copy.message;
-//            id = copy.id;
-//            //tag = copy.tag;
-//            postTime = copy.postTime;
          }
       }
-
-//      public MessageJSONObject() : base("message")
-//      {
-//         uid = 0;
-//         username = "default";
-//         avatar = "";
-//         stars = "";
-//         message = "";
-//         //tag = "";
-//         postTime = new DateTime(0);
-//         id = -1;
-//      }
-
-//      public static void FindNextID(IEnumerable<UserMessageJSONObject> messages)
-//      {
-//         if(messages != null && messages.Count() > 0)
-//            NextID = messages.Max(x => x.id) + 1;
-//      }
-
-//      public string time
-//      {
-//         get { return postTime.ToString() + " UTC"; }
-//      }
-
-      //This is ONLY because we don't want to serialize it.
-//      public DateTime PostTime()
-//      {
-//         return postTime;
-//      }
-
-//      public void SetCommand()
-//      {
-//         isCommand = true;
-//      }
-
-//      public void SetHidden(bool hidden)
-//      {
-//         display = !hidden;
-//      }
 
       public void SetSpammable(bool spammable)
       {
          spamupdate = spammable;
       }
 
-//      public void SetHidden()
-//      {
-//         display = false;
-//      }
-//
-//      public void SetVisible()
-//      {
-//         display = true;
-//      }
-
-//      public void SetSpammable()
-//      {
-//         spamupdate = true;
-//      }
-//
-//      public void SetUnspammable()
-//      {
-//         spamupdate = false;
-//      }
-
-//      public void SetSpamValue(int value)
-//      {
-//         spamValue = value;
-//      }
-//
-//      public int GetSpamValue()
-//      {
-//         return spamValue;
-//      }
-
       public bool IsSpammable()
       {
          return spamupdate;
       }
-
-//      public bool IsHidden()
-//      {
-//         return !display;
-//      }
-
-//      public bool IsCommand
-//      {
-//         get { return isCommand; }
-//      }
    }
 }

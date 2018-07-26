@@ -37,10 +37,12 @@ namespace ModulePackage1
          {
             case "me":
                moduleOutput = new ModuleJSONObject();
+               //moduleOutput.moduleRecipients.Add("LoggerModule");
                //moduleOutput.broadcast = true;
                moduleOutput.sendtype = MessageBaseSendType.Broadcast;
                moduleOutput.message = user.Username + " " + command.Arguments[0]; //System.Security.SecurityElement.Escape(command.Arguments[0]);
                moduleOutput.tag = command.tag;
+               SendModuleCommunication(moduleOutput, "logger");
                outputs.Add(moduleOutput);
                break;
 

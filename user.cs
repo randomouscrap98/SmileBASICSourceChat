@@ -196,7 +196,6 @@ namespace ChatEssentials
    {
       public const double BanSpamScore = 100;
       public const double JoinSpamMinutes = 2.0;
-      //public const string IrcAppendTag = "-irc";
 
       private static TimeSpan PolicyReminderTime = TimeSpan.FromDays(1);
       private static TimeSpan QueryUserTimeout = TimeSpan.FromSeconds(1);
@@ -210,7 +209,6 @@ namespace ChatEssentials
 
       private readonly int uid = 0;
       private string username = "default";
-      //private string ircUsername = "";
       private string avatar = "";
       private string avatarStatic = "";
       private string stars = "";
@@ -234,15 +232,12 @@ namespace ChatEssentials
 
       private bool lastActive = true;
       private bool acceptedPolicy = false;
-      /*private bool isIrcUser = false;
-      private bool ircActive = false;*/
       private DateTime lastPolicyReminder = new DateTime(0);
       private DateTime lastPing = DateTime.Now;
       private DateTime lastPost = DateTime.Now;
       private DateTime lastDecay = DateTime.Now;
       private DateTime lastBlock = new DateTime(0);
       private DateTime lastGlobalReduce = new DateTime(0);
-      //private DateTime lastJoin = DateTime.Now;
       private DateTime blockedUntil = new DateTime(0);
       private List<UserSession> sessions = new List<UserSession>();
       private List<DateTime> recentJoins = new List<DateTime>();
@@ -250,9 +245,11 @@ namespace ChatEssentials
 
       public readonly Object Lock = new Object();
 
-      public User(int uid)
+      public User(int uid, string username = "")
       {
          this.uid = uid;
+         if(!String.IsNullOrWhiteSpace(username))
+            this.username = username;
       }
 
       public void Log(string message, LogLevel level = LogLevel.Normal)
@@ -271,11 +268,6 @@ namespace ChatEssentials
       {
          get { return username; }
       }
-
-//      public string IrcUsername
-//      {
-//         get { return ircUsername; }
-//      }
 
       public string Avatar
       {
@@ -716,27 +708,6 @@ namespace ChatEssentials
 
          try
          {
-            /*using (HttpClient client = new HttpClient())
-            {
-               //client.BaseAddress = new Uri(url);
-               client.Timeout = QueryUserTimeout;
-               client.DefaultRequestHeaders.Add("CF-Connecting-IP", "127.0.0.1");
-               
-               var getTask = client.GetAsync(new Uri(url));
-               getTask.Wait();
-
-               using (HttpResponseMessage response = getTask.Result)
-               {
-                  using (HttpContent content = response.Content)
-                  {
-                     var stringTask = content.ReadAsStringAsync();
-                     stringTask.Wait();
-                     htmlCode = stringTask.Result;
-                     json = JsonConvert.DeserializeObject(htmlCode);
-                  }
-               }
-            }*/
-               
             using (TimedWebClient client = new TimedWebClient())
             {
                //Console.WriteLine("REQUESTING URL: " + url);

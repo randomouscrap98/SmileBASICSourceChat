@@ -22,6 +22,7 @@ namespace ModuleSystem
 
       public readonly Object Lock = new Object();
       public event CommandCallback OnExtraCommandOutput;
+      public static Action<MessageBaseJSONObject, string, string> HandleModuleCommunication = null;
 
       public Module()
       {
@@ -154,11 +155,6 @@ namespace ModuleSystem
          }
       }
 
-//      public ModuleJSONObject CreateMessage(string message, UserInfo user)
-//      {
-//         return new ModuleJSONObject(Nickname, message, user);
-//      }
-
       /// <summary>
       /// Modules can use this to add a generic error to their return from ProccessCommand.
       /// </summary>
@@ -166,7 +162,6 @@ namespace ModuleSystem
       protected void AddError(List<MessageBaseJSONObject> output)
       {
          ModuleJSONObject error = new ModuleJSONObject("An internal error occurred for the " + Nickname + " module");
-         //error.message = ";
          output.Add(error);
       }
 
@@ -178,6 +173,12 @@ namespace ModuleSystem
       protected int ExtraCommandHandlerCount
       {
          get { return OnExtraCommandOutput.GetInvocationList().Length; }
+      }
+
+      protected void SendModuleCommunication(MessageBaseJSONObject message, string recipient)
+      {
+         if(HandleModuleCommunication != null)
+            HandleModuleCommunication(message, Nickname, recipient);
       }
 
       /// <summary>
@@ -200,6 +201,15 @@ namespace ModuleSystem
       public virtual bool SaveFiles()
       {
          return true;
+      }
+
+      /// <summary>
+      /// Called when another module sends a message directly to you. No outside processing is 
+      /// performed... Be warned: this means no sender.
+      /// </summary>
+      public virtual void ProcessModuleCommunication(MessageBaseJSONObject message, string module)
+      {
+         //Does nothing.
       }
 
       /// <summary>
@@ -319,19 +329,6 @@ namespace ModuleSystem
          try
          {
             return CallInSaveFolder<bool>(module, module.LoadFiles);
-//
-//            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
-//               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
-//            string currentDirectory = Directory.GetCurrentDirectory();
-//
-//            Directory.CreateDirectory(saveDirectory);
-//            Directory.SetCurrentDirectory(saveDirectory);
-//
-//            bool result = module.LoadFiles();
-//
-//            Directory.SetCurrentDirectory(currentDirectory);
-//
-//            return result;
          }
          catch
          {
@@ -345,18 +342,6 @@ namespace ModuleSystem
          try
          {
             return CallInSaveFolder<bool>(module, module.SaveFiles);
-//            string saveDirectory = StringExtensions.PathFixer(StringExtensions.PathFixer(
-//               options.GetAsType<string>(LoaderName, "saveFolder")) + module.ModuleName);
-//            string currentDirectory = Directory.GetCurrentDirectory();
-//
-//            Directory.CreateDirectory(saveDirectory);
-//            Directory.SetCurrentDirectory(saveDirectory);
-//
-//            bool result = module.SaveFiles();
-//
-//            Directory.SetCurrentDirectory(currentDirectory);
-//
-//            return result;
          }
          catch
          {
@@ -448,6 +433,18 @@ namespace ModuleSystem
                }
             }
          }
+
+         Module.HandleModuleCommunication = (message, sender, receiver) =>
+         {
+            foreach(Module mod in activeModules)
+            {
+               if(mod.Nickname == receiver)
+               {
+                  logger.LogGeneral($"Module {sender} is communicating with {receiver}", MyExtensions.Logging.LogLevel.Debug, LoaderName);
+                  mod.ProcessModuleCommunication(message, sender);
+               }
+            }
+         };
 
          //Step 5: write out our combined options file and hope it's correct. Also, dish out the
          //options loaded from the file to the different modules
