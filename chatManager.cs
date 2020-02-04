@@ -553,7 +553,7 @@ the actions of any user within the chat.".Replace("\n", " ");
          lock (managerLock)
          {
             Log("Enter allacceptedtagsforuser lock", MyExtensions.Logging.LogLevel.Locks);
-            allTags = ChatSettings.AcceptedTags.Union(rooms.Where(x => x.Value.Users.Contains(user) && !(x.Value.Users.Count == 2 && x.Value.Users.Any(y => GetUser(y).ShadowBanned && y != user))).Select(x => x.Key)).ToList();
+            allTags = ChatSettings.AcceptedTags.Union(rooms.Where(x => x.Value.Users.Contains(user) /*&& !(x.Value.Users.Count == 2 && x.Value.Users.Any(y => GetUser(y).ShadowBanned && y != user))*/).Select(x => x.Key)).ToList();
             //allTags.Add(MessageBaseJSONObject.DefaultTag);
             Log("Exit allacceptedtagsforuser lock", MyExtensions.Logging.LogLevel.Locks);
          }
@@ -582,7 +582,7 @@ the actions of any user within the chat.".Replace("\n", " ");
             if(rooms.ContainsKey(room))
             {
                var loggedInUsers = LoggedInUsers();
-               pmUsers = rooms[room].Users.Where(x => !GetUser(x).ShadowBanned).Select(x => 
+               pmUsers = rooms[room].Users/*.Where(x => !GetUser(x).ShadowBanned)*/.Select(x => 
                      new UserInfo(users[x], loggedInUsers.ContainsKey(x))).ToList();
             }
 
@@ -646,6 +646,10 @@ the actions of any user within the chat.".Replace("\n", " ");
             if (newUsers.Count < 1)
             {
                error = "There's not enough people to make the room";
+            }
+            else if(users[creator].ShadowBanned)
+            {
+               error = "A backend problem occurred and the PM room couldn't be created. This is a bug!";
             }
             else if (rooms.Any(x => x.Value.Users.SetEquals(newUsers)))
             {
@@ -1005,7 +1009,8 @@ the actions of any user within the chat.".Replace("\n", " ");
                //Glop them all together. 
                .SelectMany(x => x.Value.Where(
                   //Oh, but we only want to glop stuff that we're allowed to receive!
-                  y => y.IsSendable() && y.RealRecipientList(loggedInUserKeys).Contains(user)) 
+                  y => y.IsSendable() && y.RealRecipientList(loggedInUserKeys).Contains(user) &&
+                       (y.sender.uid == user || !GetUser(y.sender.uid).ShadowBanned)) 
                   //Only take the amount that the user wants
                   .Take(messageCount))
                .OrderBy(x => x.id).ToList();
